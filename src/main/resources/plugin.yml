@@ -1,0 +1,27 @@
+main: com.cavetale.halloween.HalloweenPlugin
+name: Halloween
+
+version: 0.1
+api-version: 1.17
+
+author: StarTux
+description: Halloween Plugin 2021
+website: https://github.com/StarTux/Halloween
+
+depend: [Core, Area, Resident]
+softdepend: []
+
+commands:
+
+  halloween:
+    aliases: []
+    description: Halloween Command
+    permission: halloween.halloween
+    usage: |-
+      /halloween
+
+permissions:
+
+  halloween.halloween:
+    description: Use /halloween
+    default: op
