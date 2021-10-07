@@ -1,6 +1,7 @@
 package com.cavetale.halloween;
 
 import com.cavetale.core.event.player.PluginPlayerEvent;
+import com.cavetale.halloween.attraction.Attraction;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;

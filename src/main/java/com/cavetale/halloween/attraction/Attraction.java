@@ -1,14 +1,17 @@
-package com.cavetale.halloween;
+package com.cavetale.halloween.attraction;
 
 import com.cavetale.area.struct.Cuboid;
 import com.cavetale.core.event.player.PluginPlayerEvent;
 import com.cavetale.core.util.Json;
+import com.cavetale.halloween.HalloweenPlugin;
 import com.cavetale.resident.PluginSpawn;
 import com.cavetale.resident.ZoneType;
 import com.cavetale.resident.save.Loc;
 import java.io.File;
 import java.time.Duration;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import lombok.Getter;
 import lombok.NonNull;
 import net.kyori.adventure.text.Component;
@@ -21,73 +24,71 @@ import org.bukkit.entity.Player;
 
 /**
  * Base class for all attractions.
+ * @param <T> the save tag class
  */
 @Getter
-public abstract class Attraction {
+public abstract class Attraction<T extends Object> {
     protected final HalloweenPlugin plugin;
     protected final String name;
     protected final List<Cuboid> allAreas;
     protected final File saveFile;
     protected final Cuboid mainArea;
+    protected final Class<T> saveTagClass;
     protected PluginSpawn mainVillager;
+    protected final Random random = ThreadLocalRandom.current();
+    protected T saveTag;
 
-    static Attraction of(HalloweenPlugin plugin, @NonNull final String name, @NonNull final List<Cuboid> areaList) {
+    public static Attraction of(HalloweenPlugin plugin, @NonNull final String name, @NonNull final List<Cuboid> areaList) {
         if (areaList.isEmpty()) throw new IllegalArgumentException(name + ": area list is empty");
         if (areaList.get(0).name == null) throw new IllegalArgumentException(name + ": first area has no name!");
         String typeName = areaList.get(0).name;
         switch (typeName) {
-        case "play_music": return new PlayMusicAttraction(plugin, name, areaList);
+        case "repeat_melody": return new RepeatMelodyAttraction(plugin, name, areaList);
         default:
             throw new IllegalArgumentException(name + ": first area has unknown name: " + typeName);
         }
     }
 
-    protected Attraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList) {
+    protected Attraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList, final Class<T> saveTagClass) {
         this.plugin = plugin;
         this.name = name;
         this.allAreas = areaList;
-        this.saveFile = new File(plugin.attractionsFolder, name + ".json");
+        this.saveFile = new File(plugin.getAttractionsFolder(), name + ".json");
         this.mainArea = areaList.get(0);
+        this.saveTagClass = saveTagClass;
         for (Cuboid area : areaList) {
             if ("npc".equals(area.name)) {
                 Location location = area.min.toBlock(plugin.getWorld()).getLocation().add(0.5, 0.0, 0.5);
                 mainVillager = PluginSpawn.register(plugin, ZoneType.HALLOWEEN, Loc.of(location));
-                mainVillager.setOnPlayerClick(this::onClickMainVillager);
+                mainVillager.setOnPlayerClick(this::clickMainVillager);
             }
         }
     }
 
-    protected final void load() {
-        Object saveTag = getSaveTag();
-        if (saveTag != null) {
-            Json.save(saveFile, saveTag, true);
+    public final void load() {
+        if (saveFile.exists() && saveTagClass != null) {
+            saveTag = Json.load(saveFile, saveTagClass);
         }
         onLoad();
     }
 
-    protected final void save() {
+    public final void save() {
         onSave();
-        if (saveFile.exists()) {
-            Class<?> saveTagClass = getSaveTagClass();
-            if (saveTagClass != null) {
-                Object saveTag = Json.load(saveFile, saveTagClass);
-                if (saveTag != null) {
-                    setSaveTag(saveTag);
-                }
-            }
+        if (saveTag != null) {
+            Json.save(saveFile, saveTag, true);
         }
     }
 
-    protected final void enable() {
+    public final void enable() {
         plugin.getLogger().info("Enabling " + name);
         onEnable();
     }
 
-    protected final void disable() {
+    public final void disable() {
         onDisable();
     }
 
-    protected final void tick() {
+    public final void tick() {
         onTick();
     }
 
@@ -127,23 +128,22 @@ public abstract class Attraction {
     protected void onSave() { }
 
     /**
-     * Set the save tag after it was loaded.
+     * Override me to tell if this attraction is currently playing!
      */
-    protected void setSaveTag(Object saveTag) { }
+    protected abstract boolean isPlaying();
 
     /**
-     * Return the save tag.
+     * Override me when a player starts the game!
      */
-    protected Object getSaveTag() {
-        return null;
+    protected abstract void start(Player player);
+
+    protected final void clickMainVillager(Player player) {
+        // TODO dialogue
+        // TODO cooldowns
+        // TODO price of admission
+        if (isPlaying()) return;
+        start(player);
     }
 
-    protected final Class<?> getSaveTagClass() {
-        Object saveTag = getSaveTag();
-        return saveTag != null ? saveTag.getClass() : null;
-    }
-
-    protected void onClickMainVillager(Player player) { }
-
-    protected void onPluginPlayer(PluginPlayerEvent event) { }
+    public void onPluginPlayer(PluginPlayerEvent event) { }
 }

@@ -1,6 +1,7 @@
 package com.cavetale.halloween;
 
 import com.cavetale.core.util.Json;
+import com.cavetale.halloween.attraction.Attraction;
 import java.io.File;
 import java.time.Duration;
 import java.util.HashMap;
@@ -19,7 +20,7 @@ public final class Session {
         this.plugin = plugin;
         this.uuid = player.getUniqueId();
         this.name = player.getName();
-        this.saveFile = new File(plugin.playersFolder, uuid + ".json");
+        this.saveFile = new File(plugin.getPlayersFolder(), uuid + ".json");
     }
 
     protected void load() {

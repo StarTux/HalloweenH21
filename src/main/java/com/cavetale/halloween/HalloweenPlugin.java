@@ -2,6 +2,7 @@ package com.cavetale.halloween;
 
 import com.cavetale.area.struct.AreasFile;
 import com.cavetale.area.struct.Cuboid;
+import com.cavetale.halloween.attraction.Attraction;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,23 +10,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class HalloweenPlugin extends JavaPlugin {
+    @Getter protected static HalloweenPlugin instance;
     protected static final String WORLD = "halloween";
     protected static final String AREAS_FILE = "Halloween";
     HalloweenCommand halloweenCommand = new HalloweenCommand(this);
     EventListener eventListener = new EventListener(this);
     protected final Map<String, Attraction> attractionsMap = new HashMap<>();
     protected final Map<UUID, Session> sessionsMap = new HashMap<>();
-    protected File attractionsFolder;
-    protected File playersFolder;
+    @Getter protected File attractionsFolder;
+    @Getter protected File playersFolder;
 
     @Override
     public void onEnable() {
+        instance = this;
         halloweenCommand.enable();
         eventListener.enable();
         attractionsFolder = new File(getDataFolder(), "attractions");
@@ -38,9 +42,11 @@ public final class HalloweenPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        clearSessions();
+        clearAttractions();
     }
 
-    protected World getWorld() {
+    public World getWorld() {
         return Bukkit.getWorld(WORLD);
     }
 
@@ -100,7 +106,7 @@ public final class HalloweenPlugin extends JavaPlugin {
         }
     }
 
-    protected List<Player> getPlayersIn(Cuboid area) {
+    public List<Player> getPlayersIn(Cuboid area) {
         List<Player> result = new ArrayList<>();
         for (Player player : getWorld().getPlayers()) {
             if (area.contains(player.getLocation())) {
