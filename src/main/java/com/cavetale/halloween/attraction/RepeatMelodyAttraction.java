@@ -25,10 +25,10 @@ import org.bukkit.Note.Tone;
 import org.bukkit.Note;
 import org.bukkit.entity.Player;
 
-public final class RepeatMelodyAttraction extends Attraction<SaveTag> {
+public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttraction.SaveTag> {
     protected Melody melody = null;
 
-    RepeatMelodyAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList) {
+    protected RepeatMelodyAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList) {
         super(plugin, name, areaList, SaveTag.class);
     }
 
@@ -159,53 +159,56 @@ public final class RepeatMelodyAttraction extends Attraction<SaveTag> {
             changeState(State.IDLE);
         }
     }
-}
 
-@RequiredArgsConstructor
-enum State {
-    IDLE {
-        @Override void enter(RepeatMelodyAttraction instance) {
-            instance.saveTag.currentPlayer = null;
-            instance.saveTag.melody = null;
-            instance.melody = null;
-        }
 
-        @Override void exit(RepeatMelodyAttraction instance) {
-        }
-    },
-    PLAY {
-        @Override void enter(RepeatMelodyAttraction instance) {
-            instance.saveTag.lastNotePlayed = System.currentTimeMillis();
-            instance.saveTag.noteIndex = 0;
-        }
+    @RequiredArgsConstructor
+    enum State {
+        IDLE {
+            @Override void enter(RepeatMelodyAttraction instance) {
+                instance.saveTag.currentPlayer = null;
+                instance.saveTag.melody = null;
+                instance.melody = null;
+            }
 
-        @Override State tick(RepeatMelodyAttraction instance) {
-            return instance.tickPlay();
-        }
-    },
-    REPLAY {
-        @Override void enter(RepeatMelodyAttraction instance) {
-            instance.onEnterReplay();
-        }
+            @Override void exit(RepeatMelodyAttraction instance) {
+            }
+        },
+        PLAY {
+            @Override void enter(RepeatMelodyAttraction instance) {
+                instance.saveTag.lastNotePlayed = System.currentTimeMillis();
+                instance.saveTag.noteIndex = 0;
+            }
 
-        @Override State tick(RepeatMelodyAttraction instance) {
-            return instance.tickReplay();
-        }
-    };
+            @Override State tick(RepeatMelodyAttraction instance) {
+                return instance.tickPlay();
+            }
+        },
+        REPLAY {
+            @Override void enter(RepeatMelodyAttraction instance) {
+                instance.onEnterReplay();
+            }
 
-    void enter(RepeatMelodyAttraction instance) { }
-    void exit(RepeatMelodyAttraction instance) { }
-    State tick(RepeatMelodyAttraction instance) {
-        return null;
+            @Override State tick(RepeatMelodyAttraction instance) {
+                return instance.tickReplay();
+            }
+        };
+
+        void enter(RepeatMelodyAttraction instance) { }
+
+        void exit(RepeatMelodyAttraction instance) { }
+
+        State tick(RepeatMelodyAttraction instance) {
+            return null;
+        }
     }
-}
 
-final class SaveTag {
-    protected State state = State.IDLE;
-    protected UUID currentPlayer = null;
-    protected int noteIndex;
-    protected int maxNoteIndex;
-    protected long lastNotePlayed;
-    protected long playerTimeout;
-    protected List<String> melody;
+    static final class SaveTag {
+        protected State state = State.IDLE;
+        protected UUID currentPlayer = null;
+        protected int noteIndex;
+        protected int maxNoteIndex;
+        protected long lastNotePlayed;
+        protected long playerTimeout;
+        protected List<String> melody;
+    }
 }

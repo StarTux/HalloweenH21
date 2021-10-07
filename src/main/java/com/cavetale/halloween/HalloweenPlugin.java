@@ -20,8 +20,8 @@ public final class HalloweenPlugin extends JavaPlugin {
     @Getter protected static HalloweenPlugin instance;
     protected static final String WORLD = "halloween";
     protected static final String AREAS_FILE = "Halloween";
-    HalloweenCommand halloweenCommand = new HalloweenCommand(this);
-    EventListener eventListener = new EventListener(this);
+    protected final HalloweenCommand halloweenCommand = new HalloweenCommand(this);
+    protected final EventListener eventListener = new EventListener(this);
     protected final Map<String, Attraction> attractionsMap = new HashMap<>();
     protected final Map<UUID, Session> sessionsMap = new HashMap<>();
     @Getter protected File attractionsFolder;

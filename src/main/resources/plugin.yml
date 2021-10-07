@@ -8,7 +8,7 @@ author: StarTux
 description: Halloween Plugin 2021
 website: https://github.com/StarTux/Halloween
 
-depend: [Core, Area, Resident]
+depend: [Core, Mytems, Area, Resident]
 softdepend: []
 
 commands:

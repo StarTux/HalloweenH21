@@ -44,6 +44,7 @@ public abstract class Attraction<T extends Object> {
         String typeName = areaList.get(0).name;
         switch (typeName) {
         case "repeat_melody": return new RepeatMelodyAttraction(plugin, name, areaList);
+        case "shoot_target": return new ShootTargetAttraction(plugin, name, areaList);
         default:
             throw new IllegalArgumentException(name + ": first area has unknown name: " + typeName);
         }
