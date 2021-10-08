@@ -11,14 +11,12 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
-import org.bukkit.Bukkit;
 import org.bukkit.Instrument;
 import org.bukkit.Location;
 import org.bukkit.Note.Tone;
@@ -29,7 +27,7 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
     protected Melody melody = null;
 
     protected RepeatMelodyAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList) {
-        super(plugin, name, areaList, SaveTag.class);
+        super(plugin, name, areaList, SaveTag.class, SaveTag::new);
     }
 
     @Override
@@ -98,7 +96,7 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
     }
 
     protected State tickPlay() {
-        Player player = Bukkit.getPlayer(saveTag.currentPlayer);
+        Player player = getCurrentPlayer();
         if (player == null || !mainArea.contains(player.getLocation())) return State.IDLE;
         long now = System.currentTimeMillis();
         if (now < saveTag.lastNotePlayed + 666L) return null;
@@ -111,13 +109,13 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
     protected void onEnterReplay() {
         saveTag.noteIndex = 0;
         saveTag.playerTimeout = System.currentTimeMillis() + 10000L;
-        Player player = Bukkit.getPlayer(saveTag.currentPlayer);
+        Player player = getCurrentPlayer();
         if (player == null) return;
         player.sendActionBar(Component.text("Your turn!", NamedTextColor.GREEN));
     }
 
     protected State tickReplay() {
-        Player player = Bukkit.getPlayer(saveTag.currentPlayer);
+        Player player = getCurrentPlayer();
         if (player == null || !mainArea.contains(player.getLocation())) return State.IDLE;
         if (System.currentTimeMillis() > saveTag.playerTimeout) {
             player.closeInventory();
@@ -155,7 +153,7 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
             }
         } else {
             player.closeInventory();
-            wrong(player);
+            fail(player);
             changeState(State.IDLE);
         }
     }
@@ -202,9 +200,8 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
         }
     }
 
-    static final class SaveTag {
+    static final class SaveTag extends Attraction.SaveTag {
         protected State state = State.IDLE;
-        protected UUID currentPlayer = null;
         protected int noteIndex;
         protected int maxNoteIndex;
         protected long lastNotePlayed;

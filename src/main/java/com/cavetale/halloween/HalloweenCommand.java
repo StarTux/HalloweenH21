@@ -22,7 +22,7 @@ public final class HalloweenCommand extends AbstractCommand<HalloweenPlugin> {
             .senderCaller(this::info);
         rootNode.addChild("reload").denyTabCompletion()
             .description("Reload areas")
-            .senderCaller(this::info);
+            .senderCaller(this::reload);
         rootNode.addChild("melody").arguments("<melody> [speed] [player]")
             .description("Play melody")
             .completers(CommandArgCompleter.enumLowerList(Melodies.class),
