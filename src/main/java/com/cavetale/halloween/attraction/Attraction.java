@@ -26,6 +26,10 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 /**
  * Base class for all attractions.
@@ -51,6 +55,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         switch (typeName) {
         case "repeat_melody": return new RepeatMelodyAttraction(plugin, name, areaList);
         case "shoot_target": return new ShootTargetAttraction(plugin, name, areaList);
+        case "find_spiders": return new FindSpidersAttraction(plugin, name, areaList);
         default:
             throw new IllegalArgumentException(name + ": first area has unknown name: " + typeName);
         }
@@ -171,6 +176,14 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     protected void onLoad() { }
 
     protected void onSave() { }
+
+    public void onEntityDamage(EntityDamageEvent event) { }
+
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) { }
+
+    public void onPlayerInteract(PlayerInteractEvent event) { }
+
+    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) { }
 
     /**
      * Override me when a player starts the game!

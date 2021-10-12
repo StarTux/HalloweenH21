@@ -6,13 +6,19 @@ import com.cavetale.halloween.attraction.ShootTargetAttraction;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -26,21 +32,21 @@ public final class EventListener implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    void onPlayerJoin(PlayerJoinEvent event) {
+    protected void onPlayerJoin(PlayerJoinEvent event) {
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    void onPlayerQuit(PlayerQuitEvent event) {
+    protected void onPlayerQuit(PlayerQuitEvent event) {
         plugin.clearSession(event.getPlayer().getUniqueId());
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+    protected void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
         plugin.clearSession(event.getPlayer().getUniqueId());
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    void onPluginPlayer(PluginPlayerEvent event) {
+    protected void onPluginPlayer(PluginPlayerEvent event) {
         Player player = event.getPlayer();
         if (!plugin.getWorld().equals(player.getWorld())) return;
         for (Attraction attraction : new ArrayList<>(plugin.attractionsMap.values())) {
@@ -51,15 +57,55 @@ public final class EventListener implements Listener {
     }
 
     @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
-    void onProjectileHit(ProjectileHitEvent event) {
+    protected void onProjectileHit(ProjectileHitEvent event) {
         Projectile entity = event.getEntity();
         if (!plugin.getWorld().equals(entity.getWorld())) return;
-        for (Attraction attraction : new ArrayList<>(plugin.attractionsMap.values())) {
+        for (Attraction attraction : plugin.attractionsMap.values()) {
             if (!attraction.isInArea(entity.getLocation())) continue;
             if (attraction instanceof ShootTargetAttraction) {
                 ((ShootTargetAttraction) attraction).onProjectileHit(event);
             }
             break;
+        }
+    }
+
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
+    protected void onEntityDamage(EntityDamageEvent event) {
+        Entity entity = event.getEntity();
+        Location location = entity.getLocation();
+        for (Attraction attraction : plugin.attractionsMap.values()) {
+            if (!attraction.isInArea(location)) continue;
+            attraction.onEntityDamage(event);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
+    protected void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        Entity entity = event.getEntity();
+        Location location = entity.getLocation();
+        for (Attraction attraction : plugin.attractionsMap.values()) {
+            if (!attraction.isInArea(location)) continue;
+            attraction.onEntityDamageByEntity(event);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
+    protected void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        Entity entity = event.getRightClicked();
+        Location location = entity.getLocation();
+        for (Attraction attraction : plugin.attractionsMap.values()) {
+            if (!attraction.isInArea(location)) continue;
+            attraction.onPlayerInteractEntity(event);
+        }
+    }
+
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
+    protected void onPlayerInteract(PlayerInteractEvent event) {
+        if (!event.hasBlock()) return;
+        Location location = event.getClickedBlock().getLocation();
+        for (Attraction attraction : plugin.attractionsMap.values()) {
+            if (!attraction.isInArea(location)) continue;
+            attraction.onPlayerInteract(event);
         }
     }
 }
