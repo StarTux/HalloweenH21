@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
@@ -25,9 +26,11 @@ import org.bukkit.entity.Player;
 
 public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttraction.SaveTag> {
     protected Melody melody = null;
+    @Getter final Component displayName = Component.text("Play the Melody", NamedTextColor.DARK_RED);
 
     protected RepeatMelodyAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList) {
         super(plugin, name, areaList, SaveTag.class, SaveTag::new);
+        this.doesRequireInstrument = true;
     }
 
     @Override
@@ -58,6 +61,11 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
         changeState(State.PLAY);
     }
 
+    @Override
+    protected void stop() {
+        changeState(State.IDLE);
+    }
+
     private void changeState(@NonNull State newState) {
         saveTag.state.exit(this);
         saveTag.state = newState;
@@ -84,7 +92,7 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
         Tone[] tones = Tone.values();
         List<Tone> semis = new ArrayList<>(List.of(tones));
         Collections.shuffle(semis, random);
-        semis = semis.subList(0, 1 + random.nextInt(4));
+        semis = semis.subList(0, 4);
         Semitone semitone = random.nextBoolean() ? Semitone.SHARP : Semitone.FLAT;
         for (int i = 0; i < 8; i += 1) {
             Tone tone = tones[random.nextInt(tones.length)];
@@ -141,6 +149,8 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
                 player.closeInventory();
                 if (saveTag.maxNoteIndex >= melody.size()) {
                     victory(player);
+                    prepareReward(player, true);
+                    plugin.sessionOf(player).setCooldown(this, Duration.ofMinutes(20));
                     changeState(State.IDLE);
                     return;
                 } else {

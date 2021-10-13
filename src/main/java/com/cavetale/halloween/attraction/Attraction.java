@@ -1,9 +1,15 @@
 package com.cavetale.halloween.attraction;
 
 import com.cavetale.area.struct.Cuboid;
+import com.cavetale.area.struct.Vec3i;
 import com.cavetale.core.event.player.PluginPlayerEvent;
+import com.cavetale.core.font.Unicode;
+import com.cavetale.core.font.VanillaItems;
 import com.cavetale.core.util.Json;
 import com.cavetale.halloween.HalloweenPlugin;
+import com.cavetale.halloween.Session;
+import com.cavetale.halloween.util.Gui;
+import com.cavetale.mytems.Mytems;
 import com.cavetale.resident.PluginSpawn;
 import com.cavetale.resident.ZoneType;
 import com.cavetale.resident.save.Loc;
@@ -18,11 +24,15 @@ import lombok.Getter;
 import lombok.NonNull;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
@@ -30,6 +40,9 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 
 /**
  * Base class for all attractions.
@@ -47,6 +60,9 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     protected final Random random = ThreadLocalRandom.current();
     protected T saveTag;
     protected Supplier<T> saveTagSupplier;
+    protected Vec3i npcVector;
+    protected Mytems firstCompletionMytems = null;
+    protected boolean doesRequireInstrument;
 
     public static Attraction of(HalloweenPlugin plugin, @NonNull final String name, @NonNull final List<Cuboid> areaList) {
         if (areaList.isEmpty()) throw new IllegalArgumentException(name + ": area list is empty");
@@ -56,6 +72,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         case "repeat_melody": return new RepeatMelodyAttraction(plugin, name, areaList);
         case "shoot_target": return new ShootTargetAttraction(plugin, name, areaList);
         case "find_spiders": return new FindSpidersAttraction(plugin, name, areaList);
+        case "open_chest": return new OpenChestAttraction(plugin, name, areaList);
         default:
             throw new IllegalArgumentException(name + ": first area has unknown name: " + typeName);
         }
@@ -72,6 +89,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         this.saveTagSupplier = saveTagSupplier;
         for (Cuboid area : areaList) {
             if ("npc".equals(area.name)) {
+                npcVector = area.min;
                 Location location = area.min.toBlock(plugin.getWorld()).getLocation().add(0.5, 0.0, 0.5);
                 mainVillager = PluginSpawn.register(plugin, ZoneType.HALLOWEEN, Loc.of(location));
                 mainVillager.setOnPlayerClick(this::clickMainVillager);
@@ -120,7 +138,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         player.showTitle(Title.title(Component.text("Wrong", NamedTextColor.DARK_RED),
                                      Component.text("Try Again", NamedTextColor.DARK_RED)));
         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, SoundCategory.MASTER, 2.0f, 0.5f);
-        plugin.sessionOf(player).setCooldown(this, Duration.ofSeconds(3));
+        plugin.sessionOf(player).setCooldown(this, Duration.ofSeconds(10));
     }
 
     protected final void progress(Player player) {
@@ -128,18 +146,13 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     }
 
     protected final void victory(Player player) {
-        // TODO Regular reward
-        // TODO cooldown
         Component message = Component.text("Complete", NamedTextColor.GOLD);
         player.showTitle(Title.title(message, Component.text("Good Job!", NamedTextColor.GOLD)));
         player.sendMessage(message);
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.MASTER, 0.3f, 2.0f);
-        plugin.sessionOf(player).setCooldown(this, Duration.ofMinutes(20));
     }
 
     protected final void perfect(Player player) {
-        // TODO Perfect reward
-        // TODO cooldown
         Component message = Component.join(JoinConfiguration.noSeparators(), new Component[] {
                 Component.text("P", NamedTextColor.GOLD),
                 Component.text("E", NamedTextColor.RED),
@@ -153,7 +166,6 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         player.showTitle(Title.title(message, Component.empty()));
         player.sendMessage(message);
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.MASTER, 0.3f, 2.0f);
-        plugin.sessionOf(player).setCooldown(this, Duration.ofMinutes(20));
     }
 
     /**
@@ -162,10 +174,18 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     public abstract boolean isPlaying();
 
     public final Player getCurrentPlayer() {
-        return saveTag.currentPlayer != null
+        Player player = saveTag.currentPlayer != null
             ? Bukkit.getPlayer(saveTag.currentPlayer)
             : null;
+        if (player == null) return null;
+        if (!isInArea(player.getLocation())) {
+            plugin.sessionOf(player).setCooldown(this, Duration.ofMinutes(1));
+            return null;
+        }
+        return player;
     }
+
+    protected abstract Component getDisplayName();
 
     protected abstract void onTick();
 
@@ -185,16 +205,250 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
 
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event) { }
 
+    public final void onPlayerQuit(PlayerQuitEvent event) {
+        if (isPlaying() && event.getPlayer().equals(getCurrentPlayer())) {
+            plugin.sessionOf(event.getPlayer()).setCooldown(this, Duration.ofMinutes(1));
+            stop();
+        }
+    }
+
+    /**
+     * Override for a custom prize.
+     */
+    protected final ItemStack getFirstCompletionReward(Player player) {
+        if (firstCompletionMytems != null) {
+            return firstCompletionMytems.createItemStack(player);
+        }
+        return Mytems.HALLOWEEN_TOKEN.createItemStack(player);
+    }
+
+    /**
+     * Override for a custom prize.
+     */
+    protected ItemStack getRegularCompletionReward(Player player) {
+        List<Mytems> pool = List.of(Mytems.CANDY_CORN,
+                                    Mytems.CHOCOLATE_BAR,
+                                    Mytems.LOLLIPOP,
+                                    Mytems.ORANGE_CANDY);
+        Mytems mytems = pool.get(random.nextInt(pool.size()));
+        return mytems.createItemStack(player);
+    }
+
+    /**
+     * Give unique prize in a chest and update the session.
+     */
+    protected final void giveFirstCompletionReward(Player player) {
+        Session session = plugin.sessionOf(player);
+        session.clearPrizeWaiting(this);
+        session.lockUnique(this);
+        session.save();
+        giveInGui(player, getFirstCompletionReward(player));
+    }
+
+    /**
+     * Give regular prize in a chest and update the session.
+     */
+    protected final void giveRegularCompletionReward(Player player) {
+        Session session = plugin.sessionOf(player);
+        session.clearPrizeWaiting(this);
+        session.save();
+        giveInGui(player, getRegularCompletionReward(player));
+    }
+
+    /**
+     * Prepare unique prize for when they next click the NPC.
+     * Also update the session.
+     */
+    protected final void prepareFirstCompletionReward(Player player) {
+        Session session = plugin.sessionOf(player);
+        session.setFirstCompletionPrizeWaiting(this);
+        session.lockUnique(this);
+        session.save();
+    }
+
+    /**
+     * Prepare regular prize for when they next click the NPC.
+     * Also update the session.
+     */
+    protected final void prepareRegularCompletionReward(Player player) {
+        Session session = plugin.sessionOf(player);
+        session.setRegularCompletionPrizeWaiting(this);
+        session.save();
+    }
+
+    /**
+     * Give the appropriate reward and update the session.
+     */
+    protected final void giveReward(Player player, boolean appliesForFirstCompletion) {
+        Session session = plugin.sessionOf(player);
+        if (appliesForFirstCompletion && !session.isUniqueLocked(this)) {
+            giveFirstCompletionReward(player);
+        } else {
+            giveRegularCompletionReward(player);
+        }
+    }
+
+    /**
+     * Prepare the appropriate reward for when they next click the
+     * NPC, and update the session.
+     */
+    protected final void prepareReward(Player player, boolean appliesForFirstCompletion) {
+        Session session = plugin.sessionOf(player);
+        if (appliesForFirstCompletion && !session.isUniqueLocked(this)) {
+            prepareFirstCompletionReward(player);
+        } else {
+            prepareRegularCompletionReward(player);
+        }
+    }
+
+    protected final void giveInGui(Player player, ItemStack prize) {
+        Gui gui = new Gui(plugin);
+        gui.setItem(13, prize);
+        gui.setEditable(true);
+        gui.title(getDisplayName());
+        gui.onClose(evt -> {
+                for (ItemStack item : gui.getInventory()) {
+                    if (item == null || item.getType() == Material.AIR) continue;
+                    for (ItemStack drop : player.getInventory().addItem(item).values()) {
+                        player.getWorld().dropItem(player.getEyeLocation(), drop);
+                    }
+                }
+                player.playSound(player.getLocation(), Sound.BLOCK_CHEST_CLOSE, SoundCategory.BLOCKS, 1.0f, 1.0f);
+            });
+        gui.open(player);
+        player.playSound(player.getLocation(), Sound.BLOCK_CHEST_OPEN, SoundCategory.BLOCKS, 1.0f, 1.0f);
+    }
+
+    protected final boolean checkCooldown(Player player) {
+        Session session = plugin.sessionOf(player);
+        Duration cooldown = session.getCooldown(this);
+        if (cooldown != null) {
+            long minutes = cooldown.toMinutes();
+            long seconds = cooldown.toSeconds() % 60L;
+            Component message = Component.text("Give others a chance and wait "
+                                               + minutes + "m "
+                                               + seconds + "s",
+                                               NamedTextColor.RED);
+            player.sendMessage(message);
+            player.sendActionBar(message);
+            return false;
+        }
+        return true;
+    }
+
+    protected final boolean checkSomebodyPlaying(Player player) {
+        if (!isPlaying()) return true;
+        Player somebody = getCurrentPlayer();
+        if (player.equals(somebody)) return false; // fail silently
+        Component somebodyName = somebody != null
+            ? Component.text("Somebody")
+            : somebody.displayName();
+        Component message = Component.join(JoinConfiguration.noSeparators(), new Component[] {
+                Component.text("Please wait: "),
+                somebodyName,
+                Component.text(" is playing this right now"),
+            }).color(NamedTextColor.RED);
+        player.sendMessage(message);
+        player.sendActionBar(message);
+        return false;
+    }
+
+    protected final boolean checkInstrument(Player player) {
+        for (ItemStack itemStack : player.getInventory()) {
+            Mytems mytems = Mytems.forItem(itemStack);
+            if (mytems != null && mytems.category == Mytems.Category.MUSIC) {
+                return true;
+            }
+        }
+        Component message = Component.join(JoinConfiguration.noSeparators(), new Component[] {
+                Component.text("You don't have a "),
+                Mytems.ANGELIC_HARP.component,
+                Component.text("musical instrument!"),
+            }).color(NamedTextColor.RED);
+        player.sendMessage(message);
+        player.sendActionBar(message);
+        return false;
+    }
+
+    protected final boolean takeEntryFee(Player player) {
+        ItemStack entryFee = new ItemStack(Material.DIAMOND);
+        for (ItemStack itemStack : player.getInventory()) {
+            if (entryFee.isSimilar(itemStack)) {
+                itemStack.subtract(1);
+                return true;
+            }
+        }
+        Component message = Component.join(JoinConfiguration.noSeparators(), new Component[] {
+                Component.text("You don't have a "),
+                VanillaItems.DIAMOND.component,
+                Component.text("diamond!"),
+            }).color(NamedTextColor.RED);
+        player.sendMessage(message);
+        player.sendActionBar(message);
+        return false;
+    }
+
     /**
      * Override me when a player starts the game!
      */
     protected abstract void start(Player player);
 
+    protected abstract void stop();
+
     protected final void clickMainVillager(Player player) {
-        // TODO dialogue
-        // TODO cooldowns
-        // TODO price of admission
-        if (isPlaying()) return;
+        Session session = plugin.sessionOf(player);
+        int prizeWaiting = session.getPrizeWaiting(this);
+        if (prizeWaiting > 0) {
+            session.save();
+            ItemStack itemStack = prizeWaiting == 2
+                ? getFirstCompletionReward(player)
+                : getRegularCompletionReward(player);
+        }
+        if (!checkCooldown(player)) return;
+        if (!checkSomebodyPlaying(player)) return;
+        ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
+        book.editMeta(m -> {
+                BookMeta meta = (BookMeta) m;
+                Component page = Component.join(JoinConfiguration.noSeparators(), new Component[] {
+                        getDisplayName(),
+                        Component.newline(),
+                        Component.text("Halloween Game", NamedTextColor.DARK_GRAY),
+                        (doesRequireInstrument
+                         ? Component.text(" Requires Musical Instrument", NamedTextColor.RED)
+                         : Component.empty()),
+                        Component.newline(),
+                        Component.newline(),
+                        (!session.isUniqueLocked(this)
+                         ? Component.text(Unicode.CHECKBOX.character + " Not yet finished", NamedTextColor.DARK_GRAY)
+                         : Component.text(Unicode.CHECKED_CHECKBOX.character + " Finished", NamedTextColor.BLUE)),
+                        Component.newline(),
+                        Component.newline(),
+                        Component.text("Play this for the cost of 1 "),
+                        VanillaItems.DIAMOND.component,
+                        Component.text("Diamond?"),
+                        Component.newline(),
+                        Component.newline(),
+                        (Component.text("[Yes]", NamedTextColor.BLUE)
+                         .clickEvent(ClickEvent.runCommand("/hallow yes " + name))
+                         .hoverEvent(HoverEvent.showText(Component.text("Play this Game", NamedTextColor.GREEN)))),
+                        Component.space(),
+                        (Component.text("[No]", NamedTextColor.DARK_RED)
+                         .clickEvent(ClickEvent.runCommand("/hallow no " + name))
+                         .hoverEvent(HoverEvent.showText(Component.text("Goodbye!", NamedTextColor.RED)))),
+                    });
+                meta.setAuthor("Cavetale");
+                meta.title(getDisplayName());
+                meta.pages(List.of(page));
+            });
+        player.openBook(book);
+    }
+
+    public final void onClickYes(Player player) {
+        if (!checkCooldown(player)) return;
+        if (!checkSomebodyPlaying(player)) return;
+        if (doesRequireInstrument && !checkInstrument(player)) return;
+        if (!takeEntryFee(player)) return;
+        player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 2.0f);
         start(player);
     }
 
@@ -206,5 +460,9 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
 
     protected final void subtitle(Player player, Component component) {
         player.showTitle(Title.title(Component.empty(), component));
+    }
+
+    protected final void confetti(Player player, Location location) {
+        player.spawnParticle(Particle.SPELL_MOB, location, 16, 0.25, 0.25, 0.25, 1.0);
     }
 }

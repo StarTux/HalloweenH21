@@ -2,6 +2,8 @@ package com.cavetale.halloween.attraction;
 
 import com.cavetale.area.struct.Cuboid;
 import com.cavetale.area.struct.Vec3i;
+import com.cavetale.core.font.Unicode;
+import com.cavetale.core.font.VanillaItems;
 import com.cavetale.halloween.HalloweenPlugin;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -12,14 +14,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
@@ -43,6 +46,7 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
      * Ghast lifetime is from spawnGhastEntities() to clearGhastEntities().
      */
     private final Map<UUID, Vec3i> targetGhastMap = new HashMap<>();
+    @Getter final Component displayName = Component.text("Shoot the Targets", NamedTextColor.DARK_RED);
 
     protected ShootTargetAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList) {
         super(plugin, name, areaList, SaveTag.class, SaveTag::new);
@@ -72,6 +76,11 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
         saveTag.missed = 0;
         saveTag.currentRound = 0;
         changeState(State.WARMUP);
+    }
+
+    @Override
+    protected void stop() {
+        changeState(State.IDLE);
     }
 
     @Override
@@ -119,7 +128,7 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
             Vec3i targetBlock = Vec3i.of(hitBlock);
             if (!saveTag.targetBlocks.remove(targetBlock)) return;
             hitBlock.setType(Material.AIR);
-            player.spawnParticle(Particle.SPELL_MOB, projectile.getLocation(), 16, 0.25, 0.25, 0.25, 1.0);
+            confetti(player, projectile.getLocation());
             projectile.remove();
             saveTag.score += 1;
             saveTag.roundScore += 1;
@@ -131,7 +140,7 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
             Vec3i targetGhast = targetGhastMap.remove(hitEntity.getUniqueId());
             if (targetGhast == null) return;
             hitEntity.remove();
-            player.spawnParticle(Particle.SPELL_MOB, projectile.getLocation(), 16, 0.25, 0.25, 0.25, 1.0);
+            confetti(player, projectile.getLocation());
             projectile.remove();
             if (!saveTag.targetGhasts.remove(targetGhast)) {
                 throw new IllegalStateException(name + ": no target ghast: " + targetGhast);
@@ -196,7 +205,7 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
 
     protected State tickWarmup() {
         Player player = getCurrentPlayer();
-        if (player == null || !isInArea(player.getLocation())) return State.IDLE;
+        if (player == null) return State.IDLE;
         long now = System.currentTimeMillis();
         if (now < saveTag.warmupStarted + WARMUP_TIME.toMillis()) {
             long seconds = (WARMUP_TIME.toMillis() - (now - saveTag.warmupStarted) - 1L) / 1000L + 1L;
@@ -226,9 +235,13 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
             long seconds = (SHOOT_TIME.toMillis() - (now - saveTag.shootingStarted) - 1L) / 1000L + 1L;
             if (secondsLeft != seconds) {
                 secondsLeft = seconds;
-                player.sendActionBar(Component.text(seconds, NamedTextColor.GOLD)
-                                     .append(Component.text(" " + saveTag.roundScore + "/" + saveTag.roundTargetCount,
-                                                            NamedTextColor.DARK_RED)));
+                player.sendActionBar(Component.join(JoinConfiguration.noSeparators(), new Component[] {
+                            Component.text(Unicode.WATCH.string + seconds, NamedTextColor.GOLD),
+                            Component.space(),
+                            VanillaItems.TARGET.component,
+                            Component.text(saveTag.roundScore + "/" + saveTag.roundTargetCount,
+                                           NamedTextColor.DARK_RED),
+                        }));
             }
             return null;
         }
@@ -239,8 +252,12 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
         if (saveTag.currentRound >= MAX_ROUNDS - 1) {
             if (perfectRound) {
                 perfect(player);
+                prepareReward(player, true);
+                plugin.sessionOf(player).setCooldown(this, Duration.ofSeconds(30));
             } else {
                 victory(player);
+                prepareReward(player, false);
+                plugin.sessionOf(player).setCooldown(this, Duration.ofMinutes(20));
             }
             return State.IDLE;
         }

@@ -2,6 +2,8 @@ package com.cavetale.halloween.attraction;
 
 import com.cavetale.area.struct.Cuboid;
 import com.cavetale.area.struct.Vec3i;
+import com.cavetale.core.font.Unicode;
+import com.cavetale.core.font.VanillaItems;
 import com.cavetale.halloween.HalloweenPlugin;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -9,12 +11,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import lombok.Getter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.Tag;
@@ -33,6 +36,7 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
     protected final Set<Vec3i> possibleSpiderBlocks;
     protected CaveSpider currentSpider;
     protected int secondsLeft;
+    @Getter final Component displayName = Component.text("Spider Hunt", NamedTextColor.DARK_RED);
 
     protected FindSpidersAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList) {
         super(plugin, name, areaList, SaveTag.class, SaveTag::new);
@@ -51,10 +55,15 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
     }
 
     @Override
-    public void start(Player player) {
+    protected void start(Player player) {
         saveTag.currentPlayer = player.getUniqueId();
         makeSpiderBlocks();
         changeState(State.SEARCH);
+    }
+
+    @Override
+    protected void stop() {
+        changeState(State.IDLE);
     }
 
     @Override
@@ -120,11 +129,13 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
     }
 
     public void spiderFound(Player player) {
-        player.spawnParticle(Particle.SPELL_MOB, currentSpider.getLocation(), 16, 0.25, 0.25, 0.25, 1.0);
+        confetti(player, currentSpider.getLocation().add(0, currentSpider.getHeight() * 0.5, 0));
         clearSpider();
         saveTag.spiderBlockIndex += 1;
         if (saveTag.spiderBlockIndex >= saveTag.spiderBlocks.size()) {
             victory(player);
+            prepareReward(player, true);
+            plugin.sessionOf(player).setCooldown(this, Duration.ofMinutes(20));
             changeState(State.IDLE);
         } else {
             progress(player);
@@ -179,9 +190,13 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
         int seconds = (int) ((timeout - now - 1) / 1000L) + 1;
         if (seconds != secondsLeft) {
             secondsLeft = seconds;
-            String progress = " " + (saveTag.spiderBlockIndex + 1) + "/" + saveTag.spiderBlocks.size();
-            player.sendActionBar(Component.text(seconds, NamedTextColor.GOLD)
-                                 .append(Component.text(progress, NamedTextColor.DARK_RED)));
+            String progress = (saveTag.spiderBlockIndex + 1) + "/" + saveTag.spiderBlocks.size();
+            player.sendActionBar(Component.join(JoinConfiguration.noSeparators(), new Component[] {
+                        Component.text(Unicode.WATCH.string + seconds, NamedTextColor.GOLD),
+                        Component.space(),
+                        VanillaItems.SPIDER_EYE.component,
+                        Component.text(progress, NamedTextColor.DARK_RED),
+                    }));
             player.playSound(currentSpider.getLocation(), Sound.ENTITY_SPIDER_HURT, SoundCategory.HOSTILE, 1.0f, 0.5f);
         }
         Location location = currentSpider.getLocation();

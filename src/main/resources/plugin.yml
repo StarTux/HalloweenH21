@@ -13,14 +13,24 @@ softdepend: []
 
 commands:
 
+  hallow:
+    aliases: []
+    description: Player Click Command
+    permission: halloween.player
+    usage: ''
+
   halloween:
     aliases: []
-    description: Halloween Command
+    description: Admin Command
     permission: halloween.halloween
     usage: |-
       /halloween
 
 permissions:
+
+  halloween.player:
+    description: Play the games
+    default: true
 
   halloween.halloween:
     description: Use /halloween

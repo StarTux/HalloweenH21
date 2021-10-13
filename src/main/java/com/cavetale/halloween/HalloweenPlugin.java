@@ -3,6 +3,7 @@ package com.cavetale.halloween;
 import com.cavetale.area.struct.AreasFile;
 import com.cavetale.area.struct.Cuboid;
 import com.cavetale.halloween.attraction.Attraction;
+import com.cavetale.halloween.util.Gui;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ public final class HalloweenPlugin extends JavaPlugin {
     protected static final String WORLD = "halloween";
     protected static final String AREAS_FILE = "Halloween";
     protected final HalloweenCommand halloweenCommand = new HalloweenCommand(this);
+    protected final HallowCommand hallowCommand = new HallowCommand(this);
     protected final EventListener eventListener = new EventListener(this);
     protected final Map<String, Attraction> attractionsMap = new HashMap<>();
     protected final Map<UUID, Session> sessionsMap = new HashMap<>();
@@ -31,6 +33,7 @@ public final class HalloweenPlugin extends JavaPlugin {
     public void onEnable() {
         instance = this;
         halloweenCommand.enable();
+        hallowCommand.enable();
         eventListener.enable();
         attractionsFolder = new File(getDataFolder(), "attractions");
         playersFolder = new File(getDataFolder(), "players");
@@ -38,6 +41,7 @@ public final class HalloweenPlugin extends JavaPlugin {
         playersFolder.mkdirs();
         loadAttractions();
         Bukkit.getScheduler().runTaskTimer(this, this::tick, 0L, 0L);
+        Gui.enable(this);
     }
 
     @Override
@@ -82,8 +86,7 @@ public final class HalloweenPlugin extends JavaPlugin {
 
     protected void clearSession(UUID uuid) {
         Session session = sessionsMap.remove(uuid);
-        if (session == null) return;
-        session.save();
+        if (session != null) session.save();
     }
 
     protected void loadAttractions() {

@@ -3,7 +3,6 @@ package com.cavetale.halloween;
 import com.cavetale.core.event.player.PluginPlayerEvent;
 import com.cavetale.halloween.attraction.Attraction;
 import com.cavetale.halloween.attraction.ShootTargetAttraction;
-import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -37,6 +36,9 @@ public final class EventListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     protected void onPlayerQuit(PlayerQuitEvent event) {
+        for (Attraction attraction : plugin.attractionsMap.values()) {
+            attraction.onPlayerQuit(event);
+        }
         plugin.clearSession(event.getPlayer().getUniqueId());
     }
 
@@ -49,7 +51,7 @@ public final class EventListener implements Listener {
     protected void onPluginPlayer(PluginPlayerEvent event) {
         Player player = event.getPlayer();
         if (!plugin.getWorld().equals(player.getWorld())) return;
-        for (Attraction attraction : new ArrayList<>(plugin.attractionsMap.values())) {
+        for (Attraction attraction : plugin.attractionsMap.values()) {
             if (!attraction.isInArea(player.getLocation())) continue;
             attraction.onPluginPlayer(event);
             break;
