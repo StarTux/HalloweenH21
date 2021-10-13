@@ -399,10 +399,14 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         Session session = plugin.sessionOf(player);
         int prizeWaiting = session.getPrizeWaiting(this);
         if (prizeWaiting > 0) {
+            session.clearPrizeWaiting(this);
             session.save();
-            ItemStack itemStack = prizeWaiting == 2
-                ? getFirstCompletionReward(player)
-                : getRegularCompletionReward(player);
+            if (prizeWaiting == 2) {
+                giveFirstCompletionReward(player);
+            } else {
+                giveRegularCompletionReward(player);
+            }
+            return;
         }
         if (!checkCooldown(player)) return;
         if (!checkSomebodyPlaying(player)) return;
