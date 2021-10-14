@@ -104,7 +104,7 @@ public final class OpenChestAttraction extends Attraction<OpenChestAttraction.Sa
         boolean bingo = roll < 0.15;
         giveReward(player, bingo);
         if (bingo) {
-            plugin.sessionOf(player).setCooldown(this, Duration.ofMinutes(20));
+            plugin.sessionOf(player).setCooldown(this, completionCooldown);
         } else {
             plugin.sessionOf(player).setCooldown(this, Duration.ofSeconds(30));
         }

@@ -92,7 +92,7 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
         Tone[] tones = Tone.values();
         List<Tone> semis = new ArrayList<>(List.of(tones));
         Collections.shuffle(semis, random);
-        semis = semis.subList(0, 4);
+        semis = new ArrayList<>(semis.subList(0, 4));
         Semitone semitone = random.nextBoolean() ? Semitone.SHARP : Semitone.FLAT;
         for (int i = 0; i < 8; i += 1) {
             Tone tone = tones[random.nextInt(tones.length)];
@@ -150,7 +150,7 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
                 if (saveTag.maxNoteIndex >= melody.size()) {
                     victory(player);
                     prepareReward(player, true);
-                    plugin.sessionOf(player).setCooldown(this, Duration.ofMinutes(20));
+                    plugin.sessionOf(player).setCooldown(this, completionCooldown);
                     changeState(State.IDLE);
                     return;
                 } else {

@@ -257,7 +257,7 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
             } else {
                 victory(player);
                 prepareReward(player, false);
-                plugin.sessionOf(player).setCooldown(this, Duration.ofMinutes(20));
+                plugin.sessionOf(player).setCooldown(this, completionCooldown);
             }
             return State.IDLE;
         }

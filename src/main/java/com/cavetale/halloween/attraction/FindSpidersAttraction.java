@@ -135,7 +135,7 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
         if (saveTag.spiderBlockIndex >= saveTag.spiderBlocks.size()) {
             victory(player);
             prepareReward(player, true);
-            plugin.sessionOf(player).setCooldown(this, Duration.ofMinutes(20));
+            plugin.sessionOf(player).setCooldown(this, completionCooldown);
             changeState(State.IDLE);
         } else {
             progress(player);
@@ -155,7 +155,7 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
                 return true;
             });
         Collections.shuffle(spiderBlocks);
-        saveTag.spiderBlocks = spiderBlocks.subList(0, Math.min(MAX_SPIDERS, spiderBlocks.size()));
+        saveTag.spiderBlocks = new ArrayList<>(spiderBlocks.subList(0, Math.min(MAX_SPIDERS, spiderBlocks.size())));
         saveTag.spiderBlockIndex = 0;
     }
 

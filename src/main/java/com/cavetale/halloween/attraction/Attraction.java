@@ -63,6 +63,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     protected Vec3i npcVector;
     protected Mytems firstCompletionMytems = null;
     protected boolean doesRequireInstrument;
+    protected Duration completionCooldown = Duration.ofMinutes(20);
 
     public static Attraction of(HalloweenPlugin plugin, @NonNull final String name, @NonNull final List<Cuboid> areaList) {
         if (areaList.isEmpty()) throw new IllegalArgumentException(name + ": area list is empty");
@@ -73,6 +74,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         case "shoot_target": return new ShootTargetAttraction(plugin, name, areaList);
         case "find_spiders": return new FindSpidersAttraction(plugin, name, areaList);
         case "open_chest": return new OpenChestAttraction(plugin, name, areaList);
+        case "find_blocks": return new FindBlocksAttraction(plugin, name, areaList);
         default:
             throw new IllegalArgumentException(name + ": first area has unknown name: " + typeName);
         }
