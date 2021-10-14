@@ -58,6 +58,7 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
     protected void start(Player player) {
         saveTag.currentPlayer = player.getUniqueId();
         makeSpiderBlocks();
+        startingGun(player);
         changeState(State.SEARCH);
     }
 

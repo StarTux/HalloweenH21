@@ -75,6 +75,7 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
         saveTag.score = 0;
         saveTag.missed = 0;
         saveTag.currentRound = 0;
+        startingGun(player);
         changeState(State.WARMUP);
     }
 

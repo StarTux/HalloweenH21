@@ -61,6 +61,7 @@ public final class FindBlocksAttraction extends Attraction<FindBlocksAttraction.
     @Override
     protected void start(Player player) {
         saveTag.currentPlayer = player.getUniqueId();
+        startingGun(player);
         changeState(State.SEARCH);
     }
 

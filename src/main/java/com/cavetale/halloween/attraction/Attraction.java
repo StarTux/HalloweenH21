@@ -75,6 +75,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         case "find_spiders": return new FindSpidersAttraction(plugin, name, areaList);
         case "open_chest": return new OpenChestAttraction(plugin, name, areaList);
         case "find_blocks": return new FindBlocksAttraction(plugin, name, areaList);
+        case "race": return new RaceAttraction(plugin, name, areaList);
         default:
             throw new IllegalArgumentException(name + ": first area has unknown name: " + typeName);
         }
@@ -127,6 +128,10 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
 
     public final void tick() {
         onTick();
+    }
+
+    protected final void startingGun(Player player) {
+        player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 2.0f);
     }
 
     protected final void timeout(Player player) {
@@ -182,12 +187,20 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         if (player == null) return null;
         if (!isInArea(player.getLocation())) {
             plugin.sessionOf(player).setCooldown(this, Duration.ofMinutes(1));
+            stop();
             return null;
         }
         return player;
     }
 
     protected abstract Component getDisplayName();
+
+    /**
+     * Description is shown in the book.
+     */
+    protected Component getDescription() {
+        return Component.empty();
+    }
 
     protected abstract void onTick();
 
@@ -322,6 +335,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     }
 
     protected final boolean checkCooldown(Player player) {
+        if (player.hasPermission("halloween.nocooldown")) return true;
         Session session = plugin.sessionOf(player);
         Duration cooldown = session.getCooldown(this);
         if (cooldown != null) {
@@ -418,11 +432,10 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
                 Component page = Component.join(JoinConfiguration.noSeparators(), new Component[] {
                         getDisplayName(),
                         Component.newline(),
-                        Component.text("Halloween Game", NamedTextColor.DARK_GRAY),
+                        getDescription(),
                         (doesRequireInstrument
-                         ? Component.text(" Requires Musical Instrument", NamedTextColor.RED)
+                         ? Component.text("\nRequires Musical Instrument", NamedTextColor.RED)
                          : Component.empty()),
-                        Component.newline(),
                         Component.newline(),
                         (!session.isUniqueLocked(this)
                          ? Component.text(Unicode.CHECKBOX.character + " Not yet finished", NamedTextColor.DARK_GRAY)
@@ -454,7 +467,6 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         if (!checkSomebodyPlaying(player)) return;
         if (doesRequireInstrument && !checkInstrument(player)) return;
         if (!takeEntryFee(player)) return;
-        player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 2.0f);
         start(player);
     }
 

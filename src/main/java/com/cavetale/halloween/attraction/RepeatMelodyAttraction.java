@@ -58,6 +58,7 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
         saveTag.currentPlayer = player.getUniqueId();
         makeMelody();
         saveTag.maxNoteIndex = 2;
+        startingGun(player);
         changeState(State.PLAY);
     }
 

@@ -35,3 +35,7 @@ permissions:
   halloween.halloween:
     description: Use /halloween
     default: op
+
+  halloween.nocooldown:
+    description: Skip cooldowns
+    default: op

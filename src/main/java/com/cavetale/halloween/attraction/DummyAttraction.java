@@ -38,6 +38,7 @@ public final class DummyAttraction extends Attraction<DummyAttraction.SaveTag> {
     @Override
     public void start(Player player) {
         saveTag.currentPlayer = player.getUniqueId();
+        startingGun(player);
         changeState(State.PLAY);
     }
 

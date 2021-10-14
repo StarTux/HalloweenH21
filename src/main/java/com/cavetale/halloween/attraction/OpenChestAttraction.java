@@ -52,6 +52,7 @@ public final class OpenChestAttraction extends Attraction<OpenChestAttraction.Sa
     public void start(Player player) {
         saveTag.currentPlayer = player.getUniqueId();
         placeChests(player);
+        startingGun(player);
         changeState(State.OPEN);
     }
 
