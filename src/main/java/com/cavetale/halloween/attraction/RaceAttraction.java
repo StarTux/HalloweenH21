@@ -72,7 +72,9 @@ public final class RaceAttraction extends Attraction<RaceAttraction.SaveTag> {
 
     @Override
     public Component getDescription() {
-        return Component.text("Race me once around the house? I bet you can't beat me; I'm super fast!");
+        return Component.text("Race me once around the house?"
+                              + " I bet you can't beat me,"
+                              + " I'm super fast!");
     }
 
     protected State tickCountdown(Player player) {

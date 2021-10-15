@@ -3,7 +3,6 @@ package com.cavetale.halloween;
 import com.cavetale.core.command.AbstractCommand;
 import com.cavetale.core.command.CommandArgCompleter;
 import com.cavetale.core.command.CommandWarn;
-import com.cavetale.halloween.music.Melodies;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -23,12 +22,11 @@ public final class HalloweenCommand extends AbstractCommand<HalloweenPlugin> {
         rootNode.addChild("reload").denyTabCompletion()
             .description("Reload areas")
             .senderCaller(this::reload);
-        rootNode.addChild("melody").arguments("<melody> [speed] [player]")
-            .description("Play melody")
-            .completers(CommandArgCompleter.enumLowerList(Melodies.class),
-                        CommandArgCompleter.integer(i -> i > 0),
+        rootNode.addChild("music").arguments("<melody> [player]")
+            .description("Play music")
+            .completers(CommandArgCompleter.enumLowerList(Music.class),
                         CommandArgCompleter.NULL)
-            .senderCaller(this::melody);
+            .senderCaller(this::music);
     }
 
     private int requireInt(String arg) {
@@ -54,37 +52,28 @@ public final class HalloweenCommand extends AbstractCommand<HalloweenPlugin> {
     }
 
 
-    protected boolean melody(CommandSender sender, String[] args) {
+    protected boolean music(CommandSender sender, String[] args) {
         if (args.length > 3) return false;
-        Melodies melodies;
-        int speed;
+        Music music;
         Player target;
         try {
-            melodies = Melodies.valueOf(args[0].toUpperCase());
+            music = Music.valueOf(args[0].toUpperCase());
         } catch (IllegalArgumentException iae) {
-            throw new CommandWarn("Melody not found: " + args[0]);
+            throw new CommandWarn("Music not found: " + args[0]);
         }
         if (args.length >= 2) {
-            speed = requireInt(args[1]);
-            if (speed < 1) throw new CommandWarn("Speed must be positive: " + speed);
-        } else {
-            speed = 2;
-        }
-        if (args.length >= 3) {
-            target = Bukkit.getPlayerExact(args[2]);
+            target = Bukkit.getPlayerExact(args[1]);
             if (target == null) {
-                throw new CommandWarn("Player not found: " + args[2]);
+                throw new CommandWarn("Player not found: " + args[1]);
             }
         } else {
             if (!(sender instanceof Player)) {
-                throw new CommandWarn("[fam:melody] Player expected!");
+                throw new CommandWarn("[fam:music] Player expected!");
             }
             target = (Player) sender;
         }
-        melodies.melody.play(target, speed, () -> {
-                sender.sendMessage(Component.text("Done playing!", NamedTextColor.YELLOW));
-            });
-        sender.sendMessage(Component.text("Playing " + melodies + " to " + target.getName(), NamedTextColor.YELLOW));
+        music.melody.play(target);
+        sender.sendMessage(Component.text("Playing " + music + " to " + target.getName(), NamedTextColor.YELLOW));
         return true;
     }
 }

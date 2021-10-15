@@ -95,6 +95,13 @@ public final class FindBlocksAttraction extends Attraction<FindBlocksAttraction.
         }
     }
 
+    @Override
+    public Component getDescription() {
+        return Component.text("My place is haunted!"
+                              + " a ghost keeps placing and rearranging blocks."
+                              + " Can you find them all?");
+    }
+
     protected static boolean isCeilingBlock(Block block) {
         if (block.isSolid() && block.getType().isOccluding()) return true;
         BlockData bd = block.getBlockData();

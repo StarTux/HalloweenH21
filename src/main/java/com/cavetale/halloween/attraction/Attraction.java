@@ -76,6 +76,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         case "open_chest": return new OpenChestAttraction(plugin, name, areaList);
         case "find_blocks": return new FindBlocksAttraction(plugin, name, areaList);
         case "race": return new RaceAttraction(plugin, name, areaList);
+        case "music_hero": return new MusicHeroAttraction(plugin, name, areaList);
         default:
             throw new IllegalArgumentException(name + ": first area has unknown name: " + typeName);
         }
@@ -445,7 +446,6 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
                         Component.text("Play this for the cost of 1 "),
                         VanillaItems.DIAMOND.component,
                         Component.text("Diamond?"),
-                        Component.newline(),
                         Component.newline(),
                         (Component.text("[Yes]", NamedTextColor.BLUE)
                          .clickEvent(ClickEvent.runCommand("/hallow yes " + name))
