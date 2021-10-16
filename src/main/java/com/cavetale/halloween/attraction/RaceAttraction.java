@@ -8,7 +8,6 @@ import com.cavetale.mytems.Mytems;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -25,7 +24,6 @@ import org.bukkit.entity.Player;
 public final class RaceAttraction extends Attraction<RaceAttraction.SaveTag> {
     protected static final Duration COUNTDOWN_TIME = Duration.ofSeconds(3);
     protected static final Duration MAX_RACE_TIME = Duration.ofSeconds(60);
-    @Getter protected final Component displayName = Component.text("Who's Faster?", NamedTextColor.RED);
     protected int secondsRaced;
     protected int countdownSeconds;
     protected List<Cuboid> aiCheckpointList = new ArrayList<>();
@@ -43,6 +41,7 @@ public final class RaceAttraction extends Attraction<RaceAttraction.SaveTag> {
                 startArea = area;
             }
         }
+        this.displayName = Component.text("Race Me", NamedTextColor.RED);
     }
 
     @Override

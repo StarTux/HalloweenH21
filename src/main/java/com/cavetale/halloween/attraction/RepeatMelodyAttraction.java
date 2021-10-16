@@ -11,7 +11,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
@@ -26,11 +25,11 @@ import org.bukkit.entity.Player;
 
 public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttraction.SaveTag> {
     protected Melody melody = null;
-    @Getter final Component displayName = Component.text("Play the Melody", NamedTextColor.DARK_RED);
 
     protected RepeatMelodyAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList) {
         super(plugin, name, areaList, SaveTag.class, SaveTag::new);
         this.doesRequireInstrument = true;
+        this.displayName = Component.text("Play the Melody", NamedTextColor.DARK_RED);
     }
 
     @Override
@@ -80,7 +79,7 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
         }
         List<Component> comps = new ArrayList<>();
         for (int i = 0; i <= saveTag.noteIndex; i += 1) {
-            comps.add(Component.text(melody.getBeats().get(i).displayString));
+            comps.add(Component.text(melody.getBeats().get(i).toString()));
         }
         Component line = Component.join(JoinConfiguration.separator(Component.space()), comps).color(NamedTextColor.AQUA);
         player.showTitle(Title.title(Component.empty(), line,
@@ -97,8 +96,11 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
         Semitone semitone = random.nextBoolean() ? Semitone.SHARP : Semitone.FLAT;
         for (int i = 0; i < 8; i += 1) {
             Tone tone = tones[random.nextInt(tones.length)];
-            Semitone theSemi = semis.contains(tone) ? semitone : Semitone.NATURAL;
-            melodyBuilder.beat(6, tone, theSemi, 1);
+            if (semis.contains(tone)) {
+                melodyBuilder.beat(6, tone, semitone, 1);
+            } else {
+                melodyBuilder.beat(6, tone, 1);
+            }
         }
         melody = melodyBuilder.build();
         saveTag.melody = melody.serialize();

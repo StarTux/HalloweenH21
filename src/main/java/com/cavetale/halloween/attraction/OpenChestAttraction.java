@@ -8,7 +8,6 @@ import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -23,7 +22,6 @@ public final class OpenChestAttraction extends Attraction<OpenChestAttraction.Sa
     protected static final Duration OPEN_TIME = Duration.ofSeconds(30);
     Set<Vec3i> chestBlockSet = new HashSet<>();
     protected int secondsLeft;
-    @Getter protected final Component displayName = Component.text("Chest Game", NamedTextColor.DARK_RED);
     protected static final List<Object> PRIZE_POOL = List.of(Mytems.CANDY_CORN,
                                                              Mytems.CHOCOLATE_BAR,
                                                              Mytems.LOLLIPOP,
@@ -41,6 +39,7 @@ public final class OpenChestAttraction extends Attraction<OpenChestAttraction.Sa
                 chestBlockSet.addAll(cuboid.enumerate());
             }
         }
+        this.displayName = Component.text("Chest Game", NamedTextColor.DARK_RED);
     }
 
     @Override

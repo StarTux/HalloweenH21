@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -56,10 +57,12 @@ public final class HalloweenPlugin extends JavaPlugin {
 
     protected void tick() {
         for (Attraction attraction : new ArrayList<>(attractionsMap.values())) {
-            try {
-                attraction.tick();
-            } catch (Exception e) {
-                getLogger().log(Level.SEVERE, attraction.getName(), e);
+            if (attraction.isPlaying()) {
+                try {
+                    attraction.tick();
+                } catch (Exception e) {
+                    getLogger().log(Level.SEVERE, attraction.getName(), e);
+                }
             }
         }
     }
@@ -125,5 +128,13 @@ public final class HalloweenPlugin extends JavaPlugin {
                 newSession.load();
                 return newSession;
             });
+    }
+
+    protected <T extends Attraction> void applyActiveAttraction(Class<T> type, Consumer<T> consumer) {
+        for (Attraction attraction : attractionsMap.values()) {
+            if (attraction.isPlaying() && type.isInstance(attraction)) {
+                consumer.accept(type.cast(attraction));
+            }
+        }
     }
 }

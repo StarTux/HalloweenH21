@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -36,7 +35,6 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
     protected final Set<Vec3i> possibleSpiderBlocks;
     protected CaveSpider currentSpider;
     protected int secondsLeft;
-    @Getter final Component displayName = Component.text("Spider Hunt", NamedTextColor.DARK_RED);
 
     protected FindSpidersAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList) {
         super(plugin, name, areaList, SaveTag.class, SaveTag::new);
@@ -47,6 +45,7 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
             }
         }
         this.possibleSpiderBlocks = Set.copyOf(spiderSet);
+        this.displayName = Component.text("Spider Hunt", NamedTextColor.DARK_RED);
     }
 
     @Override

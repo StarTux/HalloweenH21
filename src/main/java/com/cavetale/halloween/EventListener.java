@@ -2,7 +2,12 @@ package com.cavetale.halloween;
 
 import com.cavetale.core.event.player.PluginPlayerEvent;
 import com.cavetale.halloween.attraction.Attraction;
+import com.cavetale.halloween.attraction.MusicHeroAttraction;
 import com.cavetale.halloween.attraction.ShootTargetAttraction;
+import com.cavetale.mytems.event.music.PlayerBeatEvent;
+import com.cavetale.mytems.event.music.PlayerCloseMusicalInstrumentEvent;
+import com.cavetale.mytems.event.music.PlayerMelodyCompleteEvent;
+import com.cavetale.mytems.event.music.PlayerOpenMusicalInstrumentEvent;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -109,5 +114,25 @@ public final class EventListener implements Listener {
             if (!attraction.isInArea(location)) continue;
             attraction.onPlayerInteract(event);
         }
+    }
+
+    @EventHandler
+    protected void onPlayerOpenMusicalInstrument(PlayerOpenMusicalInstrumentEvent event) {
+        plugin.applyActiveAttraction(MusicHeroAttraction.class, m -> m.onPlayerOpenMusicalInstrument(event));
+    }
+
+    @EventHandler
+    protected void onPlayerCloseMusicalInstrument(PlayerCloseMusicalInstrumentEvent event) {
+        plugin.applyActiveAttraction(MusicHeroAttraction.class, m -> m.onPlayerCloseMusicalInstrument(event));
+    }
+
+    @EventHandler
+    protected void onPlayerBeat(PlayerBeatEvent event) {
+        plugin.applyActiveAttraction(MusicHeroAttraction.class, m -> m.onPlayerBeat(event));
+    }
+
+    @EventHandler
+    protected void onPlayerMelodyComplete(PlayerMelodyCompleteEvent event) {
+        plugin.applyActiveAttraction(MusicHeroAttraction.class, m -> m.onPlayerMelodyComplete(event));
     }
 }

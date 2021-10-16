@@ -64,6 +64,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     protected Mytems firstCompletionMytems = null;
     protected boolean doesRequireInstrument;
     protected Duration completionCooldown = Duration.ofMinutes(20);
+    protected Component displayName = Component.empty();
 
     public static Attraction of(HalloweenPlugin plugin, @NonNull final String name, @NonNull final List<Cuboid> areaList) {
         if (areaList.isEmpty()) throw new IllegalArgumentException(name + ": area list is empty");
@@ -194,8 +195,6 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         return player;
     }
 
-    protected abstract Component getDisplayName();
-
     /**
      * Description is shown in the book.
      */
@@ -321,7 +320,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         Gui gui = new Gui(plugin);
         gui.setItem(13, prize);
         gui.setEditable(true);
-        gui.title(getDisplayName());
+        gui.title(displayName);
         gui.onClose(evt -> {
                 for (ItemStack item : gui.getInventory()) {
                     if (item == null || item.getType() == Material.AIR) continue;
@@ -358,8 +357,8 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         Player somebody = getCurrentPlayer();
         if (player.equals(somebody)) return false; // fail silently
         Component somebodyName = somebody != null
-            ? Component.text("Somebody")
-            : somebody.displayName();
+            ? somebody.displayName()
+            : Component.text("Somebody");
         Component message = Component.join(JoinConfiguration.noSeparators(), new Component[] {
                 Component.text("Please wait: "),
                 somebodyName,
@@ -431,7 +430,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         book.editMeta(m -> {
                 BookMeta meta = (BookMeta) m;
                 Component page = Component.join(JoinConfiguration.noSeparators(), new Component[] {
-                        getDisplayName(),
+                        displayName,
                         Component.newline(),
                         getDescription(),
                         (doesRequireInstrument
@@ -456,7 +455,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
                          .hoverEvent(HoverEvent.showText(Component.text("Goodbye!", NamedTextColor.RED)))),
                     });
                 meta.setAuthor("Cavetale");
-                meta.title(getDisplayName());
+                meta.title(displayName);
                 meta.pages(List.of(page));
             });
         player.openBook(book);

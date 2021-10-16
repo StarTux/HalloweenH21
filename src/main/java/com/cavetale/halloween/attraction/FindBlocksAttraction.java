@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -41,7 +40,6 @@ public final class FindBlocksAttraction extends Attraction<FindBlocksAttraction.
     protected static final Duration SEARCH_TIME = Duration.ofSeconds(120);
     protected static final int MAX_BLOCKS = 10;
     Set<Vec3i> originBlockSet = new HashSet<>();
-    @Getter protected final Component displayName = Component.text("Hidden Blocks", NamedTextColor.DARK_RED);
     protected int secondsLeft;
 
     protected FindBlocksAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList) {
@@ -51,6 +49,7 @@ public final class FindBlocksAttraction extends Attraction<FindBlocksAttraction.
                 originBlockSet.addAll(area.enumerate());
             }
         }
+        this.displayName = Component.text("Hidden Blocks", NamedTextColor.DARK_RED);
     }
 
     @Override

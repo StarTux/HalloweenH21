@@ -9,7 +9,6 @@ import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -18,7 +17,6 @@ import org.bukkit.entity.Player;
 public final class DummyAttraction extends Attraction<DummyAttraction.SaveTag> {
     protected static final Duration PLAY_TIME = Duration.ofSeconds(30);
     protected int secondsLeft;
-    @Getter protected final Component displayName = Component.text("Dummy", NamedTextColor.RED);
     protected final Set<Vec3i> blocks = new HashSet<>();;
 
     protected DummyAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList) {
@@ -28,6 +26,7 @@ public final class DummyAttraction extends Attraction<DummyAttraction.SaveTag> {
                 blocks.addAll(area.enumerate());
             }
         }
+        this.displayName = Component.text("Dummy", NamedTextColor.RED);
     }
 
     @Override
@@ -49,13 +48,14 @@ public final class DummyAttraction extends Attraction<DummyAttraction.SaveTag> {
 
     @Override
     public void onTick() {
-        State newState = saveTag.state.tick(this);
+        if (saveTag.state == State.IDLE) return;
+        Player player = getCurrentPlayer();
+        if (player == null) return;
+        State newState = saveTag.state.tick(this, player);
         if (newState != null) changeState(newState);
     }
 
-    protected State tickPlay() {
-        Player player = getCurrentPlayer();
-        if (player == null) return State.IDLE;
+    protected State tickPlay(Player player) {
         long now = System.currentTimeMillis();
         long timeout = saveTag.playStarted + PLAY_TIME.toMillis();
         if (now > timeout) {
@@ -86,8 +86,8 @@ public final class DummyAttraction extends Attraction<DummyAttraction.SaveTag> {
     enum State {
         IDLE,
         PLAY {
-            @Override protected State tick(DummyAttraction instance) {
-                return instance.tickPlay();
+            @Override protected State tick(DummyAttraction instance, Player player) {
+                return instance.tickPlay(player);
             }
 
             @Override protected void enter(DummyAttraction instance) {
@@ -102,7 +102,7 @@ public final class DummyAttraction extends Attraction<DummyAttraction.SaveTag> {
 
         protected void exit(DummyAttraction instance) { }
 
-        protected State tick(DummyAttraction instance) {
+        protected State tick(DummyAttraction instance, Player player) {
             return null;
         }
     }
