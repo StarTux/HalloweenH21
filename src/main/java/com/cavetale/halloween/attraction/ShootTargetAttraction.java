@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -46,7 +45,6 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
      * Ghast lifetime is from spawnGhastEntities() to clearGhastEntities().
      */
     private final Map<UUID, Vec3i> targetGhastMap = new HashMap<>();
-    @Getter final Component displayName = Component.text("Shoot the Targets", NamedTextColor.DARK_RED);
 
     protected ShootTargetAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList) {
         super(plugin, name, areaList, SaveTag.class, SaveTag::new);
@@ -67,6 +65,8 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
         this.targetBlocks = Set.copyOf(set);
         this.ghastAreas = List.copyOf(ghastList);
         this.ghastBlocks = Set.copyOf(ghastSet);
+        this.displayName = Component.text("Bull's Eye!", NamedTextColor.DARK_RED);
+        this.description = Component.text("Shoot all the target blocks and ghasts as they appear!");
     }
 
     @Override

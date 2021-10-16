@@ -65,6 +65,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     protected boolean doesRequireInstrument;
     protected Duration completionCooldown = Duration.ofMinutes(20);
     protected Component displayName = Component.empty();
+    protected Component description = Component.empty();
 
     public static Attraction of(HalloweenPlugin plugin, @NonNull final String name, @NonNull final List<Cuboid> areaList) {
         if (areaList.isEmpty()) throw new IllegalArgumentException(name + ": area list is empty");
@@ -125,6 +126,10 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     }
 
     public final void disable() {
+        if (mainVillager != null) {
+            mainVillager.despawn();
+            mainVillager = null;
+        }
         onDisable();
     }
 
@@ -193,13 +198,6 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
             return null;
         }
         return player;
-    }
-
-    /**
-     * Description is shown in the book.
-     */
-    protected Component getDescription() {
-        return Component.empty();
     }
 
     protected abstract void onTick();
@@ -432,7 +430,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
                 Component page = Component.join(JoinConfiguration.noSeparators(), new Component[] {
                         displayName,
                         Component.newline(),
-                        getDescription(),
+                        description,
                         (doesRequireInstrument
                          ? Component.text("\nRequires Musical Instrument", NamedTextColor.RED)
                          : Component.empty()),

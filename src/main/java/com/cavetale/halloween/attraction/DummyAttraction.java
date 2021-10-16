@@ -27,6 +27,7 @@ public final class DummyAttraction extends Attraction<DummyAttraction.SaveTag> {
             }
         }
         this.displayName = Component.text("Dummy", NamedTextColor.RED);
+        this.description = Component.text("Hello");
     }
 
     @Override

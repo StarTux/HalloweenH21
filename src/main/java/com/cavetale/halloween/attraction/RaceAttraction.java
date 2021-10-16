@@ -42,6 +42,9 @@ public final class RaceAttraction extends Attraction<RaceAttraction.SaveTag> {
             }
         }
         this.displayName = Component.text("Race Me", NamedTextColor.RED);
+        this.description = Component.text("Race me once around the house?"
+                                          + " I bet you can't beat me,"
+                                          + " I'm super fast!");
     }
 
     @Override
@@ -67,13 +70,6 @@ public final class RaceAttraction extends Attraction<RaceAttraction.SaveTag> {
         if (player == null) return;
         State newState = saveTag.state.tick(this, player);
         if (newState != null) changeState(newState);
-    }
-
-    @Override
-    public Component getDescription() {
-        return Component.text("Race me once around the house?"
-                              + " I bet you can't beat me,"
-                              + " I'm super fast!");
     }
 
     protected State tickCountdown(Player player) {

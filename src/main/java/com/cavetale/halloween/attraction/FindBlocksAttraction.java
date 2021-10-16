@@ -50,6 +50,9 @@ public final class FindBlocksAttraction extends Attraction<FindBlocksAttraction.
             }
         }
         this.displayName = Component.text("Hidden Blocks", NamedTextColor.DARK_RED);
+        this.description = Component.text("My place is haunted!"
+                                          + " a ghost keeps placing and rearranging blocks."
+                                          + " Can you find them all?");
     }
 
     @Override
@@ -92,13 +95,6 @@ public final class FindBlocksAttraction extends Attraction<FindBlocksAttraction.
         if (saveTag.blocksFound < saveTag.totalBlocks) {
             progress(player);
         }
-    }
-
-    @Override
-    public Component getDescription() {
-        return Component.text("My place is haunted!"
-                              + " a ghost keeps placing and rearranging blocks."
-                              + " Can you find them all?");
     }
 
     protected static boolean isCeilingBlock(Block block) {

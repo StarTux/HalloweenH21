@@ -30,6 +30,8 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
         super(plugin, name, areaList, SaveTag.class, SaveTag::new);
         this.doesRequireInstrument = true;
         this.displayName = Component.text("Play the Melody", NamedTextColor.DARK_RED);
+        this.description = Component.text("I'll give you a melody and you're gonna repeat it. It gets harder every round.");
+
     }
 
     @Override
@@ -170,11 +172,6 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
             fail(player);
             changeState(State.IDLE);
         }
-    }
-
-    @Override
-    public Component getDescription() {
-        return Component.text("I'll give you a melody and you're gonna repeat it. It gets harder every round.");
     }
 
     @RequiredArgsConstructor

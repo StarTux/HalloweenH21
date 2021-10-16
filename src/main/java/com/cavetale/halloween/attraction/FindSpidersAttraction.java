@@ -46,6 +46,9 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
         }
         this.possibleSpiderBlocks = Set.copyOf(spiderSet);
         this.displayName = Component.text("Spider Hunt", NamedTextColor.DARK_RED);
+        this.description = Component.text("My place is lousy with spiders."
+                                          + " They come out one by one and I can't sleep because they are noisy!"
+                                          + " Please find them all.");
     }
 
     @Override

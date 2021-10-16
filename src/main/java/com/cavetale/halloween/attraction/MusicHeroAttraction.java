@@ -48,6 +48,8 @@ public final class MusicHeroAttraction extends Attraction<MusicHeroAttraction.Sa
         this.music = Music.MOONSHINE_SONATA;
         this.melody = music.melody;
         this.displayName = Component.text("Music Hero", NamedTextColor.RED);
+        this.description = Component.text("Play the notes while they're on your instrument."
+                                          + " Don't miss a single note for the prize!");
     }
 
     @Override
