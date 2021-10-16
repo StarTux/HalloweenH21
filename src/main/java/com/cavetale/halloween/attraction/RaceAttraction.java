@@ -3,6 +3,7 @@ package com.cavetale.halloween.attraction;
 import com.cavetale.area.struct.Cuboid;
 import com.cavetale.area.struct.Vec3i;
 import com.cavetale.core.font.Unicode;
+import com.cavetale.halloween.Booth;
 import com.cavetale.halloween.HalloweenPlugin;
 import com.cavetale.mytems.Mytems;
 import java.time.Duration;
@@ -30,8 +31,8 @@ public final class RaceAttraction extends Attraction<RaceAttraction.SaveTag> {
     protected List<Cuboid> playerCheckpointList = new ArrayList<>();
     Cuboid startArea = Cuboid.ZERO;
 
-    protected RaceAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList) {
-        super(plugin, name, areaList, SaveTag.class, SaveTag::new);
+    protected RaceAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList, final Booth booth) {
+        super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
         for (Cuboid area : areaList) {
             if ("ai".equals(area.name)) {
                 aiCheckpointList.add(area);

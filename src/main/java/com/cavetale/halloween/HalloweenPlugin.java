@@ -6,9 +6,11 @@ import com.cavetale.halloween.attraction.Attraction;
 import com.cavetale.halloween.util.Gui;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -97,10 +99,20 @@ public final class HalloweenPlugin extends JavaPlugin {
         if (world == null) throw new IllegalStateException("World not found: " + WORLD);
         AreasFile areasFile = AreasFile.load(world, AREAS_FILE);
         if (areasFile == null) throw new IllegalStateException("Areas file not found: " + AREAS_FILE);
+        Set<Booth> unusedBooths = EnumSet.allOf(Booth.class);
         for (Map.Entry<String, List<Cuboid>> entry : areasFile.areas.entrySet()) {
             String name = entry.getKey();
+            Booth booth = Booth.forName(name);
+            if (booth == null) {
+                getLogger().warning(name + ": No Booth found!");
+            } else {
+                unusedBooths.remove(booth);
+            }
             List<Cuboid> areaList = entry.getValue();
-            Attraction attraction = Attraction.of(this, name, areaList);
+            Attraction attraction = Attraction.of(this, name, areaList, booth);
+            if (attraction == null) {
+                getLogger().warning(name + ": No Attraction!");
+            }
             try {
                 attraction.enable();
                 attraction.load();
@@ -109,6 +121,9 @@ public final class HalloweenPlugin extends JavaPlugin {
                 continue;
             }
             attractionsMap.put(name, attraction);
+        }
+        for (Booth booth : unusedBooths) {
+            getLogger().warning(booth + ": Booth unused");
         }
     }
 

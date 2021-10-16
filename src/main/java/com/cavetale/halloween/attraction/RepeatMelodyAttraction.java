@@ -3,6 +3,7 @@ package com.cavetale.halloween.attraction;
 import com.cavetale.area.struct.Cuboid;
 import com.cavetale.core.event.player.PluginPlayerEvent.Detail;
 import com.cavetale.core.event.player.PluginPlayerEvent;
+import com.cavetale.halloween.Booth;
 import com.cavetale.halloween.HalloweenPlugin;
 import com.cavetale.mytems.item.music.Beat;
 import com.cavetale.mytems.item.music.Melody;
@@ -26,8 +27,8 @@ import org.bukkit.entity.Player;
 public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttraction.SaveTag> {
     protected Melody melody = null;
 
-    protected RepeatMelodyAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList) {
-        super(plugin, name, areaList, SaveTag.class, SaveTag::new);
+    protected RepeatMelodyAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList, final Booth booth) {
+        super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
         this.doesRequireInstrument = true;
         this.displayName = Component.text("Play the Melody", NamedTextColor.DARK_RED);
         this.description = Component.text("I'll give you a melody and you're gonna repeat it. It gets harder every round.");

@@ -4,6 +4,7 @@ import com.cavetale.area.struct.Cuboid;
 import com.cavetale.area.struct.Vec3i;
 import com.cavetale.core.font.Unicode;
 import com.cavetale.core.font.VanillaItems;
+import com.cavetale.halloween.Booth;
 import com.cavetale.halloween.HalloweenPlugin;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -46,8 +47,8 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
      */
     private final Map<UUID, Vec3i> targetGhastMap = new HashMap<>();
 
-    protected ShootTargetAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList) {
-        super(plugin, name, areaList, SaveTag.class, SaveTag::new);
+    protected ShootTargetAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList, final Booth booth) {
+        super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
         List<Cuboid> list = new ArrayList<>();
         List<Cuboid> ghastList = new ArrayList<>();
         Set<Vec3i> set = new HashSet<>();
@@ -254,11 +255,11 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
             if (perfectRound) {
                 perfect(player);
                 prepareReward(player, true);
-                plugin.sessionOf(player).setCooldown(this, Duration.ofSeconds(30));
+                plugin.sessionOf(player).setCooldown(this, completionCooldown);
             } else {
                 victory(player);
                 prepareReward(player, false);
-                plugin.sessionOf(player).setCooldown(this, completionCooldown);
+                plugin.sessionOf(player).setCooldown(this, Duration.ofSeconds(30));
             }
             return State.IDLE;
         }

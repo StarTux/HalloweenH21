@@ -4,6 +4,7 @@ import com.cavetale.area.struct.Cuboid;
 import com.cavetale.area.struct.Vec3i;
 import com.cavetale.core.font.Unicode;
 import com.cavetale.core.font.VanillaItems;
+import com.cavetale.halloween.Booth;
 import com.cavetale.halloween.HalloweenPlugin;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -42,8 +43,8 @@ public final class FindBlocksAttraction extends Attraction<FindBlocksAttraction.
     Set<Vec3i> originBlockSet = new HashSet<>();
     protected int secondsLeft;
 
-    protected FindBlocksAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList) {
-        super(plugin, name, areaList, SaveTag.class, SaveTag::new);
+    protected FindBlocksAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList, final Booth booth) {
+        super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
         for (Cuboid area : areaList) {
             if ("blocks".equals(area.name)) {
                 originBlockSet.addAll(area.enumerate());

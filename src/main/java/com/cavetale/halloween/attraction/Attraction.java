@@ -6,6 +6,7 @@ import com.cavetale.core.event.player.PluginPlayerEvent;
 import com.cavetale.core.font.Unicode;
 import com.cavetale.core.font.VanillaItems;
 import com.cavetale.core.util.Json;
+import com.cavetale.halloween.Booth;
 import com.cavetale.halloween.HalloweenPlugin;
 import com.cavetale.halloween.Session;
 import com.cavetale.halloween.util.Gui;
@@ -66,25 +67,42 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     protected Duration completionCooldown = Duration.ofMinutes(20);
     protected Component displayName = Component.empty();
     protected Component description = Component.empty();
+    protected ItemStack firstCompletionReward = Mytems.HALLOWEEN_TOKEN.createItemStack();
 
-    public static Attraction of(HalloweenPlugin plugin, @NonNull final String name, @NonNull final List<Cuboid> areaList) {
+    public static Attraction of(HalloweenPlugin plugin, @NonNull final String name, @NonNull final List<Cuboid> areaList,
+                                final Booth booth) {
         if (areaList.isEmpty()) throw new IllegalArgumentException(name + ": area list is empty");
         if (areaList.get(0).name == null) throw new IllegalArgumentException(name + ": first area has no name!");
         String typeName = areaList.get(0).name;
-        switch (typeName) {
-        case "repeat_melody": return new RepeatMelodyAttraction(plugin, name, areaList);
-        case "shoot_target": return new ShootTargetAttraction(plugin, name, areaList);
-        case "find_spiders": return new FindSpidersAttraction(plugin, name, areaList);
-        case "open_chest": return new OpenChestAttraction(plugin, name, areaList);
-        case "find_blocks": return new FindBlocksAttraction(plugin, name, areaList);
-        case "race": return new RaceAttraction(plugin, name, areaList);
-        case "music_hero": return new MusicHeroAttraction(plugin, name, areaList);
+        AttractionType attractionType = booth != null && booth.type != null
+            ? booth.type
+            : AttractionType.forName(typeName);
+        if (attractionType == null) return null;
+        Attraction result = makeAttraction(plugin, attractionType, name, areaList, booth);
+        if (booth != null) {
+            if (booth.displayName != null) result.displayName = booth.displayName;
+            if (booth.description != null) result.description = booth.description;
+            if (booth.reward != null) result.firstCompletionReward = booth.reward;
+            if (booth.consumer != null) booth.consumer.accept(result);
+        }
+        return result;
+    }
+
+    private static Attraction makeAttraction(HalloweenPlugin plugin, AttractionType type, String name, List<Cuboid> areaList, Booth booth) {
+        switch (type) {
+        case REPEAT_MELODY: return new RepeatMelodyAttraction(plugin, name, areaList, booth);
+        case SHOOT_TARGET: return new ShootTargetAttraction(plugin, name, areaList, booth);
+        case FIND_SPIDERS: return new FindSpidersAttraction(plugin, name, areaList, booth);
+        case OPEN_CHEST: return new OpenChestAttraction(plugin, name, areaList, booth);
+        case FIND_BLOCKS: return new FindBlocksAttraction(plugin, name, areaList, booth);
+        case RACE: return new RaceAttraction(plugin, name, areaList, booth);
+        case MUSIC_HERO: return new MusicHeroAttraction(plugin, name, areaList, booth);
         default:
-            throw new IllegalArgumentException(name + ": first area has unknown name: " + typeName);
+            throw new IllegalArgumentException(type + ": Not implemented!");
         }
     }
 
-    protected Attraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList,
+    protected Attraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList, final Booth booth,
                          final Class<T> saveTagClass, final Supplier<T> saveTagSupplier) {
         this.plugin = plugin;
         this.name = name;
@@ -228,16 +246,6 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     /**
      * Override for a custom prize.
      */
-    protected final ItemStack getFirstCompletionReward(Player player) {
-        if (firstCompletionMytems != null) {
-            return firstCompletionMytems.createItemStack(player);
-        }
-        return Mytems.HALLOWEEN_TOKEN.createItemStack(player);
-    }
-
-    /**
-     * Override for a custom prize.
-     */
     protected ItemStack getRegularCompletionReward(Player player) {
         List<Mytems> pool = List.of(Mytems.CANDY_CORN,
                                     Mytems.CHOCOLATE_BAR,
@@ -255,7 +263,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         session.clearPrizeWaiting(this);
         session.lockUnique(this);
         session.save();
-        giveInGui(player, getFirstCompletionReward(player));
+        giveInGui(player, firstCompletionReward.clone());
     }
 
     /**

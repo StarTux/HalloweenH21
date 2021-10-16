@@ -2,6 +2,7 @@ package com.cavetale.halloween.attraction;
 
 import com.cavetale.area.struct.Cuboid;
 import com.cavetale.area.struct.Vec3i;
+import com.cavetale.halloween.Booth;
 import com.cavetale.halloween.HalloweenPlugin;
 import com.cavetale.mytems.Mytems;
 import java.time.Duration;
@@ -32,8 +33,8 @@ public final class OpenChestAttraction extends Attraction<OpenChestAttraction.Sa
                                                              new ItemStack(Material.EMERALD),
                                                              new ItemStack(Material.COD));
 
-    protected OpenChestAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList) {
-        super(plugin, name, areaList, SaveTag.class, SaveTag::new);
+    protected OpenChestAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList, final Booth booth) {
+        super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
         for (Cuboid cuboid : areaList) {
             if ("chest".equals(cuboid.name)) {
                 chestBlockSet.addAll(cuboid.enumerate());
