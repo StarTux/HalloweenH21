@@ -201,7 +201,7 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
                         VanillaItems.SPIDER_EYE.component,
                         Component.text(progress, NamedTextColor.DARK_RED),
                     }));
-            player.playSound(currentSpider.getLocation(), Sound.ENTITY_SPIDER_HURT, SoundCategory.HOSTILE, 1.0f, 0.5f);
+            currentSpider.getWorld().playSound(currentSpider.getLocation(), Sound.ENTITY_SPIDER_HURT, SoundCategory.HOSTILE, 1.0f, 0.5f);
         }
         Location location = currentSpider.getLocation();
         location.setYaw(location.getYaw() + 18.0f);

@@ -31,6 +31,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -64,7 +65,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     protected Vec3i npcVector;
     protected Mytems firstCompletionMytems = null;
     protected boolean doesRequireInstrument;
-    protected Duration completionCooldown = Duration.ofMinutes(20);
+    protected Duration completionCooldown = Duration.ofMinutes(10);
     protected Component displayName = Component.empty();
     protected Component description = Component.empty();
     protected ItemStack firstCompletionReward = Mytems.HALLOWEEN_TOKEN.createItemStack();
@@ -111,13 +112,19 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         this.mainArea = areaList.get(0);
         this.saveTagClass = saveTagClass;
         this.saveTagSupplier = saveTagSupplier;
+        Vec3i mainVillagerVec = null;
         for (Cuboid area : areaList) {
             if ("npc".equals(area.name)) {
-                npcVector = area.min;
-                Location location = area.min.toBlock(plugin.getWorld()).getLocation().add(0.5, 0.0, 0.5);
-                mainVillager = PluginSpawn.register(plugin, ZoneType.HALLOWEEN, Loc.of(location));
-                mainVillager.setOnPlayerClick(this::clickMainVillager);
+                mainVillagerVec = area.min;
             }
+        }
+        if (mainVillagerVec != null) {
+            Location location = mainVillagerVec.toLocation(plugin.getWorld());
+            mainVillager = PluginSpawn.register(plugin, ZoneType.HALLOWEEN, Loc.of(location));
+            mainVillager.setOnPlayerClick(this::clickMainVillager);
+            mainVillager.setOnMobSpawning(mob -> {
+                    mob.setCollidable(false);
+                });
         }
     }
 
@@ -145,7 +152,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
 
     public final void disable() {
         if (mainVillager != null) {
-            mainVillager.despawn();
+            mainVillager.unregister();
             mainVillager = null;
         }
         onDisable();
@@ -487,5 +494,10 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
 
     protected final void confetti(Player player, Location location) {
         player.spawnParticle(Particle.SPELL_MOB, location, 16, 0.25, 0.25, 0.25, 1.0);
+    }
+
+    protected final void highlight(Player player, Location location) {
+        Particle.DustOptions dustOptions = new Particle.DustOptions(Color.WHITE, 4.0f);
+        player.spawnParticle(Particle.REDSTONE, location, 4, 1.0, 1.0, 1.0, 1.0, dustOptions);
     }
 }

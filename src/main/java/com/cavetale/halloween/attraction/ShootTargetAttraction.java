@@ -6,6 +6,7 @@ import com.cavetale.core.font.Unicode;
 import com.cavetale.core.font.VanillaItems;
 import com.cavetale.halloween.Booth;
 import com.cavetale.halloween.HalloweenPlugin;
+import com.cavetale.halloween.Session;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,6 +31,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Ghast;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 
 public final class ShootTargetAttraction extends Attraction<ShootTargetAttraction.SaveTag> {
@@ -105,6 +107,13 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
         }
     }
 
+    @Override
+    public void onEntityDamage(EntityDamageEvent event) {
+        if (targetGhastMap.containsKey(event.getEntity().getUniqueId())) {
+            event.setCancelled(true);
+        }
+    }
+
     protected void onDisable() {
         clearGhastEntities();
     }
@@ -122,6 +131,10 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
     public void onProjectileHit(ProjectileHitEvent event) {
         if (saveTag.state != State.SHOOT) return;
         Projectile projectile = event.getEntity();
+        switch (projectile.getType()) {
+        case ARROW: case SPECTRAL_ARROW: break;
+        default: return;
+        }
         if (!(projectile.getShooter() instanceof Player)) return;
         Player player = (Player) projectile.getShooter();
         if (!player.getUniqueId().equals(saveTag.currentPlayer)) return;
@@ -244,6 +257,9 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
                             Component.text(saveTag.roundScore + "/" + saveTag.roundTargetCount,
                                            NamedTextColor.DARK_RED),
                         }));
+                for (Vec3i vec : saveTag.targetBlocks) {
+                    highlight(player, vec.toLocation(player.getWorld()).add(0, 0.5, 0));
+                }
             }
             return null;
         }
@@ -252,14 +268,17 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
             return State.IDLE;
         }
         if (saveTag.currentRound >= MAX_ROUNDS - 1) {
+            Session session = plugin.sessionOf(player);
             if (perfectRound) {
                 perfect(player);
                 prepareReward(player, true);
-                plugin.sessionOf(player).setCooldown(this, completionCooldown);
+                session.setCooldown(this, completionCooldown);
             } else {
                 victory(player);
                 prepareReward(player, false);
-                plugin.sessionOf(player).setCooldown(this, Duration.ofSeconds(30));
+                session.setCooldown(this, session.isUniqueLocked(this)
+                                    ? completionCooldown
+                                    : Duration.ofSeconds(30));
             }
             return State.IDLE;
         }
