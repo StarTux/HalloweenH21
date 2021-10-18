@@ -24,8 +24,6 @@ import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Ghast;
@@ -78,7 +76,6 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
         saveTag.score = 0;
         saveTag.missed = 0;
         saveTag.currentRound = 0;
-        startingGun(player);
         changeState(State.WARMUP);
     }
 
@@ -177,10 +174,17 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
             saveTag.targetBlocks.add(targetBlock);
             targetBlock.toBlock(plugin.getWorld()).setType(Material.TARGET);
         }
-        if (saveTag.currentRound >= 3 && !ghastBlocks.isEmpty()) {
-            List<Vec3i> possibleGhasts = new ArrayList<>(ghastBlocks);
-            Vec3i ghastBlock = possibleGhasts.get(random.nextInt(possibleGhasts.size()));
-            saveTag.targetGhasts.add(ghastBlock);
+        if (saveTag.currentRound >= 2 && !ghastBlocks.isEmpty()) {
+            int ghastCount = Math.max(1, (saveTag.currentRound - 1) / 2);
+            for (int i = 0; i < ghastCount; i += 1) {
+                List<Vec3i> possibleGhasts = new ArrayList<>(ghastBlocks);
+                for (Vec3i old : saveTag.targetGhasts) {
+                    possibleGhasts.removeIf(b -> b.maxDistance(old) < 4);
+                }
+                if (possibleGhasts.isEmpty()) break;
+                Vec3i ghastBlock = possibleGhasts.get(random.nextInt(possibleGhasts.size()));
+                saveTag.targetGhasts.add(ghastBlock);
+            }
         }
         spawnGhastEntities();
         saveTag.roundTargetCount = saveTag.targetBlocks.size() + saveTag.targetGhasts.size();
@@ -198,6 +202,7 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
     protected void spawnGhastEntities() {
         for (Vec3i ghastBlock : saveTag.targetGhasts) {
             Location location = ghastBlock.toLocation(plugin.getWorld());
+            location.setYaw(random.nextFloat() * 360.0f);
             Ghast ghast = location.getWorld().spawn(location, Ghast.class, g -> {
                     g.setPersistent(false);
                     g.setRemoveWhenFarAway(false);
@@ -235,7 +240,7 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
                                   Title.Times.of(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO));
         player.showTitle(title);
         player.sendMessage(Component.text("Shoot!", NamedTextColor.GOLD, TextDecoration.ITALIC));
-        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_FLUTE, SoundCategory.MASTER, 1.0f, 2.0f);
+        startingGun(player);
         return State.SHOOT;
     }
 
@@ -260,6 +265,13 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
                 for (Vec3i vec : saveTag.targetBlocks) {
                     highlight(player, vec.toLocation(player.getWorld()).add(0, 0.5, 0));
                 }
+            }
+            for (UUID uuid : targetGhastMap.keySet()) {
+                Entity e = Bukkit.getEntity(uuid);
+                if (e == null) continue;
+                Location loc = e.getLocation();
+                loc.setYaw(loc.getYaw() + 18.0f);
+                e.teleport(loc);
             }
             return null;
         }

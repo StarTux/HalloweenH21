@@ -8,6 +8,7 @@ import com.cavetale.core.font.VanillaItems;
 import com.cavetale.core.util.Json;
 import com.cavetale.halloween.Booth;
 import com.cavetale.halloween.HalloweenPlugin;
+import com.cavetale.halloween.Music;
 import com.cavetale.halloween.Session;
 import com.cavetale.halloween.util.Gui;
 import com.cavetale.mytems.Mytems;
@@ -112,14 +113,13 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         this.mainArea = areaList.get(0);
         this.saveTagClass = saveTagClass;
         this.saveTagSupplier = saveTagSupplier;
-        Vec3i mainVillagerVec = null;
         for (Cuboid area : areaList) {
             if ("npc".equals(area.name)) {
-                mainVillagerVec = area.min;
+                npcVector = area.min;
             }
         }
-        if (mainVillagerVec != null) {
-            Location location = mainVillagerVec.toLocation(plugin.getWorld());
+        if (npcVector != null) {
+            Location location = npcVector.toLocation(plugin.getWorld());
             mainVillager = PluginSpawn.register(plugin, ZoneType.HALLOWEEN, Loc.of(location));
             mainVillager.setOnPlayerClick(this::clickMainVillager);
             mainVillager.setOnMobSpawning(mob -> {
@@ -169,14 +169,14 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     protected final void timeout(Player player) {
         player.showTitle(Title.title(Component.text("Timeout", NamedTextColor.DARK_RED),
                                      Component.text("Try Again", NamedTextColor.DARK_RED)));
-        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, SoundCategory.MASTER, 2.0f, 0.5f);
+        Music.DECKED_OUT.melody.play(player);
         plugin.sessionOf(player).setCooldown(this, Duration.ofSeconds(10));
     }
 
     protected final void fail(Player player) {
         player.showTitle(Title.title(Component.text("Wrong", NamedTextColor.DARK_RED),
                                      Component.text("Try Again", NamedTextColor.DARK_RED)));
-        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, SoundCategory.MASTER, 2.0f, 0.5f);
+        Music.DECKED_OUT.melody.play(player);
         plugin.sessionOf(player).setCooldown(this, Duration.ofSeconds(10));
     }
 

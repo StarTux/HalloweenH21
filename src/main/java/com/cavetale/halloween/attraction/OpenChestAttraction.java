@@ -2,14 +2,17 @@ package com.cavetale.halloween.attraction;
 
 import com.cavetale.area.struct.Cuboid;
 import com.cavetale.area.struct.Vec3i;
+import com.cavetale.core.font.Unicode;
 import com.cavetale.halloween.Booth;
 import com.cavetale.halloween.HalloweenPlugin;
+import com.cavetale.halloween.Session;
 import com.cavetale.mytems.Mytems;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -106,10 +109,13 @@ public final class OpenChestAttraction extends Attraction<OpenChestAttraction.Sa
         double roll = random.nextDouble();
         boolean bingo = roll < 0.15;
         giveReward(player, bingo);
+        Session session = plugin.sessionOf(player);
         if (bingo) {
-            plugin.sessionOf(player).setCooldown(this, completionCooldown);
+            session.setCooldown(this, completionCooldown);
         } else {
-            plugin.sessionOf(player).setCooldown(this, Duration.ofSeconds(30));
+            session.setCooldown(this, (session.isUniqueLocked(this)
+                                       ? completionCooldown
+                                       : Duration.ofSeconds(30)));
         }
         changeState(State.IDLE);
     }
@@ -137,6 +143,17 @@ public final class OpenChestAttraction extends Attraction<OpenChestAttraction.Sa
         if (now > timeout) {
             timeout(player);
             return State.IDLE;
+        }
+        int seconds = (int) ((timeout - now - 1L) / 1000L) + 1;
+        if (seconds != secondsLeft) {
+            secondsLeft = seconds;
+            player.sendActionBar(Component.join(JoinConfiguration.noSeparators(), new Component[] {
+                        Component.text(Unicode.WATCH.string + seconds, NamedTextColor.GOLD),
+                        Component.text(" Pick a chest!", NamedTextColor.WHITE),
+                    }));
+            for (Vec3i vec : chestBlockSet) {
+                highlight(player, vec.toLocation(player.getWorld()).add(0, 0.5, 0));
+            }
         }
         return null;
     }

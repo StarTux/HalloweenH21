@@ -3,9 +3,11 @@ package com.cavetale.halloween;
 import com.cavetale.area.struct.AreasFile;
 import com.cavetale.area.struct.Cuboid;
 import com.cavetale.halloween.attraction.Attraction;
+import com.cavetale.halloween.attraction.AttractionType;
 import com.cavetale.halloween.util.Gui;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -125,6 +127,16 @@ public final class HalloweenPlugin extends JavaPlugin {
         for (Booth booth : unusedBooths) {
             getLogger().warning(booth + ": Booth unused");
         }
+        Map<AttractionType, Integer> counts = new EnumMap<>(AttractionType.class);
+        for (AttractionType type : AttractionType.values()) counts.put(type, 0);
+        for (Attraction attraction : attractionsMap.values()) {
+            AttractionType type = AttractionType.of(attraction);
+            counts.put(type, counts.get(type) + 1);
+        }
+        for (AttractionType type : AttractionType.values()) {
+            getLogger().info(counts.get(type) + " " + type);
+        }
+        getLogger().info(attractionsMap.size() + " Total");
     }
 
     public List<Player> getPlayersIn(Cuboid area) {

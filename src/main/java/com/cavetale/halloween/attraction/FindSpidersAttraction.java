@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -31,7 +32,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public final class FindSpidersAttraction extends Attraction<FindSpidersAttraction.SaveTag> {
-    protected static final Duration SEARCH_TIME = Duration.ofSeconds(40);
+    @Setter protected Duration searchTime = Duration.ofSeconds(40);
     protected static final int MAX_SPIDERS = 10;
     protected final Set<Vec3i> possibleSpiderBlocks;
     protected CaveSpider currentSpider;
@@ -186,7 +187,7 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
         Player player = getCurrentPlayer();
         if (player == null || currentSpider == null) return State.IDLE;
         long now = System.currentTimeMillis();
-        long timeout = saveTag.searchStarted + SEARCH_TIME.toMillis();
+        long timeout = saveTag.searchStarted + searchTime.toMillis();
         if (now > timeout) {
             timeout(player);
             return State.IDLE;

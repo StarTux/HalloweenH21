@@ -105,7 +105,14 @@ public enum Music {
                    .beat(8, G, 1)
                    .beat(8, F, SHARP, 0)
                    .beat(8, G, 1)
-                   .build());
+                   .build()),
+
+    DECKED_OUT(Map.of(),
+               Melody.builder(DIDGERIDOO, 100L)
+               .beat(3, C, 0)
+               .beat(3, B, 0)
+               .beat(3, G, FLAT, 0)
+               .build());
 
     public final Map<Tone, Semitone> keys;
     public final Melody melody;

@@ -144,7 +144,7 @@ public final class RaceAttraction extends Attraction<RaceAttraction.SaveTag> {
         }
         if (seconds != secondsRaced) {
             secondsRaced = seconds;
-            String progress = 0 + "/" + 1;
+            String progress = (saveTag.playerCheckpointIndex + 1) + "/" + playerCheckpointList.size();
             player.sendActionBar(Component.join(JoinConfiguration.noSeparators(), new Component[] {
                         Component.text(Unicode.WATCH.string + seconds, NamedTextColor.GOLD),
                         Component.space(),
@@ -171,7 +171,7 @@ public final class RaceAttraction extends Attraction<RaceAttraction.SaveTag> {
         }
         Location location = block.getLocation().add(0.5, 0.0, 0.5);
         mainVillager.pathing(mob -> {
-                mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.45);
+                mob.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.48);
                 mob.setCollidable(false);
                 mob.getPathfinder().moveTo(location, 1.0);
             });
