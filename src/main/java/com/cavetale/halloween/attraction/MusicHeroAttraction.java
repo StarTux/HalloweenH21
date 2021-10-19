@@ -25,6 +25,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Material;
 import org.bukkit.Note.Tone;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -89,7 +90,9 @@ public final class MusicHeroAttraction extends Attraction<MusicHeroAttraction.Sa
         case RIGHT_CLICK_BLOCK: break;
         default: return;
         }
-        if (event.hasBlock() && Vec3i.of(event.getClickedBlock()).equals(lecternBlock)) {
+        if (!event.hasBlock()) return;
+        Block block = event.getClickedBlock();
+        if (block.getType() == Material.LECTERN || Vec3i.of(block).equals(lecternBlock)) {
             event.setUseInteractedBlock(Event.Result.DENY);
             Player player = event.getPlayer();
             if (melodyBook == null) makeMelodyBook();

@@ -7,6 +7,7 @@ import com.cavetale.halloween.attraction.AttractionType;
 import com.cavetale.halloween.util.Gui;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -133,7 +134,9 @@ public final class HalloweenPlugin extends JavaPlugin {
             AttractionType type = AttractionType.of(attraction);
             counts.put(type, counts.get(type) + 1);
         }
-        for (AttractionType type : AttractionType.values()) {
+        List<AttractionType> rankings = new ArrayList<>(List.of(AttractionType.values()));
+        Collections.sort(rankings, (a, b) -> Integer.compare(counts.get(a), counts.get(b)));
+        for (AttractionType type : rankings) {
             getLogger().info(counts.get(type) + " " + type);
         }
         getLogger().info(attractionsMap.size() + " Total");

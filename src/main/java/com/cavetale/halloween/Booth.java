@@ -35,6 +35,9 @@ public enum Booth {
     FLARE_DANCER_MUSIC(AttractionType.MUSIC_HERO,
                      null, null,
                      null, null),
+    OWO_TREE_MUSIC(AttractionType.MUSIC_HERO,
+                   null, null,
+                   null, null),
 
     // Repeat Melody
     COFFEE_SONG(AttractionType.REPEAT_MELODY, null, null, null, null),
@@ -59,6 +62,12 @@ public enum Booth {
     ABYSMAL_VOID_MELODY(AttractionType.REPEAT_MELODY,
                         null, null,
                         null, null),
+    CEDRIC_MELODY(AttractionType.REPEAT_MELODY,
+                  null, null,
+                  null, null),
+    AIRONT_MELODY(AttractionType.REPEAT_MELODY,
+                  null, null,
+                  null, null),
 
     // Shoot Target
     SHOOTING_PYRAMID(AttractionType.SHOOT_TARGET,
@@ -91,6 +100,10 @@ public enum Booth {
                                           + " halls. Shoot them all with your"
                                           + " bow and arrow!"),
                      null, null),
+    RAT_CRYPT_SHOOTING(AttractionType.SHOOT_TARGET,
+                       null, null,
+                       null, null),
+
     // Find Spiders
     SPIDER_MANSION(AttractionType.FIND_SPIDERS,
                    null, null,
@@ -115,6 +128,12 @@ public enum Booth {
     DMS_SPIDER_MANSION(AttractionType.FIND_SPIDERS,
                        null, null,
                        null, null),
+    FOIVI_SPIDER_GARDEN(AttractionType.FIND_SPIDERS,
+                        Component.text("Spider Garden", NamedTextColor.DARK_RED),
+                        Component.text("Help, my home and garden are infested with spiders!"
+                                       + " They come out one by one and make noise."
+                                       + " Please find them all."),
+                        null, null),
 
     // Find Blocks
     GHOST_TOWER(AttractionType.FIND_BLOCKS,
@@ -129,6 +148,14 @@ public enum Booth {
     PYRO_GHOST_BLOCKS(AttractionType.FIND_BLOCKS,
                       null, null,
                       null, null),
+    PUP_GHOST_BLOCKS(AttractionType.FIND_BLOCKS,
+                     null, null,
+                     null, null),
+    LILLYPADDS_ORPHANAGE(AttractionType.FIND_BLOCKS,
+                         null, Component.text("The orphanage is haunted!"
+                                              + " a ghost keeps placing and rearranging blocks."
+                                              + " Can you find them all?"),
+                         null, null),
 
     // Open Chest
     DRAGON_TOWER(AttractionType.OPEN_CHEST,
@@ -146,6 +173,15 @@ public enum Booth {
     BRINDLE_MANSION_CHESTS(AttractionType.OPEN_CHEST,
                            null, null,
                            null, null),
+    GICHYU_CHESTS(AttractionType.OPEN_CHEST,
+                  null, null,
+                  null, null),
+    POIVON_CHESTS(AttractionType.OPEN_CHEST,
+                  null, null,
+                  null, null),
+    HYRULE_CHESTS(AttractionType.OPEN_CHEST,
+                  null, null,
+                  null, null),
 
     // Race
     POOL_RACE(AttractionType.RACE,
@@ -162,7 +198,12 @@ public enum Booth {
     TECHNOLOGY_TENT_RACE(AttractionType.RACE,
                          null, Component.text("Race me once around the tent,"
                                               + " counter clockwise!"),
-                         null, null);
+                         null, null),
+    LORD_SHEEP_CHURCH_RACE(AttractionType.RACE,
+                           null, Component.text("A race round the church,"
+                                                + " counter clockwise?"
+                                                + " Nobody's fater than me!"),
+                           null, null),
     ;
 
     public final String name; // Corresponds with area.name
