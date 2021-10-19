@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -26,6 +27,7 @@ import org.bukkit.entity.Player;
 
 public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttraction.SaveTag> {
     protected Melody melody = null;
+    @Setter protected Instrument instrument = Instrument.PIANO;
 
     protected RepeatMelodyAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList, final Booth booth) {
         super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
@@ -91,12 +93,19 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
     }
 
     protected void makeMelody() {
-        Melody.Builder melodyBuilder = Melody.builder(Instrument.PIANO, 100L);
+        Melody.Builder melodyBuilder = Melody.builder(instrument, 100L);
         Tone[] tones = Tone.values();
         List<Tone> semis = new ArrayList<>(List.of(tones));
+        final Semitone semitone;
+        if (random.nextBoolean()) {
+            semis.removeIf(tone -> !tone.isSharpable());
+            semitone = Semitone.SHARP;
+        } else {
+            semis.removeIf(tone -> tone.ordinal() > 0 && !tones[tone.ordinal() - 1].isSharpable());
+            semitone = Semitone.FLAT;
+        }
         Collections.shuffle(semis, random);
-        semis = new ArrayList<>(semis.subList(0, 4));
-        Semitone semitone = random.nextBoolean() ? Semitone.SHARP : Semitone.FLAT;
+        semis = new ArrayList<>(semis.subList(0, random.nextInt(4)));
         for (int i = 0; i < 8; i += 1) {
             Tone tone = tones[random.nextInt(tones.length)];
             if (semis.contains(tone)) {

@@ -224,15 +224,19 @@ public final class FindBlocksAttraction extends Attraction<FindBlocksAttraction.
                 for (BlockFace facing : HORIZONTAL_FACES) {
                     Block nbor = block.getRelative(facing);
                     if (nbor.isEmpty() && nbor.getLightFromBlocks() > 0) {
-                        blockDataList.add(List.of(Material.SHROOMLIGHT.createBlockData()));
-                        blockDataList.add(List.of(new BlockData[] {
-                                    Material.JACK_O_LANTERN.createBlockData(bd -> {
-                                            ((Directional) bd).setFacing(facing);
-                                        }),
-                                    Material.CARVED_PUMPKIN.createBlockData(bd -> {
-                                            ((Directional) bd).setFacing(facing);
-                                        }),
-                                }));
+                        if (block.getType() != Material.SHROOMLIGHT) {
+                            blockDataList.add(List.of(Material.SHROOMLIGHT.createBlockData()));
+                        }
+                        if (block.getType() != Material.JACK_O_LANTERN && block.getType() != Material.CARVED_PUMPKIN) {
+                            blockDataList.add(List.of(new BlockData[] {
+                                        Material.JACK_O_LANTERN.createBlockData(bd -> {
+                                                ((Directional) bd).setFacing(facing);
+                                            }),
+                                        Material.CARVED_PUMPKIN.createBlockData(bd -> {
+                                                ((Directional) bd).setFacing(facing);
+                                            }),
+                                    }));
+                        }
                     }
                 }
             } else {

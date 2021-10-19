@@ -51,6 +51,7 @@ public final class MusicHeroAttraction extends Attraction<MusicHeroAttraction.Sa
         this.displayName = Component.text("Music Hero", NamedTextColor.RED);
         this.description = Component.text("Play the notes while they're on your instrument."
                                           + " Don't miss a single note for the prize!");
+        this.doesRequireInstrument = true;
     }
 
     @Override

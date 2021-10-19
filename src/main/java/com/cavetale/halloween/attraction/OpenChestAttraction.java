@@ -32,7 +32,11 @@ public final class OpenChestAttraction extends Attraction<OpenChestAttraction.Sa
                                                              Mytems.ORANGE_CANDY,
                                                              new ItemStack(Material.DIAMOND, 1),
                                                              new ItemStack(Material.DIAMOND, 2),
-                                                             new ItemStack(Material.DIAMOND, 3),
+                                                             new ItemStack(Material.DIAMOND, 4),
+                                                             new ItemStack(Material.DIAMOND, 8),
+                                                             new ItemStack(Material.DIAMOND, 16),
+                                                             new ItemStack(Material.DIAMOND, 32),
+                                                             new ItemStack(Material.DIAMOND, 64),
                                                              new ItemStack(Material.EMERALD),
                                                              new ItemStack(Material.COD));
 

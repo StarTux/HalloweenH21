@@ -2,7 +2,6 @@ package com.cavetale.halloween.attraction;
 
 import com.cavetale.area.struct.Cuboid;
 import com.cavetale.area.struct.Vec3i;
-import com.cavetale.core.font.Unicode;
 import com.cavetale.core.font.VanillaItems;
 import com.cavetale.halloween.Booth;
 import com.cavetale.halloween.HalloweenPlugin;
@@ -14,7 +13,6 @@ import java.util.List;
 import java.util.Set;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -144,6 +142,8 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
             changeState(State.IDLE);
         } else {
             progress(player);
+            player.sendActionBar(makeProgressComponent(secondsLeft, VanillaItems.SPIDER_EYE.component,
+                                                       saveTag.spiderBlockIndex + 1, saveTag.spiderBlocks.size()));
             changeState(State.SEARCH);
         }
     }
@@ -195,13 +195,8 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
         int seconds = (int) ((timeout - now - 1) / 1000L) + 1;
         if (seconds != secondsLeft) {
             secondsLeft = seconds;
-            String progress = (saveTag.spiderBlockIndex + 1) + "/" + saveTag.spiderBlocks.size();
-            player.sendActionBar(Component.join(JoinConfiguration.noSeparators(), new Component[] {
-                        Component.text(Unicode.WATCH.string + seconds, NamedTextColor.GOLD),
-                        Component.space(),
-                        VanillaItems.SPIDER_EYE.component,
-                        Component.text(progress, NamedTextColor.DARK_RED),
-                    }));
+            player.sendActionBar(makeProgressComponent(seconds, VanillaItems.SPIDER_EYE.component,
+                                                       saveTag.spiderBlockIndex + 1, saveTag.spiderBlocks.size()));
             currentSpider.getWorld().playSound(currentSpider.getLocation(), Sound.ENTITY_SPIDER_HURT, SoundCategory.HOSTILE, 1.0f, 0.5f);
         }
         Location location = currentSpider.getLocation();

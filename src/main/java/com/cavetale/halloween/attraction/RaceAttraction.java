@@ -2,7 +2,6 @@ package com.cavetale.halloween.attraction;
 
 import com.cavetale.area.struct.Cuboid;
 import com.cavetale.area.struct.Vec3i;
-import com.cavetale.core.font.Unicode;
 import com.cavetale.halloween.Booth;
 import com.cavetale.halloween.HalloweenPlugin;
 import com.cavetale.mytems.Mytems;
@@ -10,12 +9,9 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
-import org.bukkit.Instrument;
 import org.bukkit.Location;
-import org.bukkit.Note;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
@@ -98,10 +94,7 @@ public final class RaceAttraction extends Attraction<RaceAttraction.SaveTag> {
             player.showTitle(Title.title(Component.text(seconds, NamedTextColor.GOLD),
                                          Component.text("Get Ready", NamedTextColor.GOLD),
                                          Title.Times.of(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO)));
-            List<Note.Tone> tones = List.of(Note.Tone.C, Note.Tone.A, Note.Tone.G);
-            if (seconds < tones.size()) {
-                player.playNote(player.getLocation(), Instrument.PLING, Note.natural(0, tones.get(seconds)));
-            }
+            countdown(player, seconds);
         }
         return null;
     }
@@ -144,13 +137,8 @@ public final class RaceAttraction extends Attraction<RaceAttraction.SaveTag> {
         }
         if (seconds != secondsRaced) {
             secondsRaced = seconds;
-            String progress = (saveTag.playerCheckpointIndex + 1) + "/" + playerCheckpointList.size();
-            player.sendActionBar(Component.join(JoinConfiguration.noSeparators(), new Component[] {
-                        Component.text(Unicode.WATCH.string + seconds, NamedTextColor.GOLD),
-                        Component.space(),
-                        Mytems.GOLDEN_CUP.component,
-                        Component.text(progress, NamedTextColor.DARK_RED),
-                    }));
+            player.sendActionBar(makeProgressComponent(seconds, Mytems.GOLDEN_CUP.component,
+                                                       saveTag.playerCheckpointIndex + 1, playerCheckpointList.size()));
             List<Vec3i> vectorList = playerCheckpoint.enumerate();
             Vec3i vector = vectorList.get(random.nextInt(vectorList.size()));
             confetti(player, vector.toLocation(plugin.getWorld()).add(0, 0.6, 0));

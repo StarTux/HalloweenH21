@@ -2,7 +2,6 @@ package com.cavetale.halloween.attraction;
 
 import com.cavetale.area.struct.Cuboid;
 import com.cavetale.area.struct.Vec3i;
-import com.cavetale.core.font.Unicode;
 import com.cavetale.core.font.VanillaItems;
 import com.cavetale.halloween.Booth;
 import com.cavetale.halloween.HalloweenPlugin;
@@ -17,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
@@ -145,6 +143,8 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
             saveTag.score += 1;
             saveTag.roundScore += 1;
             progress(player);
+            player.sendActionBar(makeProgressComponent((int) secondsLeft, VanillaItems.TARGET.component,
+                                                       saveTag.roundScore, saveTag.roundTargetCount));
             return;
         }
         Entity hitEntity = event.getHitEntity();
@@ -231,7 +231,7 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
             long seconds = (WARMUP_TIME.toMillis() - (now - saveTag.warmupStarted) - 1L) / 1000L + 1L;
             if (secondsLeft != seconds) {
                 secondsLeft = seconds;
-                player.sendActionBar(Component.text(seconds, NamedTextColor.GOLD));
+                countdown(player, (int) seconds);
             }
             return null;
         }
@@ -255,13 +255,8 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
             long seconds = (SHOOT_TIME.toMillis() - (now - saveTag.shootingStarted) - 1L) / 1000L + 1L;
             if (secondsLeft != seconds) {
                 secondsLeft = seconds;
-                player.sendActionBar(Component.join(JoinConfiguration.noSeparators(), new Component[] {
-                            Component.text(Unicode.WATCH.string + seconds, NamedTextColor.GOLD),
-                            Component.space(),
-                            VanillaItems.TARGET.component,
-                            Component.text(saveTag.roundScore + "/" + saveTag.roundTargetCount,
-                                           NamedTextColor.DARK_RED),
-                        }));
+                player.sendActionBar(makeProgressComponent((int) seconds, VanillaItems.TARGET.component,
+                                                           saveTag.roundScore, saveTag.roundTargetCount));
                 for (Vec3i vec : saveTag.targetBlocks) {
                     highlight(player, vec.toLocation(player.getWorld()).add(0, 0.5, 0));
                 }

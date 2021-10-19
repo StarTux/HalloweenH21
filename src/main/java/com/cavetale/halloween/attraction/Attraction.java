@@ -33,8 +33,10 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.Instrument;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Note;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
@@ -146,7 +148,6 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     }
 
     public final void enable() {
-        plugin.getLogger().info("Enabling " + name);
         onEnable();
     }
 
@@ -205,6 +206,23 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         player.showTitle(Title.title(message, Component.empty()));
         player.sendMessage(message);
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.MASTER, 0.3f, 2.0f);
+    }
+
+    protected final void countdown(Player player, int seconds) {
+        player.sendActionBar(Component.text(seconds, NamedTextColor.GOLD));
+        List<Note.Tone> tones = List.of(Note.Tone.D, Note.Tone.A, Note.Tone.G);
+        if ((int) seconds <= tones.size()) {
+            player.playNote(player.getLocation(), Instrument.PLING, Note.natural(0, tones.get((int) seconds - 1)));
+        }
+    }
+
+    protected final Component makeProgressComponent(int seconds, Component prefix, int has, int max) {
+        return Component.join(JoinConfiguration.noSeparators(), new Component[] {
+                Component.text(Unicode.WATCH.string + seconds, NamedTextColor.GOLD),
+                Component.space(),
+                prefix,
+                Component.text(has + "/" + max, NamedTextColor.DARK_RED),
+            });
     }
 
     /**
@@ -447,7 +465,11 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
                         Component.newline(),
                         description,
                         (doesRequireInstrument
-                         ? Component.text("\nRequires Musical Instrument", NamedTextColor.RED)
+                         ? Component.join(JoinConfiguration.noSeparators(), new Component[] {
+                                 Component.newline(),
+                                 Mytems.ANGELIC_HARP.component,
+                                 Component.text("Musical Instrument Required", NamedTextColor.RED)
+                             })
                          : Component.empty()),
                         Component.newline(),
                         (!session.isUniqueLocked(this)
@@ -455,7 +477,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
                          : Component.text(Unicode.CHECKED_CHECKBOX.character + " Finished", NamedTextColor.BLUE)),
                         Component.newline(),
                         Component.newline(),
-                        Component.text("Play this for the cost of 1 "),
+                        Component.text("Play game for 1"),
                         VanillaItems.DIAMOND.component,
                         Component.text("Diamond?"),
                         Component.newline(),
