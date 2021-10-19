@@ -1,9 +1,12 @@
 package com.cavetale.halloween;
 
+import com.cavetale.area.struct.Vec3i;
 import com.cavetale.core.event.player.PluginPlayerEvent;
 import com.cavetale.halloween.attraction.Attraction;
 import com.cavetale.halloween.attraction.MusicHeroAttraction;
 import com.cavetale.halloween.attraction.ShootTargetAttraction;
+import com.cavetale.magicmap.event.MagicMapCursorEvent;
+import com.cavetale.magicmap.util.Cursors;
 import com.cavetale.mytems.event.music.PlayerBeatEvent;
 import com.cavetale.mytems.event.music.PlayerCloseMusicalInstrumentEvent;
 import com.cavetale.mytems.event.music.PlayerMelodyCompleteEvent;
@@ -25,6 +28,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.map.MapCursor;
 
 @RequiredArgsConstructor
 public final class EventListener implements Listener {
@@ -134,5 +138,25 @@ public final class EventListener implements Listener {
     @EventHandler
     protected void onPlayerMelodyComplete(PlayerMelodyCompleteEvent event) {
         plugin.applyActiveAttraction(MusicHeroAttraction.class, m -> m.onPlayerMelodyComplete(event));
+    }
+
+    @EventHandler
+    protected void onMagicMapCursor(MagicMapCursorEvent event) {
+        if (!event.getPlayer().getWorld().getName().equals((String) HalloweenPlugin.WORLD)) {
+            return;
+        }
+        Session session = plugin.sessionOf(event.getPlayer());
+        for (Attraction attraction : plugin.attractionsMap.values()) {
+            Vec3i vec = attraction.getNpcVector();
+            if (vec == null) continue;
+            if (vec.x < event.getMinX() || vec.x > event.getMaxX()) continue;
+            if (vec.z < event.getMinZ() || vec.z > event.getMaxZ()) continue;
+            boolean completed = session.isUniqueLocked(attraction);
+            MapCursor mapCursor = Cursors.make(completed ? MapCursor.Type.MANSION : MapCursor.Type.RED_X,
+                                               vec.x - event.getMinX(),
+                                               vec.z - event.getMinZ(),
+                                               8);
+            event.getCursors().addCursor(mapCursor);
+        }
     }
 }
