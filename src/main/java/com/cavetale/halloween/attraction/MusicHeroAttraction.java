@@ -19,6 +19,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -35,8 +36,7 @@ import org.bukkit.inventory.meta.BookMeta;
 public final class MusicHeroAttraction extends Attraction<MusicHeroAttraction.SaveTag> {
     protected static final Duration WARMUP_TIME = Duration.ofSeconds(30);
     protected int secondsLeft;
-    protected Music music;
-    protected Melody melody;
+    @Setter protected Music music;
     protected Vec3i lecternBlock = null;
     protected ItemStack melodyBook;
 
@@ -48,7 +48,6 @@ public final class MusicHeroAttraction extends Attraction<MusicHeroAttraction.Sa
             }
         }
         this.music = Music.MOONSHINE_SONATA;
-        this.melody = music.melody;
         this.displayName = Component.text("Music Hero", NamedTextColor.RED);
         this.description = Component.text("Play the notes while they're on your instrument."
                                           + " Don't miss a single note for the prize!");
@@ -103,10 +102,12 @@ public final class MusicHeroAttraction extends Attraction<MusicHeroAttraction.Sa
     public void onPlayerOpenMusicalInstrument(PlayerOpenMusicalInstrumentEvent event) {
         Player player = getCurrentPlayer();
         if (saveTag.state != State.IDLE && Objects.equals(player, event.getPlayer())) {
-            long avg = (long) melody.getAverageTicks();
+            long avg = (long) music.melody.getAverageTicks();
             long desired = 900L;
             long speed = ((desired - 1) / avg) + 1;
-            event.setHeroMelody(melody.withSpeed(speed));
+            List<Beat> beats = new ArrayList<>(music.melody.getBeats());
+            beats.removeIf(b -> b.instrument != music.instrument || b.ticks == 0);
+            event.setHeroMelody(new Melody(music.keys, beats, speed));
             changeState(State.PLAY);
         }
     }
@@ -130,7 +131,7 @@ public final class MusicHeroAttraction extends Attraction<MusicHeroAttraction.Sa
         if (finalScore >= maximumScore) {
             player.closeInventory();
             perfect(player);
-            melody.play(player.getLocation(), 24.0);
+            music.melody.play(player.getLocation(), 24.0);
             plugin.sessionOf(player).setCooldown(this, completionCooldown);
             prepareReward(player, true);
         } else {
@@ -181,8 +182,9 @@ public final class MusicHeroAttraction extends Attraction<MusicHeroAttraction.Sa
             keys.add(Glyph.toComponent(tone.toString().toLowerCase() + semitone.symbol));
         }
         List<Component> notes = new ArrayList<>();
-        for (Beat beat : melody.getBeats()) {
+        for (Beat beat : music.melody.getBeats()) {
             if (beat.ticks == 0) continue;
+            if (beat.instrument != music.instrument) continue;
             notes.add(Component.text(beat.toString(), NamedTextColor.BLUE));
         }
         ItemStack book = new ItemStack(Material.WRITTEN_BOOK);

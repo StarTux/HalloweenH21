@@ -3,12 +3,15 @@ package com.cavetale.halloween;
 import com.cavetale.halloween.attraction.Attraction;
 import com.cavetale.halloween.attraction.AttractionType;
 import com.cavetale.halloween.attraction.FindSpidersAttraction;
+import com.cavetale.halloween.attraction.MusicHeroAttraction;
+import com.cavetale.halloween.attraction.RepeatMelodyAttraction;
 import java.time.Duration;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Instrument;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -19,25 +22,25 @@ public enum Booth {
     MOUNTAIN_HERO(AttractionType.MUSIC_HERO,
                   null, Component.text("Thanks for visiting me up here."
                                        + " Want to learn a new melody?"),
-                  null, null),
+                  null, a -> ((MusicHeroAttraction) a).setMusic(Music.ODE_TO_JOY)),
     GLASS_PALADIN_HERO(AttractionType.MUSIC_HERO,
                        null, Component.text("Nothing like a nice tune to"
                                             + " brighten your spirits."
                                             + " Care to learn it?"),
-                       null, null),
+                       null, a -> ((MusicHeroAttraction) a).setMusic(Music.FOX_DU_HAST_DIE_GANS_GESTOHLEN)),
     MOTH_DEN_MUSIC_HERO(AttractionType.MUSIC_HERO,
                         null, Component.text("I always play this melody for our esteemed guests!"
                                              + " Care to learn it?"),
-                        null, null),
+                        null, a -> ((MusicHeroAttraction) a).setMusic(Music.FLINTSTONES)),
     LOVE_CRYME_MUSIC(AttractionType.MUSIC_HERO,
                      null, null,
-                     null, null),
+                     null, a -> ((MusicHeroAttraction) a).setMusic(Music.ALLE_MEINE_ENTCHEN)),
     FLARE_DANCER_MUSIC(AttractionType.MUSIC_HERO,
                      null, null,
                      null, null),
     OWO_TREE_MUSIC(AttractionType.MUSIC_HERO,
                    null, null,
-                   null, null),
+                   null, a -> ((MusicHeroAttraction) a).setMusic(Music.HAPPY_BIRTHDAY)),
     BRENPETER_MUSIC_HERO(AttractionType.MUSIC_HERO,
                          null, null,
                          null, null),
@@ -46,40 +49,42 @@ public enum Booth {
                null, null),
 
     // Repeat Melody
-    COFFEE_SONG(AttractionType.REPEAT_MELODY, null, null, null, null),
+    COFFEE_SONG(AttractionType.REPEAT_MELODY,
+                null, null,
+                null, a -> ((RepeatMelodyAttraction) a).set(Instrument.PIANO, 1)),
     DRACO_WOLF_SONG(AttractionType.REPEAT_MELODY,
                     null, null,
-                    null, null),
+                    null, a -> ((RepeatMelodyAttraction) a).set(Instrument.BELL, 1)),
     HAWK_MELODY(AttractionType.REPEAT_MELODY,
                 null, null,
-                null, null),
+                null, a -> ((RepeatMelodyAttraction) a).set(Instrument.FLUTE, 1)),
     ARCANTOS_MELODY(AttractionType.REPEAT_MELODY,
                     null, null,
-                    null, null),
+                    null, a -> ((RepeatMelodyAttraction) a).set(Instrument.CHIME, 1)),
     CRITTER_MELODY(AttractionType.REPEAT_MELODY,
-                    null, null,
-                    null, null),
+                   null, null,
+                   null, a -> ((RepeatMelodyAttraction) a).set(Instrument.XYLOPHONE, 1)),
     FAST_PUPPY_MELODY(AttractionType.REPEAT_MELODY,
                       null, null,
-                      null, null),
+                      null, a -> ((RepeatMelodyAttraction) a).set(Instrument.IRON_XYLOPHONE, 1)),
     YYONGI_MELODY(AttractionType.REPEAT_MELODY,
-                      null, null,
-                      null, null),
+                  null, null,
+                  null, a -> ((RepeatMelodyAttraction) a).set(Instrument.COW_BELL, 1)),
     ABYSMAL_VOID_MELODY(AttractionType.REPEAT_MELODY,
                         null, null,
-                        null, null),
+                        null, a -> ((RepeatMelodyAttraction) a).set(Instrument.BIT, 1)),
     CEDRIC_MELODY(AttractionType.REPEAT_MELODY,
                   null, null,
-                  null, null),
+                  null, a -> ((RepeatMelodyAttraction) a).set(Instrument.BANJO, 1)),
     AIRONT_MELODY(AttractionType.REPEAT_MELODY,
                   null, null,
-                  null, null),
+                  null, a -> ((RepeatMelodyAttraction) a).set(Instrument.PLING, 1)),
     ROXY_CAT_MELODY(AttractionType.REPEAT_MELODY,
                     null, null,
-                    null, null),
+                    null, a -> ((RepeatMelodyAttraction) a).set(Instrument.BASS_GUITAR, 1)),
     PILLOW_MELODY(AttractionType.REPEAT_MELODY,
                   null, null,
-                  null, null),
+                  null, a -> ((RepeatMelodyAttraction) a).set(Instrument.GUITAR, 1)),
 
     // Shoot Target
     SHOOTING_PYRAMID(AttractionType.SHOOT_TARGET,

@@ -28,6 +28,7 @@ import org.bukkit.entity.Player;
 public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttraction.SaveTag> {
     protected Melody melody = null;
     @Setter protected Instrument instrument = Instrument.PIANO;
+    @Setter protected int octave = 1;
 
     protected RepeatMelodyAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList, final Booth booth) {
         super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
@@ -35,6 +36,11 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
         this.displayName = Component.text("Play the Melody", NamedTextColor.DARK_RED);
         this.description = Component.text("I'll give you a melody and you're gonna repeat it. It gets harder every round.");
 
+    }
+
+    public void set(Instrument theInstr, int theOctave) {
+        this.instrument = theInstr;
+        this.octave = theOctave;
     }
 
     @Override
@@ -109,9 +115,9 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
         for (int i = 0; i < 8; i += 1) {
             Tone tone = tones[random.nextInt(tones.length)];
             if (semis.contains(tone)) {
-                melodyBuilder.beat(6, tone, semitone, 1);
+                melodyBuilder.beat(6, tone, semitone, octave);
             } else {
-                melodyBuilder.beat(6, tone, 1);
+                melodyBuilder.beat(6, tone, octave);
             }
         }
         melody = melodyBuilder.build();
