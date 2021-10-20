@@ -38,6 +38,12 @@ public enum Booth {
     OWO_TREE_MUSIC(AttractionType.MUSIC_HERO,
                    null, null,
                    null, null),
+    BRENPETER_MUSIC_HERO(AttractionType.MUSIC_HERO,
+                         null, null,
+                         null, null),
+    ADIS_MUSIC(AttractionType.MUSIC_HERO,
+               null, null,
+               null, null),
 
     // Repeat Melody
     COFFEE_SONG(AttractionType.REPEAT_MELODY, null, null, null, null),
@@ -66,6 +72,12 @@ public enum Booth {
                   null, null,
                   null, null),
     AIRONT_MELODY(AttractionType.REPEAT_MELODY,
+                  null, null,
+                  null, null),
+    ROXY_CAT_MELODY(AttractionType.REPEAT_MELODY,
+                    null, null,
+                    null, null),
+    PILLOW_MELODY(AttractionType.REPEAT_MELODY,
                   null, null,
                   null, null),
 
@@ -103,6 +115,18 @@ public enum Booth {
     RAT_CRYPT_SHOOTING(AttractionType.SHOOT_TARGET,
                        null, null,
                        null, null),
+    CRYSTAL_DEAR_WITCH_MANOR_SHOOTING(AttractionType.SHOOT_TARGET,
+                                      null, null,
+                                      null, null),
+    CALCULA_CLOWN_SHOOTING(AttractionType.SHOOT_TARGET,
+                           null, null,
+                           null, null),
+    CORGI_HURRICANE_SHOOTING(AttractionType.SHOOT_TARGET,
+                             null, null,
+                             null, null),
+    GROOVE_SOUL_GRAVEYARD_SHOOTING(AttractionType.SHOOT_TARGET,
+                                   null, null,
+                                   null, null),
 
     // Find Spiders
     SPIDER_MANSION(AttractionType.FIND_SPIDERS,
@@ -134,6 +158,21 @@ public enum Booth {
                                        + " They come out one by one and make noise."
                                        + " Please find them all."),
                         null, null),
+    TEKKERSMON_SPIDER_HOUSE(AttractionType.FIND_SPIDERS,
+                            null, null,
+                            null, null),
+    SPIRITUS_SPIDER_COTTAGE(AttractionType.FIND_SPIDERS,
+                            null, null,
+                            null, null),
+    BRIGHTER_GIANT_SPIDER(AttractionType.FIND_SPIDERS,
+                          Component.text("Giant Spider", NamedTextColor.DARK_RED),
+                          Component.text("I knew moving into a giant spider was a bad idea."
+                                         + " Turns out this place is spider infested."
+                                         + " Can you find them all?"),
+                          null, null),
+    PAPAMACI_SPIDERS(AttractionType.FIND_SPIDERS,
+                     null, null,
+                     null, null),
 
     // Find Blocks
     GHOST_TOWER(AttractionType.FIND_BLOCKS,
@@ -156,6 +195,12 @@ public enum Booth {
                                               + " a ghost keeps placing and rearranging blocks."
                                               + " Can you find them all?"),
                          null, null),
+    NOT_NOT_ROB_GHOST_BLOCKS(AttractionType.FIND_BLOCKS,
+                             null, null,
+                             null, null),
+    ADIS_GHOST_BLOCKS(AttractionType.FIND_BLOCKS,
+                      null, null,
+                      null, null),
 
     // Open Chest
     DRAGON_TOWER(AttractionType.OPEN_CHEST,
@@ -182,6 +227,12 @@ public enum Booth {
     HYRULE_CHESTS(AttractionType.OPEN_CHEST,
                   null, null,
                   null, null),
+    COOLJEFF_CHESTS(AttractionType.OPEN_CHEST,
+                    null, null,
+                    null, null),
+    RINTAMAKI_CHESTS(AttractionType.OPEN_CHEST,
+                     null, null,
+                     null, null),
 
     // Race
     POOL_RACE(AttractionType.RACE,
@@ -203,8 +254,7 @@ public enum Booth {
                            null, Component.text("A race round the church,"
                                                 + " counter clockwise?"
                                                 + " Nobody's fater than me!"),
-                           null, null),
-    ;
+                           null, null);
 
     public final String name; // Corresponds with area.name
     public final AttractionType type;
