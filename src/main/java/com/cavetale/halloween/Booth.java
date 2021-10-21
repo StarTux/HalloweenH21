@@ -280,7 +280,7 @@ public enum Booth {
     LORD_SHEEP_CHURCH_RACE(AttractionType.RACE,
                            null, Component.text("A race round the church,"
                                                 + " counter clockwise?"
-                                                + " Nobody's fater than me!"),
+                                                + " Nobody's faster than me!"),
                            null, null);
 
     public final String name; // Corresponds with area.name
