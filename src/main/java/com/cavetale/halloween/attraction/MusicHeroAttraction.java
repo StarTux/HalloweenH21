@@ -17,6 +17,7 @@ import com.cavetale.mytems.item.music.Melody;
 import com.cavetale.mytems.item.music.Semitone;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import lombok.Setter;
@@ -36,7 +37,8 @@ import org.bukkit.inventory.meta.BookMeta;
 public final class MusicHeroAttraction extends Attraction<MusicHeroAttraction.SaveTag> {
     protected static final Duration WARMUP_TIME = Duration.ofSeconds(30);
     protected int secondsLeft;
-    @Setter protected Music music;
+    @Setter protected Music music = Music.ALLE_MEINE_ENTCHEN;
+    @Setter protected Music backgroundMusic;
     protected Vec3i lecternBlock = null;
     protected ItemStack melodyBook;
 
@@ -47,7 +49,6 @@ public final class MusicHeroAttraction extends Attraction<MusicHeroAttraction.Sa
                 lecternBlock = area.min;
             }
         }
-        this.music = Music.ALLE_MEINE_ENTCHEN;
         this.displayName = Component.text("Music Hero", NamedTextColor.RED);
         this.description = Component.text("Play the notes while they're on your instrument."
                                           + " Don't miss a single note for the prize!");
@@ -102,11 +103,14 @@ public final class MusicHeroAttraction extends Attraction<MusicHeroAttraction.Sa
     public void onPlayerOpenMusicalInstrument(PlayerOpenMusicalInstrumentEvent event) {
         Player player = getCurrentPlayer();
         if (saveTag.state != State.IDLE && Objects.equals(player, event.getPlayer())) {
-            long avg = (long) music.melody.getAverageTicks();
-            long desired = 900L;
-            long speed = ((desired - 1) / avg) + 1;
             List<Beat> beats = new ArrayList<>(music.melody.getBeats());
             beats.removeIf(b -> b.instrument != music.instrument || b.ticks == 0);
+            List<Long> ticks = new ArrayList<>(beats.size());
+            for (Beat beat : beats) ticks.add((long) beat.ticks);
+            Collections.sort(ticks);
+            long median = ticks.get(ticks.size() / 2);
+            long desired = 900L;
+            long speed = ((desired - 1) / median) + 1;
             event.setHeroMelody(new Melody(music.keys, beats, speed));
             changeState(State.PLAY);
         }
@@ -132,6 +136,9 @@ public final class MusicHeroAttraction extends Attraction<MusicHeroAttraction.Sa
             player.closeInventory();
             perfect(player);
             music.melody.play(plugin, player.getLocation(), 24.0);
+            if (backgroundMusic != null) {
+                backgroundMusic.melody.play(plugin, player.getLocation(), 24.0);
+            }
             plugin.sessionOf(player).setCooldown(this, completionCooldown);
             prepareReward(player, true);
         } else {

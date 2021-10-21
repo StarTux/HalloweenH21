@@ -34,7 +34,7 @@ public enum Booth {
                         null, a -> ((MusicHeroAttraction) a).setMusic(Music.FLINTSTONES)),
     LOVE_CRYME_MUSIC(AttractionType.MUSIC_HERO,
                      null, null,
-                     null, a -> ((MusicHeroAttraction) a).setMusic(Music.ALLE_MEINE_ENTCHEN)),
+                     null, a -> ((MusicHeroAttraction) a).setMusic(Music.EINE_KLEINE_NACHTMUSIK)),
     FLARE_DANCER_MUSIC(AttractionType.MUSIC_HERO,
                        null, null,
                        null, a -> ((MusicHeroAttraction) a).setMusic(Music.FRERE_JACQUES)),
@@ -43,10 +43,13 @@ public enum Booth {
                    null, a -> ((MusicHeroAttraction) a).setMusic(Music.HAPPY_BIRTHDAY)),
     BRENPETER_MUSIC_HERO(AttractionType.MUSIC_HERO,
                          null, null,
-                         null, null),
+                         null, a -> ((MusicHeroAttraction) a).setMusic(Music.ALLE_MEINE_ENTCHEN)),
     ADIS_MUSIC(AttractionType.MUSIC_HERO,
                null, null,
-               null, null),
+               null, a -> {
+                   ((MusicHeroAttraction) a).setMusic(Music.KOROBENIKI);
+                   ((MusicHeroAttraction) a).setBackgroundMusic(Music.KOROBENIKI_BACKGROUND);
+               }),
 
     // Repeat Melody
     COFFEE_SONG(AttractionType.REPEAT_MELODY,
