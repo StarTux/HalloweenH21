@@ -28,6 +28,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 
 public final class FindSpidersAttraction extends Attraction<FindSpidersAttraction.SaveTag> {
     @Setter protected Duration searchTime = Duration.ofSeconds(40);
@@ -174,6 +175,7 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
                 s.setSilent(true);
                 Bukkit.getMobGoals().removeAllGoals(s);
             });
+        currentSpider.setMetadata("nomap", new FixedMetadataValue(plugin, true));
     }
 
     protected void clearSpider() {
