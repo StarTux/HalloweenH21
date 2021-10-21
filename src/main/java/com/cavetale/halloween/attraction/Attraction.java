@@ -170,14 +170,14 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     protected final void timeout(Player player) {
         player.showTitle(Title.title(Component.text("Timeout", NamedTextColor.DARK_RED),
                                      Component.text("Try Again", NamedTextColor.DARK_RED)));
-        Music.DECKED_OUT.melody.play(player);
+        Music.DECKED_OUT.melody.play(plugin, player);
         plugin.sessionOf(player).setCooldown(this, Duration.ofSeconds(10));
     }
 
     protected final void fail(Player player) {
         player.showTitle(Title.title(Component.text("Wrong", NamedTextColor.DARK_RED),
                                      Component.text("Try Again", NamedTextColor.DARK_RED)));
-        Music.DECKED_OUT.melody.play(player);
+        Music.DECKED_OUT.melody.play(plugin, player);
         plugin.sessionOf(player).setCooldown(this, Duration.ofSeconds(10));
     }
 

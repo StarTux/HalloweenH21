@@ -72,7 +72,7 @@ public final class HalloweenCommand extends AbstractCommand<HalloweenPlugin> {
             }
             target = (Player) sender;
         }
-        music.melody.play(target);
+        music.melody.play(plugin, target);
         sender.sendMessage(Component.text("Playing " + music + " to " + target.getName(), NamedTextColor.YELLOW));
         return true;
     }

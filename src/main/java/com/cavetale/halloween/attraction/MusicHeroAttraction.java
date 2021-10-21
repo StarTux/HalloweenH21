@@ -47,7 +47,7 @@ public final class MusicHeroAttraction extends Attraction<MusicHeroAttraction.Sa
                 lecternBlock = area.min;
             }
         }
-        this.music = Music.MOONSHINE_SONATA;
+        this.music = Music.ALLE_MEINE_ENTCHEN;
         this.displayName = Component.text("Music Hero", NamedTextColor.RED);
         this.description = Component.text("Play the notes while they're on your instrument."
                                           + " Don't miss a single note for the prize!");
@@ -131,7 +131,7 @@ public final class MusicHeroAttraction extends Attraction<MusicHeroAttraction.Sa
         if (finalScore >= maximumScore) {
             player.closeInventory();
             perfect(player);
-            music.melody.play(player.getLocation(), 24.0);
+            music.melody.play(plugin, player.getLocation(), 24.0);
             plugin.sessionOf(player).setCooldown(this, completionCooldown);
             prepareReward(player, true);
         } else {

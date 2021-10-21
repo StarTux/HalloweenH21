@@ -170,7 +170,7 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
                 player.closeInventory();
                 if (saveTag.maxNoteIndex >= melody.getBeats().size()) {
                     perfect(player);
-                    melody.play(player);
+                    melody.play(plugin, player);
                     prepareReward(player, true);
                     plugin.sessionOf(player).setCooldown(this, completionCooldown);
                     changeState(State.IDLE);

@@ -352,6 +352,82 @@ public enum Music {
                .beat(0, G, 1).beat(0, B, 1).beat(0, D, 1)
                .beat(8, G, 1)), // weilt
 
+    FRERE_JACQUES(PIANO, 100L,
+                  Map.of(B, FLAT),
+                  b -> b
+                  .beat(0, GUITAR, F, 1)
+                  .beat(4, F, 0)
+                  .beat(4, G, 1)
+                  .beat(4, A, 1)
+                  .beat(4, F, 0)
+                  .beat(0, GUITAR, F, 1)
+                  .beat(4, F, 0)
+                  .beat(4, G, 1)
+                  .beat(4, A, 1)
+                  .beat(4, F, 0)
+                  .beat(0, GUITAR, F, 1)
+                  .beat(4, A, 1)
+                  .beat(4, B, 1)
+                  .beat(8, C, 1)
+                  .beat(0, GUITAR, F, 1)
+                  .beat(4, A, 1)
+                  .beat(4, B, 1)
+                  .beat(8, C, 1)
+                  .beat(0, GUITAR, C, 1)
+                  .beat(2, C, 1)
+                  .beat(2, D, 1)
+                  .beat(2, C, 1)
+                  .beat(2, B, 1)
+                  .beat(0, GUITAR, F, 1)
+                  .beat(4, A, 1)
+                  .beat(4, F, 0)
+                  .beat(0, GUITAR, C, 1)
+                  .beat(2, C, 1)
+                  .beat(2, D, 1)
+                  .beat(2, C, 1)
+                  .beat(2, B, 1)
+                  .beat(0, GUITAR, F, 1)
+                  .beat(4, A, 1)
+                  .beat(4, F, 0)
+                  .beat(0, GUITAR, C, 1)
+                  .beat(4, G, 1)
+                  .beat(4, C, 0)
+                  .beat(0, GUITAR, F, 1)
+                  .beat(8, F, 0)
+                  .beat(0, GUITAR, C, 1)
+                  .beat(4, G, 1)
+                  .beat(4, C, 0)
+                  .beat(0, GUITAR, F, 1)
+                  .beat(8, F, 0)),
+
+    EINE_KLEINE_NACHTMUSIK(BIT, 100L,
+                           Map.of(F, SHARP),
+                           b -> b
+                           .beat(4, G, 1)
+                           .pause(2)
+                           .beat(2, D, 0)
+                           .beat(4, G, 1)
+                           .pause(2)
+                           .beat(2, D, 0)
+                           .beat(2, G, 1)
+                           .beat(2, D, 0)
+                           .beat(2, G, 1)
+                           .beat(2, B, 1)
+                           .beat(4, D, 1)
+                           .pause(4)
+                           .beat(4, C, 1)
+                           .pause(2)
+                           .beat(2, A, 1)
+                           .beat(4, C, 1)
+                           .pause(2)
+                           .beat(2, A, 1)
+                           .beat(2, C, 1)
+                           .beat(2, A, 1)
+                           .beat(2, F, 0)
+                           .beat(2, A, 1)
+                           .beat(4, D, 0)
+                           .pause(4)),
+
     FAIRY_FOUNTAIN(CHIME, 100L,
                    Map.of(B, FLAT),
                    b -> b
