@@ -86,7 +86,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         if (booth != null) {
             if (booth.displayName != null) result.displayName = booth.displayName;
             if (booth.description != null) result.description = booth.description;
-            if (booth.reward != null) result.firstCompletionReward = booth.reward;
+            if (booth.reward != null) result.firstCompletionReward = booth.reward.createItemStack();
             if (booth.consumer != null) booth.consumer.accept(result);
         }
         return result;
@@ -192,7 +192,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.MASTER, 0.3f, 2.0f);
     }
 
-    protected final void perfect(Player player) {
+    public static final void perfect(Player player, boolean withMusic) {
         Component message = Component.join(JoinConfiguration.noSeparators(), new Component[] {
                 Component.text("P", NamedTextColor.GOLD),
                 Component.text("E", NamedTextColor.RED),
@@ -205,7 +205,14 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
             });
         player.showTitle(Title.title(message, Component.empty()));
         player.sendMessage(message);
-        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.MASTER, 0.3f, 2.0f);
+        if (withMusic) {
+            Music.TREASURE.melody.play(HalloweenPlugin.getInstance(), player);
+            Music.TREASURE2.melody.play(HalloweenPlugin.getInstance(), player);
+        }
+    }
+
+    protected final void perfect(Player player) {
+        perfect(player, true);
     }
 
     protected final void countdown(Player player, int seconds) {

@@ -5,6 +5,9 @@ import com.cavetale.area.struct.Cuboid;
 import com.cavetale.halloween.attraction.Attraction;
 import com.cavetale.halloween.attraction.AttractionType;
 import com.cavetale.halloween.util.Gui;
+import com.cavetale.resident.PluginSpawn;
+import com.cavetale.resident.ZoneType;
+import com.cavetale.resident.save.Loc;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,12 +21,16 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class HalloweenPlugin extends JavaPlugin {
+    protected static final String TOTAL_COMPLETION = "TotalCompletion";
     @Getter protected static HalloweenPlugin instance;
     protected static final String WORLD = "halloween";
     protected static final String AREAS_FILE = "Halloween";
@@ -34,6 +41,7 @@ public final class HalloweenPlugin extends JavaPlugin {
     protected final Map<UUID, Session> sessionsMap = new HashMap<>();
     @Getter protected File attractionsFolder;
     @Getter protected File playersFolder;
+    protected PluginSpawn totalCompletionVillager;
 
     @Override
     public void onEnable() {
@@ -83,6 +91,10 @@ public final class HalloweenPlugin extends JavaPlugin {
             }
         }
         attractionsMap.clear();
+        if (totalCompletionVillager != null) {
+            totalCompletionVillager.unregister();
+            totalCompletionVillager = null;
+        }
     }
 
     protected void clearSessions() {
@@ -105,6 +117,13 @@ public final class HalloweenPlugin extends JavaPlugin {
         Set<Booth> unusedBooths = EnumSet.allOf(Booth.class);
         for (Map.Entry<String, List<Cuboid>> entry : areasFile.areas.entrySet()) {
             String name = entry.getKey();
+            if (name.equals(TOTAL_COMPLETION)) {
+                Location location = entry.getValue().get(0).min.toLocation(world);
+                this.totalCompletionVillager = PluginSpawn.register(this, ZoneType.HALLOWEEN, Loc.of(location));
+                this.totalCompletionVillager.setOnPlayerClick(this::clickTotalCompletionVillager);
+                this.totalCompletionVillager.setOnMobSpawning(mob -> mob.setCollidable(false));
+                continue;
+            }
             Booth booth = Booth.forName(name);
             if (booth == null) {
                 getLogger().warning(name + ": No Booth found!");
@@ -165,6 +184,34 @@ public final class HalloweenPlugin extends JavaPlugin {
             if (attraction.isPlaying() && type.isInstance(attraction)) {
                 consumer.accept(type.cast(attraction));
             }
+        }
+    }
+
+    protected void clickTotalCompletionVillager(Player player) {
+        Session session = sessionOf(player);
+        if (session.isUniqueNameLocked(TOTAL_COMPLETION)) {
+            player.sendMessage(Component.text("You completed everything. Congratulations!",
+                                              NamedTextColor.GOLD));
+            return;
+        }
+        Booth[] booths = Booth.values();
+        final int total = booths.length;
+        int locked = 0;
+        for (Booth booth : booths) {
+            if (session.isUniqueNameLocked(booth.name)) {
+                locked += 1;
+            }
+        }
+        if (locked >= total) {
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kite member HalloweenComplete " + player.getName());
+            session.lockUniqueName(TOTAL_COMPLETION);
+            session.save();
+            Attraction.perfect(player, true);
+        } else {
+            player.sendMessage(Component.text("You completed " + locked + "/" + total + " games."
+                                              + " Please return when you completed everything!"
+                                              + " Use your Magic Map to locate more games.",
+                                              NamedTextColor.GOLD));
         }
     }
 }

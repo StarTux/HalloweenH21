@@ -52,8 +52,16 @@ public final class Session {
         return tag.uniquesGot.contains(attraction.getName());
     }
 
+    public boolean isUniqueNameLocked(String named) {
+        return tag.uniquesGot.contains(named);
+    }
+
     public void lockUnique(Attraction attraction) {
         tag.uniquesGot.add(attraction.getName());
+    }
+
+    public void lockUniqueName(String named) {
+        tag.uniquesGot.add(named);
     }
 
     public int getPrizeWaiting(Attraction attraction) {

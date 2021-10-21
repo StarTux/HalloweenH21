@@ -5,6 +5,7 @@ import com.cavetale.halloween.attraction.AttractionType;
 import com.cavetale.halloween.attraction.FindSpidersAttraction;
 import com.cavetale.halloween.attraction.MusicHeroAttraction;
 import com.cavetale.halloween.attraction.RepeatMelodyAttraction;
+import com.cavetale.mytems.Mytems;
 import java.time.Duration;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -12,46 +13,53 @@ import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Instrument;
-import org.bukkit.inventory.ItemStack;
 
 /**
  * Static information for Attractions.
  */
 public enum Booth {
-    // Music Hero
+    // Music Hero 8
     MOUNTAIN_HERO(AttractionType.MUSIC_HERO,
                   null, Component.text("Thanks for visiting me up here."
                                        + " Want to learn a new melody?"),
-                  null, a -> ((MusicHeroAttraction) a).setMusic(Music.ODE_TO_JOY)),
+                  Mytems.HALLOWEEN_TOKEN_2,
+                  a -> ((MusicHeroAttraction) a).setMusic(Music.ODE_TO_JOY)),
     GLASS_PALADIN_HERO(AttractionType.MUSIC_HERO,
                        null, Component.text("Nothing like a nice tune to"
                                             + " brighten your spirits."
                                             + " Care to learn it?"),
-                       null, a -> ((MusicHeroAttraction) a).setMusic(Music.FOX_DU_HAST_DIE_GANS_GESTOHLEN)),
+                       Mytems.HALLOWEEN_TOKEN_2,
+                       a -> ((MusicHeroAttraction) a).setMusic(Music.FOX_DU_HAST_DIE_GANS_GESTOHLEN)),
     MOTH_DEN_MUSIC_HERO(AttractionType.MUSIC_HERO,
                         null, Component.text("I always play this melody for our esteemed guests!"
                                              + " Care to learn it?"),
-                        null, a -> ((MusicHeroAttraction) a).setMusic(Music.FLINTSTONES)),
+                        Mytems.HALLOWEEN_TOKEN_2,
+                        a -> ((MusicHeroAttraction) a).setMusic(Music.HANSCHEN_KLEIN)),
     LOVE_CRYME_MUSIC(AttractionType.MUSIC_HERO,
                      null, null,
-                     null, a -> ((MusicHeroAttraction) a).setMusic(Music.EINE_KLEINE_NACHTMUSIK)),
+                     Mytems.HALLOWEEN_TOKEN_2,
+                     a -> ((MusicHeroAttraction) a).setMusic(Music.EINE_KLEINE_NACHTMUSIK)),
     FLARE_DANCER_MUSIC(AttractionType.MUSIC_HERO,
                        null, null,
-                       null, a -> ((MusicHeroAttraction) a).setMusic(Music.FRERE_JACQUES)),
+                       Mytems.HALLOWEEN_TOKEN_2,
+                       a -> ((MusicHeroAttraction) a).setMusic(Music.FRERE_JACQUES)),
     OWO_TREE_MUSIC(AttractionType.MUSIC_HERO,
                    null, null,
-                   null, a -> ((MusicHeroAttraction) a).setMusic(Music.HAPPY_BIRTHDAY)),
+                   Mytems.HALLOWEEN_TOKEN_2,
+                   a -> ((MusicHeroAttraction) a).setMusic(Music.HAPPY_BIRTHDAY)),
     BRENPETER_MUSIC_HERO(AttractionType.MUSIC_HERO,
                          null, null,
-                         null, a -> ((MusicHeroAttraction) a).setMusic(Music.ALLE_MEINE_ENTCHEN)),
+                         Mytems.HALLOWEEN_TOKEN_2,
+                         a -> ((MusicHeroAttraction) a).setMusic(Music.ALLE_MEINE_ENTCHEN)),
     ADIS_MUSIC(AttractionType.MUSIC_HERO,
                null, null,
-               null, a -> {
+               Mytems.HALLOWEEN_TOKEN_2,
+               a -> {
                    ((MusicHeroAttraction) a).setMusic(Music.KOROBENIKI);
                    ((MusicHeroAttraction) a).setBackgroundMusic(Music.KOROBENIKI_BACKGROUND);
                }),
 
-    // Repeat Melody
+    // Repeat Melody 12
     COFFEE_SONG(AttractionType.REPEAT_MELODY,
                 null, null,
                 null, a -> ((RepeatMelodyAttraction) a).set(Instrument.PIANO, 1)),
@@ -63,7 +71,8 @@ public enum Booth {
                 null, a -> ((RepeatMelodyAttraction) a).set(Instrument.FLUTE, 1)),
     ARCANTOS_MELODY(AttractionType.REPEAT_MELODY,
                     null, null,
-                    null, a -> ((RepeatMelodyAttraction) a).set(Instrument.CHIME, 1)),
+                    Mytems.HALLOWEEN_TOKEN_2,
+                    a -> ((RepeatMelodyAttraction) a).set(Instrument.CHIME, 1)),
     CRITTER_MELODY(AttractionType.REPEAT_MELODY,
                    null, null,
                    null, a -> ((RepeatMelodyAttraction) a).set(Instrument.XYLOPHONE, 1)),
@@ -87,7 +96,8 @@ public enum Booth {
                     null, a -> ((RepeatMelodyAttraction) a).set(Instrument.BASS_GUITAR, 1)),
     PILLOW_MELODY(AttractionType.REPEAT_MELODY,
                   null, null,
-                  null, a -> ((RepeatMelodyAttraction) a).set(Instrument.GUITAR, 1)),
+                  Mytems.HALLOWEEN_TOKEN_2,
+                  a -> ((RepeatMelodyAttraction) a).set(Instrument.GUITAR, 1)),
 
     // Shoot Target
     SHOOTING_PYRAMID(AttractionType.SHOOT_TARGET,
@@ -95,7 +105,8 @@ public enum Booth {
                      Component.text("Targets will appear on each level of this pyramid."
                                     + " Use the Televator to hit them all with an arrow."
                                     + " Don't forget about the ghasts!"),
-                     null, null),
+                     Mytems.HALLOWEEN_TOKEN_2,
+                     null),
     VERANDA_TARGETS(AttractionType.SHOOT_TARGET,
                     null, Component.text("Go on my backyard veranda and shoot"
                                          + " all the targets with a bow and arrow!"),
@@ -114,7 +125,7 @@ public enum Booth {
     KOONTZY_SHOOTING(AttractionType.SHOOT_TARGET,
                      null, Component.text("Shoot the targets that appear in the frontyard"
                                           + " with a bow and arrow!"),
-                     null, null),
+                     Mytems.HALLOWEEN_TOKEN_2, null),
     KITSUNE_SHOOTING(AttractionType.SHOOT_TARGET,
                      null, Component.text("Ghasts and target blocks spawn in these"
                                           + " halls. Shoot them all with your"
@@ -148,10 +159,12 @@ public enum Booth {
                       null, null),
     PEARLESQUE_SPIDERS(AttractionType.FIND_SPIDERS,
                        null, null,
-                       null, null),
+                       Mytems.HALLOWEEN_TOKEN_2,
+                       null),
     ADIS_SPIDER_HOUSE(AttractionType.FIND_SPIDERS,
                       null, null,
-                      null, a -> {
+                      Mytems.HALLOWEEN_TOKEN_2,
+                      a -> {
                           ((FindSpidersAttraction) a).setSearchTime(Duration.ofSeconds(80));
                       }),
     NOOOMYZ_SPIDER_HOUSE(AttractionType.FIND_SPIDERS,
@@ -165,13 +178,15 @@ public enum Booth {
                         Component.text("Help, my home and garden are infested with spiders!"
                                        + " They come out one by one and make noise."
                                        + " Please find them all."),
-                        null, null),
+                        Mytems.HALLOWEEN_TOKEN_2,
+                        null),
     TEKKERSMON_SPIDER_HOUSE(AttractionType.FIND_SPIDERS,
                             null, null,
                             null, null),
     SPIRITUS_SPIDER_COTTAGE(AttractionType.FIND_SPIDERS,
                             null, null,
-                            null, null),
+                            Mytems.HALLOWEEN_TOKEN_2,
+                            null),
     BRIGHTER_GIANT_SPIDER(AttractionType.FIND_SPIDERS,
                           Component.text("Giant Spider", NamedTextColor.DARK_RED),
                           Component.text("I knew moving into a giant spider was a bad idea."
@@ -185,7 +200,8 @@ public enum Booth {
     // Find Blocks
     GHOST_TOWER(AttractionType.FIND_BLOCKS,
                 null, null,
-                null, null),
+                Mytems.HALLOWEEN_TOKEN_2,
+                null),
     HIDDEN_BLOCKS_TIX(AttractionType.FIND_BLOCKS,
                       null, null,
                       null, null),
@@ -213,7 +229,8 @@ public enum Booth {
     // Open Chest
     DRAGON_TOWER(AttractionType.OPEN_CHEST,
                  null, null,
-                 null, null),
+                 Mytems.HALLOWEEN_TOKEN_2,
+                 null),
     CHESTS_ON_HILLS(AttractionType.OPEN_CHEST,
                     null, null,
                     null, null),
@@ -268,13 +285,13 @@ public enum Booth {
     public final AttractionType type;
     public final Component displayName;
     public final Component description;
-    public final ItemStack reward;
+    public final Mytems reward;
     public final Consumer<Attraction> consumer;
 
     Booth(final AttractionType type,
           final Component displayName,
           final Component description,
-          final ItemStack reward,
+          final Mytems reward,
           final Consumer<Attraction> consumer) {
         this.name = Stream.of(name().split("_"))
             .map(s -> s.substring(0, 1) + s.substring(1).toLowerCase())

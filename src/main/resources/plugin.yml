@@ -22,7 +22,7 @@ commands:
   halloween:
     aliases: []
     description: Admin Command
-    permission: halloween.halloween
+    permission: halloween.admin
     usage: |-
       /halloween
 
@@ -32,10 +32,10 @@ permissions:
     description: Play the games
     default: true
 
-  halloween.halloween:
+  halloween.admin:
     description: Use /halloween
     default: op
 
   halloween.nocooldown:
     description: Skip cooldowns
-    default: op
+    default: false

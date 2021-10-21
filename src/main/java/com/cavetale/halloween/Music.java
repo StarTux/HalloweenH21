@@ -263,6 +263,75 @@ public enum Music {
                 .beat(1, XYLOPHONE, E, 0)
                 .beat(1, XYLOPHONE, F, 0)),
 
+    HANSCHEN_KLEIN(BANJO, 100L,
+                   Map.of(),
+                   b -> b
+                   .beat(0, COW_BELL, G, 1)
+                   .beat(4, G, 1)
+                   .beat(4, E, 0)
+                   .beat(8, E, 0)
+                   .beat(0, COW_BELL, F, 0)
+                   .beat(4, F, 0)
+                   .beat(4, D, 0)
+                   .beat(8, D, 0)
+                   .beat(0, COW_BELL, C, 0)
+                   .beat(4, C, 0)
+                   .beat(4, D, 0)
+                   .beat(4, E, 0)
+                   .beat(4, F, 0)
+                   .beat(0, COW_BELL, G, 1)
+                   .beat(4, G, 1)
+                   .beat(4, G, 1)
+                   .beat(8, G, 1)
+                   .beat(0, COW_BELL, G, 1)
+                   .beat(4, G, 1)
+                   .beat(4, E, 0)
+                   .beat(8, E, 0)
+                   .beat(0, COW_BELL, F, 0)
+                   .beat(4, F, 0)
+                   .beat(4, D, 0)
+                   .beat(8, D, 0)
+                   .beat(0, COW_BELL, C, 0)
+                   .beat(4, C, 0)
+                   .beat(4, E, 0)
+                   .beat(4, G, 1)
+                   .beat(4, G, 1)
+                   .beat(0, COW_BELL, C, 0)
+                   .beat(16, C, 0)
+                   .beat(0, COW_BELL, D, 0)
+                   .beat(4, D, 0)
+                   .beat(4, D, 0)
+                   .beat(4, D, 0)
+                   .beat(4, D, 0)
+                   .beat(0, COW_BELL, D, 0)
+                   .beat(4, D, 0)
+                   .beat(4, E, 0)
+                   .beat(8, F, 0)
+                   .beat(0, COW_BELL, E, 0)
+                   .beat(4, E, 0)
+                   .beat(4, E, 0)
+                   .beat(4, E, 0)
+                   .beat(4, E, 0)
+                   .beat(0, COW_BELL, E, 0)
+                   .beat(4, E, 0)
+                   .beat(4, F, 0)
+                   .beat(8, G, 1)
+                   .beat(0, COW_BELL, G, 1)
+                   .beat(4, G, 1)
+                   .beat(4, E, 0)
+                   .beat(8, E, 0)
+                   .beat(0, COW_BELL, F, 0)
+                   .beat(4, F, 0)
+                   .beat(4, D, 0)
+                   .beat(8, D, 0)
+                   .beat(0, COW_BELL, C, 0)
+                   .beat(4, C, 0)
+                   .beat(4, E, 0)
+                   .beat(4, G, 1)
+                   .beat(4, G, 1)
+                   .beat(0, COW_BELL, C, 0)
+                   .beat(16, C, 0)),
+
     ODE_TO_JOY(PIANO, 100L,
                Map.of(F, SHARP),
                b -> b
@@ -721,6 +790,29 @@ public enum Music {
                    .beat(8, G, 1)
                    .beat(8, F, SHARP, 0)
                    .beat(8, G, 1)),
+
+    TREASURE(PIANO, 50L,
+             Map.of(),
+             b -> b
+             .beat(3, G, 1)
+             .beat(3, F, SHARP, 0)
+             .beat(3, E, FLAT, 0)
+             .beat(3, A, 0)
+             .beat(3, G, SHARP, 0)
+             .beat(3, E, 0)
+             .beat(3, A, FLAT, 1)
+             .beat(3, C, 1)),
+    TREASURE2(CHIME, 50L,
+              Map.of(),
+              b -> b
+              .beat(3, G, 1)
+              .beat(3, F, SHARP, 0)
+              .beat(3, E, FLAT, 0)
+              .beat(3, A, 0)
+              .beat(3, G, SHARP, 0)
+              .beat(3, E, 0)
+              .beat(3, A, FLAT, 1)
+              .beat(3, C, 1)),
 
     DECKED_OUT(DIDGERIDOO, 100L,
                Map.of(),
