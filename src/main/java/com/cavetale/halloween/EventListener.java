@@ -63,7 +63,6 @@ public final class EventListener implements Listener {
         for (Attraction attraction : plugin.attractionsMap.values()) {
             if (!attraction.isInArea(player.getLocation())) continue;
             attraction.onPluginPlayer(event);
-            break;
         }
     }
 
@@ -76,7 +75,6 @@ public final class EventListener implements Listener {
             if (attraction instanceof ShootTargetAttraction) {
                 ((ShootTargetAttraction) attraction).onProjectileHit(event);
             }
-            break;
         }
     }
 
