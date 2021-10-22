@@ -567,7 +567,7 @@ public enum Music {
                .beat(2, B, 0)
                .beat(2, C, 0)
                .beat(4, D, 0)
-               .beat(2, D, 0)
+               .beat(2, C, 0)
                .beat(2, B, 0)
                .beat(4, A, 0)
                .beat(2, A, 0)
