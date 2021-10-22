@@ -189,7 +189,8 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         Component message = Component.text("Complete", NamedTextColor.GOLD);
         player.showTitle(Title.title(message, Component.text("Good Job!", NamedTextColor.GOLD)));
         player.sendMessage(message);
-        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.MASTER, 0.3f, 2.0f);
+        Music.TREASURE.melody.play(HalloweenPlugin.getInstance(), player);
+        Music.TREASURE2.melody.play(HalloweenPlugin.getInstance(), player);
     }
 
     public static final void perfect(Player player, boolean withMusic) {
