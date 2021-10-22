@@ -150,7 +150,16 @@ public final class EventListener implements Listener {
             if (vec.x < event.getMinX() || vec.x > event.getMaxX()) continue;
             if (vec.z < event.getMinZ() || vec.z > event.getMaxZ()) continue;
             boolean completed = session.isUniqueLocked(attraction);
-            MapCursor mapCursor = Cursors.make(completed ? MapCursor.Type.MANSION : MapCursor.Type.RED_X,
+            boolean pickedUp = session.getPrizeWaiting(attraction) != 2;
+            MapCursor.Type cursorType;
+            if (completed && pickedUp) {
+                cursorType = MapCursor.Type.MANSION;
+            } else if (completed && !pickedUp) {
+                cursorType = MapCursor.Type.RED_MARKER
+            } else {
+                cursorType = MapCursor.Type.RED_X;
+            }
+            MapCursor mapCursor = Cursors.make(cursorType,
                                                vec.x - event.getMinX(),
                                                vec.z - event.getMinZ(),
                                                8);
