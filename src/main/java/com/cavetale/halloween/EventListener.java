@@ -155,7 +155,7 @@ public final class EventListener implements Listener {
             if (completed && pickedUp) {
                 cursorType = MapCursor.Type.MANSION;
             } else if (completed && !pickedUp) {
-                cursorType = MapCursor.Type.RED_MARKER
+                cursorType = MapCursor.Type.RED_MARKER;
             } else {
                 cursorType = MapCursor.Type.RED_X;
             }
