@@ -6,7 +6,6 @@ import com.cavetale.core.font.Unicode;
 import com.cavetale.halloween.Booth;
 import com.cavetale.halloween.HalloweenPlugin;
 import com.cavetale.halloween.Session;
-import com.cavetale.mytems.Mytems;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
@@ -20,25 +19,11 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 
 public final class OpenChestAttraction extends Attraction<OpenChestAttraction.SaveTag> {
     protected static final Duration OPEN_TIME = Duration.ofSeconds(30);
     Set<Vec3i> chestBlockSet = new HashSet<>();
     protected int secondsLeft;
-    protected static final List<Object> PRIZE_POOL = List.of(Mytems.CANDY_CORN,
-                                                             Mytems.CHOCOLATE_BAR,
-                                                             Mytems.LOLLIPOP,
-                                                             Mytems.ORANGE_CANDY,
-                                                             new ItemStack(Material.DIAMOND, 1),
-                                                             new ItemStack(Material.DIAMOND, 2),
-                                                             new ItemStack(Material.DIAMOND, 4),
-                                                             new ItemStack(Material.DIAMOND, 8),
-                                                             new ItemStack(Material.DIAMOND, 16),
-                                                             new ItemStack(Material.DIAMOND, 32),
-                                                             new ItemStack(Material.DIAMOND, 64),
-                                                             new ItemStack(Material.EMERALD),
-                                                             new ItemStack(Material.COD));
 
     protected OpenChestAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList, final Booth booth) {
         super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
@@ -96,14 +81,6 @@ public final class OpenChestAttraction extends Attraction<OpenChestAttraction.Sa
                 return;
             }
         }
-    }
-
-    @Override
-    protected ItemStack getRegularCompletionReward(Player player) {
-        Object o = PRIZE_POOL.get(random.nextInt(PRIZE_POOL.size()));
-        if (o instanceof ItemStack) return ((ItemStack) o).clone();
-        if (o instanceof Mytems) return ((Mytems) o).createItemStack(player);
-        throw new IllegalStateException("type=" + o.getClass());
     }
 
     public void openChest(Player player, Block block) {

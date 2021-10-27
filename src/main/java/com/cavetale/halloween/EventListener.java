@@ -26,7 +26,6 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.map.MapCursor;
 
@@ -37,10 +36,6 @@ public final class EventListener implements Listener {
 
     public void enable() {
         Bukkit.getPluginManager().registerEvents(this, plugin);
-    }
-
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    protected void onPlayerJoin(PlayerJoinEvent event) {
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
