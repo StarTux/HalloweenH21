@@ -15,11 +15,8 @@ import com.cavetale.mytems.Mytems;
 import com.cavetale.resident.PluginSpawn;
 import com.cavetale.resident.ZoneType;
 import com.cavetale.resident.save.Loc;
-import com.destroystokyo.paper.MaterialSetTag;
-import com.destroystokyo.paper.MaterialTags;
 import java.io.File;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -75,24 +72,28 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     protected Component displayName = Component.empty();
     protected Component description = Component.empty();
     protected ItemStack firstCompletionReward = Mytems.HALLOWEEN_TOKEN.createItemStack();
-    protected static final List<List<Object>> PRIZE_POOL = List.of(new List[] {
-            List.of(Mytems.CANDY_CORN,
-                    Mytems.CHOCOLATE_BAR,
-                    Mytems.LOLLIPOP,
-                    Mytems.ORANGE_CANDY),
-            List.of(new ItemStack(Material.DIAMOND, 1),
-                    new ItemStack(Material.DIAMOND, 2),
-                    new ItemStack(Material.DIAMOND, 4),
-                    new ItemStack(Material.DIAMOND, 8),
-                    new ItemStack(Material.DIAMOND, 16),
-                    new ItemStack(Material.DIAMOND, 32),
-                    new ItemStack(Material.DIAMOND, 64)),
-            List.of(new ItemStack(Material.EMERALD),
-                    new ItemStack(Material.COD),
-                    new ItemStack(Material.POISONOUS_POTATO),
-                    MaterialTags.MUSIC_DISCS,
-                    new ItemStack(Material.SPYGLASS)),
-        });
+    protected static final ItemStack[][] PRIZE_POOL = {
+        {
+            Mytems.CANDY_CORN.createItemStack(),
+            Mytems.CHOCOLATE_BAR.createItemStack(),
+            Mytems.LOLLIPOP.createItemStack(),
+            Mytems.ORANGE_CANDY.createItemStack(),
+        },
+        {
+            new ItemStack(Material.DIAMOND, 1),
+            new ItemStack(Material.DIAMOND, 2),
+            new ItemStack(Material.DIAMOND, 4),
+            new ItemStack(Material.DIAMOND, 8),
+            new ItemStack(Material.DIAMOND, 16),
+            new ItemStack(Material.DIAMOND, 32),
+            new ItemStack(Material.DIAMOND, 64),
+        },
+        {
+            new ItemStack(Material.EMERALD),
+            new ItemStack(Material.COD),
+            new ItemStack(Material.POISONOUS_POTATO),
+        }
+    };
 
     public static Attraction of(HalloweenPlugin plugin, @NonNull final String name, @NonNull final List<Cuboid> areaList,
                                 final Booth booth) {
@@ -298,16 +299,9 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     }
 
     protected final ItemStack getRegularCompletionReward(Player player) {
-        List<Object> list = PRIZE_POOL.get(random.nextInt(PRIZE_POOL.size()));
-        Object o = list.get(random.nextInt(list.size()));
-        if (o instanceof ItemStack) return ((ItemStack) o).clone();
-        if (o instanceof Mytems) return ((Mytems) o).createItemStack(player);
-        if (o instanceof MaterialSetTag) {
-            List<Material> mats = new ArrayList<>(((MaterialSetTag) o).getValues());
-            Material mat = mats.get(random.nextInt(mats.size()));
-            return new ItemStack(mat);
-        }
-        throw new IllegalStateException("type=" + o.getClass());
+        ItemStack[] list = PRIZE_POOL[random.nextInt(PRIZE_POOL.length)];
+        ItemStack itemStack = list[random.nextInt(list.length)];
+        return itemStack.clone();
     }
 
     /**
