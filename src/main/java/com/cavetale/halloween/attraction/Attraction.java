@@ -89,8 +89,8 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
                     new ItemStack(Material.DIAMOND, 64)),
             List.of(new ItemStack(Material.EMERALD),
                     new ItemStack(Material.COD),
-                    new ItemStack(Material.POISONOUS_POTATO)),
-            List.of(MaterialTags.MUSIC_DISCS,
+                    new ItemStack(Material.POISONOUS_POTATO),
+                    MaterialTags.MUSIC_DISCS,
                     new ItemStack(Material.SPYGLASS)),
         });
 
