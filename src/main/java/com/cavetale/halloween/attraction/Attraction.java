@@ -72,7 +72,19 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     protected Component displayName = Component.empty();
     protected Component description = Component.empty();
     protected ItemStack firstCompletionReward = Mytems.HALLOWEEN_TOKEN.createItemStack();
-    protected static final ItemStack[][] PRIZE_POOL = {
+    protected static final ItemStack[] PREMIUM_PRIZE_POOL = {
+            Mytems.CANDY_CORN.createItemStack(),
+            Mytems.CHOCOLATE_BAR.createItemStack(),
+            Mytems.LOLLIPOP.createItemStack(),
+            Mytems.ORANGE_CANDY.createItemStack(),
+            new ItemStack(Material.DIAMOND, 2),
+            new ItemStack(Material.DIAMOND, 4),
+            new ItemStack(Material.DIAMOND, 8),
+            new ItemStack(Material.DIAMOND, 16),
+            new ItemStack(Material.DIAMOND, 32),
+            new ItemStack(Material.DIAMOND, 64),
+    };
+    protected static final ItemStack[][] DUD_PRIZE_POOL = {
         {
             Mytems.CANDY_CORN.createItemStack(),
             Mytems.CHOCOLATE_BAR.createItemStack(),
@@ -80,7 +92,6 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
             Mytems.ORANGE_CANDY.createItemStack(),
         },
         {
-            new ItemStack(Material.DIAMOND, 1),
             new ItemStack(Material.DIAMOND, 2),
             new ItemStack(Material.DIAMOND, 4),
             new ItemStack(Material.DIAMOND, 8),
@@ -94,6 +105,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
             new ItemStack(Material.POISONOUS_POTATO),
         }
     };
+    protected boolean prizePoolHasDuds = false;
 
     public static Attraction of(HalloweenPlugin plugin, @NonNull final String name, @NonNull final List<Cuboid> areaList,
                                 final Booth booth) {
@@ -299,7 +311,9 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     }
 
     protected final ItemStack getRegularCompletionReward(Player player) {
-        ItemStack[] list = PRIZE_POOL[random.nextInt(PRIZE_POOL.length)];
+        ItemStack[] list = prizePoolHasDuds
+            ? DUD_PRIZE_POOL[random.nextInt(DUD_PRIZE_POOL.length)]
+            : PREMIUM_PRIZE_POOL;
         ItemStack itemStack = list[random.nextInt(list.length)];
         return itemStack.clone();
     }

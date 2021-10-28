@@ -35,6 +35,7 @@ public final class OpenChestAttraction extends Attraction<OpenChestAttraction.Sa
         this.displayName = Component.text("Chest Game", NamedTextColor.DARK_RED);
         this.description = Component.text("Choose one of my chests and keep"
                                           + " what you find inside!");
+        this.prizePoolHasDuds = true;
     }
 
     @Override
