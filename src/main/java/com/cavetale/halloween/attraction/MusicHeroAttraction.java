@@ -135,9 +135,9 @@ public final class MusicHeroAttraction extends Attraction<MusicHeroAttraction.Sa
         if (finalScore >= maximumScore) {
             player.closeInventory();
             perfect(player, false);
-            music.melody.play(plugin, player.getLocation(), 24.0);
+            music.melody.play(plugin, player.getLocation());
             if (backgroundMusic != null) {
-                backgroundMusic.melody.play(plugin, player.getLocation(), 24.0);
+                backgroundMusic.melody.play(plugin, player.getLocation());
             }
             plugin.sessionOf(player).setCooldown(this, completionCooldown);
             prepareReward(player, true);
