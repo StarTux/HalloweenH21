@@ -3,6 +3,7 @@ package com.cavetale.halloween.attraction;
 import com.cavetale.area.struct.Cuboid;
 import com.cavetale.area.struct.Vec3i;
 import com.cavetale.core.event.player.PluginPlayerEvent;
+import com.cavetale.core.font.DefaultFont;
 import com.cavetale.core.font.Unicode;
 import com.cavetale.core.font.VanillaItems;
 import com.cavetale.core.util.Json;
@@ -519,11 +520,11 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
                         VanillaItems.DIAMOND.component,
                         Component.text("Diamond?"),
                         Component.newline(),
-                        (Component.text("[Yes]", NamedTextColor.BLUE)
+                        (DefaultFont.START_BUTTON.component
                          .clickEvent(ClickEvent.runCommand("/hallow yes " + name))
                          .hoverEvent(HoverEvent.showText(Component.text("Play this Game", NamedTextColor.GREEN)))),
                         Component.space(),
-                        (Component.text("[No]", NamedTextColor.DARK_RED)
+                        (DefaultFont.CANCEL_BUTTON.component
                          .clickEvent(ClickEvent.runCommand("/hallow no " + name))
                          .hoverEvent(HoverEvent.showText(Component.text("Goodbye!", NamedTextColor.RED)))),
                     });
