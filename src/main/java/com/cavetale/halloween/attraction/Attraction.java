@@ -225,7 +225,6 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         player.showTitle(Title.title(message, Component.text("Good Job!", NamedTextColor.GOLD)));
         player.sendMessage(message);
         Music.TREASURE.melody.play(HalloweenPlugin.getInstance(), player);
-        Music.TREASURE2.melody.play(HalloweenPlugin.getInstance(), player);
     }
 
     public static final void perfect(Player player, boolean withMusic) {
@@ -243,7 +242,6 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         player.sendMessage(message);
         if (withMusic) {
             Music.TREASURE.melody.play(HalloweenPlugin.getInstance(), player);
-            Music.TREASURE2.melody.play(HalloweenPlugin.getInstance(), player);
         }
     }
 

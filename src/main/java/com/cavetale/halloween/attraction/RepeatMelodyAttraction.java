@@ -3,10 +3,12 @@ package com.cavetale.halloween.attraction;
 import com.cavetale.area.struct.Cuboid;
 import com.cavetale.core.event.player.PluginPlayerEvent.Detail;
 import com.cavetale.core.event.player.PluginPlayerEvent;
+import com.cavetale.core.util.Json;
 import com.cavetale.halloween.Booth;
 import com.cavetale.halloween.HalloweenPlugin;
 import com.cavetale.mytems.item.music.Beat;
 import com.cavetale.mytems.item.music.Melody;
+import com.cavetale.mytems.item.music.MelodyBuilder;
 import com.cavetale.mytems.item.music.Semitone;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -54,7 +56,7 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
     @Override
     protected void onLoad() {
         if (saveTag.melody != null) {
-            melody = Melody.deserialize(saveTag.melody);
+            melody = Json.deserialize(saveTag.melody, Melody.class);
         }
     }
 
@@ -86,7 +88,7 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
     protected void playNote(Player player, Location location) {
         Beat beat = melody.getBeats().get(saveTag.noteIndex);
         for (Player online : plugin.getPlayersIn(mainArea)) {
-            beat.play(online, location);
+            beat.play(melody, online, location);
         }
         List<Component> comps = new ArrayList<>();
         for (int i = 0; i <= saveTag.noteIndex; i += 1) {
@@ -99,7 +101,7 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
     }
 
     protected void makeMelody() {
-        Melody.Builder melodyBuilder = Melody.builder(instrument, 100L);
+        MelodyBuilder melodyBuilder = Melody.builder(instrument, 100L);
         Tone[] tones = Tone.values();
         List<Tone> semis = new ArrayList<>(List.of(tones));
         final Semitone semitone;
@@ -121,7 +123,7 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
             }
         }
         melody = melodyBuilder.build();
-        saveTag.melody = melody.serialize();
+        saveTag.melody = Json.serialize(melody);
     }
 
     protected State tickPlay() {
@@ -163,7 +165,7 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
         Note note = Detail.NOTE.get(event, null);
         if (note == null) return;
         Beat beat = melody.getBeats().get(saveTag.noteIndex);
-        if (beat.countsAs(note)) {
+        if (beat.countsAs(melody, note)) {
             saveTag.noteIndex += 1;
             if (saveTag.noteIndex > saveTag.maxNoteIndex) {
                 saveTag.maxNoteIndex += 1;

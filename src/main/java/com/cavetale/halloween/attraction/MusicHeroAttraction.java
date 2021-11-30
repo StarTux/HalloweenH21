@@ -38,7 +38,6 @@ public final class MusicHeroAttraction extends Attraction<MusicHeroAttraction.Sa
     protected static final Duration WARMUP_TIME = Duration.ofSeconds(30);
     protected int secondsLeft;
     @Setter protected Music music = Music.ALLE_MEINE_ENTCHEN;
-    @Setter protected Music backgroundMusic;
     protected Vec3i lecternBlock = null;
     protected ItemStack melodyBook;
 
@@ -104,14 +103,14 @@ public final class MusicHeroAttraction extends Attraction<MusicHeroAttraction.Sa
         Player player = getCurrentPlayer();
         if (saveTag.state != State.IDLE && Objects.equals(player, event.getPlayer())) {
             List<Beat> beats = new ArrayList<>(music.melody.getBeats());
-            beats.removeIf(b -> b.instrument != music.instrument || b.ticks == 0);
+            beats.removeIf(b -> b.instrument != null || b.ticks == 0 || b.isPause());
             List<Long> ticks = new ArrayList<>(beats.size());
             for (Beat beat : beats) ticks.add((long) beat.ticks);
             Collections.sort(ticks);
             long median = ticks.get(ticks.size() / 2);
             long desired = 900L;
             long speed = ((desired - 1) / median) + 1;
-            event.setHeroMelody(new Melody(music.keys, beats, speed));
+            event.setHeroMelody(new Melody(music.melody.getInstrument(), music.keys, beats, speed, null));
             changeState(State.PLAY);
         }
     }
@@ -136,9 +135,6 @@ public final class MusicHeroAttraction extends Attraction<MusicHeroAttraction.Sa
             player.closeInventory();
             perfect(player, false);
             music.melody.play(plugin, player.getLocation());
-            if (backgroundMusic != null) {
-                backgroundMusic.melody.play(plugin, player.getLocation());
-            }
             plugin.sessionOf(player).setCooldown(this, completionCooldown);
             prepareReward(player, true);
         } else {
@@ -190,8 +186,8 @@ public final class MusicHeroAttraction extends Attraction<MusicHeroAttraction.Sa
         }
         List<Component> notes = new ArrayList<>();
         for (Beat beat : music.melody.getBeats()) {
-            if (beat.ticks == 0) continue;
-            if (beat.instrument != music.instrument) continue;
+            if (beat.ticks == 0 || beat.isPause()) continue;
+            if (beat.instrument != null) continue;
             notes.add(Component.text(beat.toString(), NamedTextColor.BLUE));
         }
         ItemStack book = new ItemStack(Material.WRITTEN_BOOK);

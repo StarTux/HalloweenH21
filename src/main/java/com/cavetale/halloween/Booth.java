@@ -56,7 +56,6 @@ public enum Booth {
                Mytems.HALLOWEEN_TOKEN_2,
                a -> {
                    ((MusicHeroAttraction) a).setMusic(Music.KOROBENIKI);
-                   ((MusicHeroAttraction) a).setBackgroundMusic(Music.KOROBENIKI_BACKGROUND);
                }),
 
     // Repeat Melody 12
