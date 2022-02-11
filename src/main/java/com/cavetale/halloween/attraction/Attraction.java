@@ -13,6 +13,7 @@ import com.cavetale.halloween.Music;
 import com.cavetale.halloween.Session;
 import com.cavetale.halloween.util.Gui;
 import com.cavetale.mytems.Mytems;
+import com.cavetale.mytems.MytemsCategory;
 import com.cavetale.resident.PluginSpawn;
 import com.cavetale.resident.ZoneType;
 import com.cavetale.resident.save.Loc;
@@ -440,7 +441,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     protected final boolean checkInstrument(Player player) {
         for (ItemStack itemStack : player.getInventory()) {
             Mytems mytems = Mytems.forItem(itemStack);
-            if (mytems != null && mytems.category == Mytems.Category.MUSIC) {
+            if (mytems != null && mytems.category == MytemsCategory.MUSIC) {
                 return true;
             }
         }
