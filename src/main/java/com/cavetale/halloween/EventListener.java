@@ -1,7 +1,7 @@
 package com.cavetale.halloween;
 
-import com.cavetale.area.struct.Vec3i;
 import com.cavetale.core.event.player.PluginPlayerEvent;
+import com.cavetale.core.struct.Vec3i;
 import com.cavetale.halloween.attraction.Attraction;
 import com.cavetale.halloween.attraction.MusicHeroAttraction;
 import com.cavetale.halloween.attraction.ShootTargetAttraction;

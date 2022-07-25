@@ -1,11 +1,12 @@
 package com.cavetale.halloween.attraction;
 
-import com.cavetale.area.struct.Cuboid;
-import com.cavetale.area.struct.Vec3i;
+import com.cavetale.area.struct.Area;
 import com.cavetale.core.event.player.PluginPlayerEvent;
 import com.cavetale.core.font.DefaultFont;
 import com.cavetale.core.font.Unicode;
 import com.cavetale.core.font.VanillaItems;
+import com.cavetale.core.struct.Cuboid;
+import com.cavetale.core.struct.Vec3i;
 import com.cavetale.core.util.Json;
 import com.cavetale.halloween.Booth;
 import com.cavetale.halloween.HalloweenPlugin;
@@ -59,7 +60,7 @@ import org.bukkit.inventory.meta.BookMeta;
 public abstract class Attraction<T extends Attraction.SaveTag> {
     protected final HalloweenPlugin plugin;
     protected final String name;
-    protected final List<Cuboid> allAreas;
+    protected final List<Area> allAreas;
     protected final File saveFile;
     protected final Cuboid mainArea;
     protected final Class<T> saveTagClass;
@@ -109,7 +110,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     };
     protected boolean prizePoolHasDuds = false;
 
-    public static Attraction of(HalloweenPlugin plugin, @NonNull final String name, @NonNull final List<Cuboid> areaList,
+    public static Attraction of(HalloweenPlugin plugin, @NonNull final String name, @NonNull final List<Area> areaList,
                                 final Booth booth) {
         if (areaList.isEmpty()) throw new IllegalArgumentException(name + ": area list is empty");
         if (areaList.get(0).name == null) throw new IllegalArgumentException(name + ": first area has no name!");
@@ -128,7 +129,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         return result;
     }
 
-    private static Attraction makeAttraction(HalloweenPlugin plugin, AttractionType type, String name, List<Cuboid> areaList, Booth booth) {
+    private static Attraction makeAttraction(HalloweenPlugin plugin, AttractionType type, String name, List<Area> areaList, Booth booth) {
         switch (type) {
         case REPEAT_MELODY: return new RepeatMelodyAttraction(plugin, name, areaList, booth);
         case SHOOT_TARGET: return new ShootTargetAttraction(plugin, name, areaList, booth);
@@ -142,16 +143,16 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         }
     }
 
-    protected Attraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList, final Booth booth,
+    protected Attraction(final HalloweenPlugin plugin, final String name, final List<Area> areaList, final Booth booth,
                          final Class<T> saveTagClass, final Supplier<T> saveTagSupplier) {
         this.plugin = plugin;
         this.name = name;
         this.allAreas = areaList;
         this.saveFile = new File(plugin.getAttractionsFolder(), name + ".json");
-        this.mainArea = areaList.get(0);
+        this.mainArea = areaList.get(0).toCuboid();
         this.saveTagClass = saveTagClass;
         this.saveTagSupplier = saveTagSupplier;
-        for (Cuboid area : areaList) {
+        for (Area area : areaList) {
             if ("npc".equals(area.name)) {
                 npcVector = area.min;
             }

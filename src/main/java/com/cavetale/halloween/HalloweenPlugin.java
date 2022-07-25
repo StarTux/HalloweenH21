@@ -1,7 +1,8 @@
 package com.cavetale.halloween;
 
+import com.cavetale.area.struct.Area;
 import com.cavetale.area.struct.AreasFile;
-import com.cavetale.area.struct.Cuboid;
+import com.cavetale.core.struct.Cuboid;
 import com.cavetale.halloween.attraction.Attraction;
 import com.cavetale.halloween.attraction.AttractionType;
 import com.cavetale.halloween.util.Gui;
@@ -115,7 +116,7 @@ public final class HalloweenPlugin extends JavaPlugin {
         AreasFile areasFile = AreasFile.load(world, AREAS_FILE);
         if (areasFile == null) throw new IllegalStateException("Areas file not found: " + AREAS_FILE);
         Set<Booth> unusedBooths = EnumSet.allOf(Booth.class);
-        for (Map.Entry<String, List<Cuboid>> entry : areasFile.areas.entrySet()) {
+        for (Map.Entry<String, List<Area>> entry : areasFile.areas.entrySet()) {
             String name = entry.getKey();
             if (name.equals(TOTAL_COMPLETION)) {
                 Location location = entry.getValue().get(0).min.toLocation(world);
@@ -130,7 +131,7 @@ public final class HalloweenPlugin extends JavaPlugin {
             } else {
                 unusedBooths.remove(booth);
             }
-            List<Cuboid> areaList = entry.getValue();
+            List<Area> areaList = entry.getValue();
             Attraction attraction = Attraction.of(this, name, areaList, booth);
             if (attraction == null) {
                 getLogger().warning(name + ": No Attraction!");

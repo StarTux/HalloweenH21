@@ -1,7 +1,8 @@
 package com.cavetale.halloween.attraction;
 
-import com.cavetale.area.struct.Cuboid;
-import com.cavetale.area.struct.Vec3i;
+import com.cavetale.area.struct.Area;
+import com.cavetale.core.struct.Cuboid;
+import com.cavetale.core.struct.Vec3i;
 import com.cavetale.halloween.Booth;
 import com.cavetale.halloween.HalloweenPlugin;
 import com.cavetale.mytems.Mytems;
@@ -25,17 +26,17 @@ public final class RaceAttraction extends Attraction<RaceAttraction.SaveTag> {
     protected int countdownSeconds;
     protected List<Cuboid> aiCheckpointList = new ArrayList<>();
     protected List<Cuboid> playerCheckpointList = new ArrayList<>();
-    Cuboid startArea = Cuboid.ZERO;
+    protected Cuboid startArea = Cuboid.ZERO;
 
-    protected RaceAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList, final Booth booth) {
+    protected RaceAttraction(final HalloweenPlugin plugin, final String name, final List<Area> areaList, final Booth booth) {
         super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
-        for (Cuboid area : areaList) {
+        for (Area area : areaList) {
             if ("ai".equals(area.name)) {
-                aiCheckpointList.add(area);
+                aiCheckpointList.add(area.toCuboid());
             } else if ("player".equals(area.name)) {
-                playerCheckpointList.add(area);
+                playerCheckpointList.add(area.toCuboid());
             } else if ("start".equals(area.name)) {
-                startArea = area;
+                startArea = area.toCuboid();
             }
         }
         this.displayName = Component.text("Race Me", NamedTextColor.RED);
@@ -150,9 +151,9 @@ public final class RaceAttraction extends Attraction<RaceAttraction.SaveTag> {
     protected void pathTo(int index) {
         if (index >= aiCheckpointList.size()) return;
         Cuboid checkpoint = aiCheckpointList.get(index);
-        Vec3i vec = new Vec3i((checkpoint.min.x + checkpoint.max.x) / 2,
-                              checkpoint.min.y,
-                              (checkpoint.min.z + checkpoint.max.z) / 2);
+        Vec3i vec = new Vec3i((checkpoint.ax + checkpoint.bx) / 2,
+                              checkpoint.ay,
+                              (checkpoint.az + checkpoint.bz) / 2);
         Block block = vec.toBlock(plugin.getWorld());
         while (block.isSolid()) {
             block = block.getRelative(0, 1, 0);

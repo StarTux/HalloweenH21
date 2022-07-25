@@ -1,9 +1,9 @@
 package com.cavetale.halloween.attraction;
 
-import com.cavetale.area.struct.Cuboid;
-import com.cavetale.area.struct.Vec3i;
+import com.cavetale.area.struct.Area;
 import com.cavetale.core.font.Unicode;
 import com.cavetale.core.font.VanillaItems;
+import com.cavetale.core.struct.Vec3i;
 import com.cavetale.halloween.Booth;
 import com.cavetale.halloween.HalloweenPlugin;
 import java.time.Duration;
@@ -20,9 +20,9 @@ public final class DummyAttraction extends Attraction<DummyAttraction.SaveTag> {
     protected int secondsLeft;
     protected final Set<Vec3i> blocks = new HashSet<>();;
 
-    protected DummyAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList, final Booth booth) {
+    protected DummyAttraction(final HalloweenPlugin plugin, final String name, final List<Area> areaList, final Booth booth) {
         super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
-        for (Cuboid area : areaList) {
+        for (Area area : areaList) {
             if ("name".equals(area.name)) {
                 blocks.addAll(area.enumerate());
             }

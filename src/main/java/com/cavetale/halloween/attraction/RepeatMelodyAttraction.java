@@ -1,6 +1,6 @@
 package com.cavetale.halloween.attraction;
 
-import com.cavetale.area.struct.Cuboid;
+import com.cavetale.area.struct.Area;
 import com.cavetale.core.event.player.PluginPlayerEvent.Detail;
 import com.cavetale.core.event.player.PluginPlayerEvent;
 import com.cavetale.core.util.Json;
@@ -32,7 +32,7 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
     @Setter protected Instrument instrument = Instrument.PIANO;
     @Setter protected int octave = 1;
 
-    protected RepeatMelodyAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList, final Booth booth) {
+    protected RepeatMelodyAttraction(final HalloweenPlugin plugin, final String name, final List<Area> areaList, final Booth booth) {
         super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
         this.doesRequireInstrument = true;
         this.displayName = Component.text("Play the Melody", NamedTextColor.DARK_RED);

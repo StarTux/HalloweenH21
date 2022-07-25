@@ -1,8 +1,9 @@
 package com.cavetale.halloween.attraction;
 
-import com.cavetale.area.struct.Cuboid;
-import com.cavetale.area.struct.Vec3i;
+import com.cavetale.area.struct.Area;
 import com.cavetale.core.font.VanillaItems;
+import com.cavetale.core.struct.Cuboid;
+import com.cavetale.core.struct.Vec3i;
 import com.cavetale.halloween.Booth;
 import com.cavetale.halloween.HalloweenPlugin;
 import com.cavetale.halloween.Session;
@@ -45,19 +46,19 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
      */
     private final Map<UUID, Vec3i> targetGhastMap = new HashMap<>();
 
-    protected ShootTargetAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList, final Booth booth) {
+    protected ShootTargetAttraction(final HalloweenPlugin plugin, final String name, final List<Area> areaList, final Booth booth) {
         super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
         List<Cuboid> list = new ArrayList<>();
         List<Cuboid> ghastList = new ArrayList<>();
         Set<Vec3i> set = new HashSet<>();
         Set<Vec3i> ghastSet = new HashSet<>();
-        for (Cuboid cuboid : areaList) {
-            if ("target".equals(cuboid.name)) {
-                list.add(cuboid);
-                set.addAll(cuboid.enumerate());
-            } else if ("ghast".equals(cuboid.name)) {
-                ghastList.add(cuboid);
-                ghastSet.addAll(cuboid.enumerate());
+        for (Area area : areaList) {
+            if ("target".equals(area.name)) {
+                list.add(area.toCuboid());
+                set.addAll(area.enumerate());
+            } else if ("ghast".equals(area.name)) {
+                ghastList.add(area.toCuboid());
+                ghastSet.addAll(area.enumerate());
             }
         }
         this.targetAreas = List.copyOf(list);
@@ -164,6 +165,12 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
         }
     }
 
+    private static int maxDistance(Vec3i a, Vec3i b) {
+        return Math.max(Math.abs(a.x - b.x),
+                        Math.max(Math.abs(a.y - b.y),
+                                 Math.abs(a.z - b.z)));
+    }
+
     protected void makeTargets() {
         List<Vec3i> possibleBlocks = new ArrayList<>(targetBlocks);
         Collections.shuffle(possibleBlocks, random);
@@ -179,7 +186,7 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
             for (int i = 0; i < ghastCount; i += 1) {
                 List<Vec3i> possibleGhasts = new ArrayList<>(ghastBlocks);
                 for (Vec3i old : saveTag.targetGhasts) {
-                    possibleGhasts.removeIf(b -> b.maxDistance(old) < 4);
+                    possibleGhasts.removeIf(b -> maxDistance(b, old) < 4);
                 }
                 if (possibleGhasts.isEmpty()) break;
                 Vec3i ghastBlock = possibleGhasts.get(random.nextInt(possibleGhasts.size()));

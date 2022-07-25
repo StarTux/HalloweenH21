@@ -1,8 +1,8 @@
 package com.cavetale.halloween.attraction;
 
-import com.cavetale.area.struct.Cuboid;
-import com.cavetale.area.struct.Vec3i;
+import com.cavetale.area.struct.Area;
 import com.cavetale.core.font.Unicode;
+import com.cavetale.core.struct.Vec3i;
 import com.cavetale.halloween.Booth;
 import com.cavetale.halloween.HalloweenPlugin;
 import com.cavetale.halloween.Session;
@@ -16,18 +16,19 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public final class OpenChestAttraction extends Attraction<OpenChestAttraction.SaveTag> {
     protected static final Duration OPEN_TIME = Duration.ofSeconds(30);
-    Set<Vec3i> chestBlockSet = new HashSet<>();
+    protected Set<Vec3i> chestBlockSet = new HashSet<>();
     protected int secondsLeft;
 
-    protected OpenChestAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList, final Booth booth) {
+    protected OpenChestAttraction(final HalloweenPlugin plugin, final String name, final List<Area> areaList, final Booth booth) {
         super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
-        for (Cuboid cuboid : areaList) {
+        for (Area cuboid : areaList) {
             if ("chest".equals(cuboid.name)) {
                 chestBlockSet.addAll(cuboid.enumerate());
             }
@@ -102,11 +103,19 @@ public final class OpenChestAttraction extends Attraction<OpenChestAttraction.Sa
         changeState(State.IDLE);
     }
 
+    private static BlockFace horizontalBlockFace(Vec3i vec) {
+        if (Math.abs(vec.x) > Math.abs(vec.z)) {
+            return vec.x > 0 ? BlockFace.EAST : BlockFace.WEST;
+        } else {
+            return vec.z > 0 ? BlockFace.SOUTH : BlockFace.NORTH;
+        }
+    }
+
     private void placeChests(Player player) {
         Vec3i playerVector = Vec3i.of(player.getLocation());
         for (Vec3i vec : chestBlockSet) {
             Chest blockData = (Chest) Material.CHEST.createBlockData();
-            blockData.setFacing(npcVector.subtract(vec).horizontalBlockFace());
+            blockData.setFacing(horizontalBlockFace(npcVector.subtract(vec)));
             vec.toBlock(plugin.getWorld()).setBlockData(blockData);
         }
     }

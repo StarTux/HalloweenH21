@@ -1,8 +1,8 @@
 package com.cavetale.halloween.attraction;
 
-import com.cavetale.area.struct.Cuboid;
-import com.cavetale.area.struct.Vec3i;
+import com.cavetale.area.struct.Area;
 import com.cavetale.core.font.VanillaItems;
+import com.cavetale.core.struct.Vec3i;
 import com.cavetale.halloween.Booth;
 import com.cavetale.halloween.HalloweenPlugin;
 import java.time.Duration;
@@ -37,12 +37,12 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
     protected CaveSpider currentSpider;
     protected int secondsLeft;
 
-    protected FindSpidersAttraction(final HalloweenPlugin plugin, final String name, final List<Cuboid> areaList, final Booth booth) {
+    protected FindSpidersAttraction(final HalloweenPlugin plugin, final String name, final List<Area> areaList, final Booth booth) {
         super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
         Set<Vec3i> spiderSet = new HashSet<>();
-        for (Cuboid cuboid : areaList) {
-            if ("spider".equals(cuboid.name)) {
-                spiderSet.addAll(cuboid.enumerate());
+        for (Area area : areaList) {
+            if ("spider".equals(area.name)) {
+                spiderSet.addAll(area.enumerate());
             }
         }
         this.possibleSpiderBlocks = Set.copyOf(spiderSet);
