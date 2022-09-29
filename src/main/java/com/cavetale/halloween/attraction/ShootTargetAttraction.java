@@ -244,7 +244,7 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
         }
         Title title = Title.title(Component.empty(),
                                   Component.text("Shoot!", NamedTextColor.GOLD, TextDecoration.ITALIC),
-                                  Title.Times.of(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO));
+                                  Title.Times.times(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO));
         player.showTitle(title);
         player.sendMessage(Component.text("Shoot!", NamedTextColor.GOLD, TextDecoration.ITALIC));
         startingGun(player);

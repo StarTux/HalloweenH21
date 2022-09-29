@@ -96,7 +96,7 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
         }
         Component line = Component.join(JoinConfiguration.separator(Component.space()), comps).color(NamedTextColor.AQUA);
         player.showTitle(Title.title(Component.empty(), line,
-                                     Title.Times.of(Duration.ZERO, Duration.ofSeconds(1), Duration.ofSeconds(1))));
+                                     Title.Times.times(Duration.ZERO, Duration.ofSeconds(1), Duration.ofSeconds(1))));
         saveTag.noteIndex += 1;
     }
 

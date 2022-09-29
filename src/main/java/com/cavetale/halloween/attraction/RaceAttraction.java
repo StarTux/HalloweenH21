@@ -85,7 +85,7 @@ public final class RaceAttraction extends Attraction<RaceAttraction.SaveTag> {
         if (timeLeft <= 0) {
             player.showTitle(Title.title(Component.text("GO!", NamedTextColor.GOLD),
                                          Component.empty(),
-                                         Title.Times.of(Duration.ZERO, Duration.ofMillis(500L), Duration.ZERO)));
+                                         Title.Times.times(Duration.ZERO, Duration.ofMillis(500L), Duration.ZERO)));
             startingGun(player);
             return State.RACE;
         }
@@ -94,7 +94,7 @@ public final class RaceAttraction extends Attraction<RaceAttraction.SaveTag> {
             countdownSeconds = seconds;
             player.showTitle(Title.title(Component.text(seconds, NamedTextColor.GOLD),
                                          Component.text("Get Ready", NamedTextColor.GOLD),
-                                         Title.Times.of(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO)));
+                                         Title.Times.times(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO)));
             countdown(player, seconds);
         }
         return null;
