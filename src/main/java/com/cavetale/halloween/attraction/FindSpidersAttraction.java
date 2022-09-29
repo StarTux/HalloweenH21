@@ -156,7 +156,7 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
                 Block block = it.toBlock(w);
                 if (block.isEmpty()) return false;
                 Material mat = block.getType();
-                if (Tag.CARPETS.isTagged(mat)) return false;
+                if (Tag.WOOL_CARPETS.isTagged(mat)) return false;
                 if (block.getType() == Material.COBWEB) return false;
                 return true;
             });
