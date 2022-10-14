@@ -106,5 +106,13 @@
       <scope>provided</scope>
     </dependency>
 
+    <!-- Poster -->
+    <dependency>
+      <groupId>com.cavetale.poster</groupId>
+      <artifactId>poster</artifactId>
+      <version>0.1-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+
   </dependencies>
 </project>

@@ -28,11 +28,8 @@ import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.NonNull;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -51,6 +48,14 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+import static net.kyori.adventure.text.Component.empty;
+import static net.kyori.adventure.text.Component.join;
+import static net.kyori.adventure.text.Component.newline;
+import static net.kyori.adventure.text.Component.space;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.JoinConfiguration.noSeparators;
+import static net.kyori.adventure.text.format.NamedTextColor.*;
+import static net.kyori.adventure.text.format.TextDecoration.*;
 
 /**
  * Base class for all attractions.
@@ -72,11 +77,11 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     protected Mytems firstCompletionMytems = null;
     protected boolean doesRequireInstrument;
     protected Duration completionCooldown = Duration.ofMinutes(10);
-    protected Component displayName = Component.empty();
-    protected Component description = Component.empty();
+    protected Component displayName = empty();
+    protected Component description = empty();
     protected ItemStack firstCompletionReward = Mytems.HALLOWEEN_TOKEN.createItemStack();
     protected static final ItemStack[] PREMIUM_PRIZE_POOL = {
-            Mytems.CANDY_CORN.createItemStack(),
+        Mytems.CANDY_CORN.createItemStack(),
             Mytems.CHOCOLATE_BAR.createItemStack(),
             Mytems.LOLLIPOP.createItemStack(),
             Mytems.ORANGE_CANDY.createItemStack(),
@@ -109,6 +114,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         }
     };
     protected boolean prizePoolHasDuds = false;
+    protected final Booth booth;
 
     public static Attraction of(HalloweenPlugin plugin, @NonNull final String name, @NonNull final List<Area> areaList,
                                 final Booth booth) {
@@ -138,6 +144,8 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         case FIND_BLOCKS: return new FindBlocksAttraction(plugin, name, areaList, booth);
         case RACE: return new RaceAttraction(plugin, name, areaList, booth);
         case MUSIC_HERO: return new MusicHeroAttraction(plugin, name, areaList, booth);
+        case POSTER: return new PosterAttraction(plugin, name, areaList, booth);
+        case SNOWBALL_FIGHT: return new SnowballFightAttraction(plugin, name, areaList, booth);
         default:
             throw new IllegalArgumentException(type + ": Not implemented!");
         }
@@ -165,8 +173,8 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
                     mob.setCollidable(false);
                 });
         }
+        this.booth = booth;
     }
-
 
     public final boolean isInArea(Location location) {
         return mainArea.contains(location);
@@ -205,15 +213,15 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     }
 
     protected final void timeout(Player player) {
-        player.showTitle(Title.title(Component.text("Timeout", NamedTextColor.DARK_RED),
-                                     Component.text("Try Again", NamedTextColor.DARK_RED)));
+        player.showTitle(Title.title(text("Timeout", DARK_RED),
+                                     text("Try Again", DARK_RED)));
         Music.DECKED_OUT.melody.play(plugin, player);
         plugin.sessionOf(player).setCooldown(this, Duration.ofSeconds(10));
     }
 
     protected final void fail(Player player) {
-        player.showTitle(Title.title(Component.text("Wrong", NamedTextColor.DARK_RED),
-                                     Component.text("Try Again", NamedTextColor.DARK_RED)));
+        player.showTitle(Title.title(text("Wrong", DARK_RED),
+                                     text("Try Again", DARK_RED)));
         Music.DECKED_OUT.melody.play(plugin, player);
         plugin.sessionOf(player).setCooldown(this, Duration.ofSeconds(10));
     }
@@ -223,24 +231,23 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     }
 
     protected final void victory(Player player) {
-        Component message = Component.text("Complete", NamedTextColor.GOLD);
-        player.showTitle(Title.title(message, Component.text("Good Job!", NamedTextColor.GOLD)));
+        Component message = text("Complete", GOLD);
+        player.showTitle(Title.title(message, text("Good Job!", GOLD)));
         player.sendMessage(message);
         Music.TREASURE.melody.play(HalloweenPlugin.getInstance(), player);
     }
 
     public static final void perfect(Player player, boolean withMusic) {
-        Component message = Component.join(JoinConfiguration.noSeparators(), new Component[] {
-                Component.text("P", NamedTextColor.GOLD),
-                Component.text("E", NamedTextColor.RED),
-                Component.text("R", NamedTextColor.YELLOW),
-                Component.text("F", NamedTextColor.GOLD),
-                Component.text("E", NamedTextColor.RED),
-                Component.text("C", NamedTextColor.YELLOW),
-                Component.text("T", NamedTextColor.GOLD),
-                Component.text("!", NamedTextColor.DARK_RED, TextDecoration.BOLD),
-            });
-        player.showTitle(Title.title(message, Component.empty()));
+        Component message = join(noSeparators(),
+                                 text("P", GOLD),
+                                 text("E", RED),
+                                 text("R", YELLOW),
+                                 text("F", GOLD),
+                                 text("E", RED),
+                                 text("C", YELLOW),
+                                 text("T", GOLD),
+                                 text("!", DARK_RED, BOLD));
+        player.showTitle(Title.title(message, empty()));
         player.sendMessage(message);
         if (withMusic) {
             Music.TREASURE.melody.play(HalloweenPlugin.getInstance(), player);
@@ -252,7 +259,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     }
 
     protected final void countdown(Player player, int seconds) {
-        player.sendActionBar(Component.text(seconds, NamedTextColor.GOLD));
+        player.sendActionBar(text(seconds, GOLD));
         List<Note.Tone> tones = List.of(Note.Tone.D, Note.Tone.A, Note.Tone.G);
         if ((int) seconds <= tones.size()) {
             player.playNote(player.getLocation(), Instrument.PLING, Note.natural(0, tones.get((int) seconds - 1)));
@@ -260,12 +267,17 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     }
 
     protected final Component makeProgressComponent(int seconds, Component prefix, int has, int max) {
-        return Component.join(JoinConfiguration.noSeparators(), new Component[] {
-                Component.text(Unicode.WATCH.string + seconds, NamedTextColor.GOLD),
-                Component.space(),
-                prefix,
-                Component.text(has + "/" + max, NamedTextColor.DARK_RED),
-            });
+        return join(noSeparators(),
+                    text(Unicode.WATCH.string + seconds, GOLD),
+                    space(),
+                    prefix,
+                    text(has + "/" + max, DARK_RED));
+    }
+
+    protected final Component makeProgressComponent(int seconds) {
+        return join(noSeparators(),
+                    text(Unicode.WATCH.string + seconds, GOLD),
+                    space());
     }
 
     /**
@@ -411,10 +423,10 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         if (cooldown != null) {
             long minutes = cooldown.toMinutes();
             long seconds = cooldown.toSeconds() % 60L;
-            Component message = Component.text("Give others a chance and wait "
+            Component message = text("Give others a chance and wait "
                                                + minutes + "m "
                                                + seconds + "s",
-                                               NamedTextColor.RED);
+                                               RED);
             player.sendMessage(message);
             player.sendActionBar(message);
             return false;
@@ -428,12 +440,12 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         if (player.equals(somebody)) return false; // fail silently
         Component somebodyName = somebody != null
             ? somebody.displayName()
-            : Component.text("Somebody");
-        Component message = Component.join(JoinConfiguration.noSeparators(), new Component[] {
-                Component.text("Please wait: "),
-                somebodyName,
-                Component.text(" is playing this right now"),
-            }).color(NamedTextColor.RED);
+            : text("Somebody");
+        Component message = join(noSeparators(),
+                                 text("Please wait: "),
+                                 somebodyName,
+                                 text(" is playing this right now"))
+            .color(RED);
         player.sendMessage(message);
         player.sendActionBar(message);
         return false;
@@ -446,11 +458,11 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
                 return true;
             }
         }
-        Component message = Component.join(JoinConfiguration.noSeparators(), new Component[] {
-                Component.text("You don't have a "),
-                Mytems.ANGELIC_HARP.component,
-                Component.text("musical instrument!"),
-            }).color(NamedTextColor.RED);
+        Component message = join(noSeparators(),
+                                 text("You don't have a "),
+                                 Mytems.ANGELIC_HARP.component,
+                                 text("musical instrument!"))
+            .color(RED);
         player.sendMessage(message);
         player.sendActionBar(message);
         return false;
@@ -464,11 +476,11 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
                 return true;
             }
         }
-        Component message = Component.join(JoinConfiguration.noSeparators(), new Component[] {
-                Component.text("You don't have a "),
-                VanillaItems.DIAMOND.component,
-                Component.text("diamond!"),
-            }).color(NamedTextColor.RED);
+        Component message = join(noSeparators(),
+                                 text("You don't have a "),
+                                 VanillaItems.DIAMOND.component,
+                                 text("diamond!"))
+            .color(RED);
         player.sendMessage(message);
         player.sendActionBar(message);
         return false;
@@ -499,35 +511,33 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
         book.editMeta(m -> {
                 BookMeta meta = (BookMeta) m;
-                Component page = Component.join(JoinConfiguration.noSeparators(), new Component[] {
-                        displayName,
-                        Component.newline(),
-                        description,
-                        (doesRequireInstrument
-                         ? Component.join(JoinConfiguration.noSeparators(), new Component[] {
-                                 Component.newline(),
-                                 Mytems.ANGELIC_HARP.component,
-                                 Component.text("Musical Instrument Required", NamedTextColor.RED)
-                             })
-                         : Component.empty()),
-                        Component.newline(),
-                        (!session.isUniqueLocked(this)
-                         ? Component.text(Unicode.CHECKBOX.character + " Not yet finished", NamedTextColor.DARK_GRAY)
-                         : Component.text(Unicode.CHECKED_CHECKBOX.character + " Finished", NamedTextColor.BLUE)),
-                        Component.newline(),
-                        Component.newline(),
-                        Component.text("Play game for 1"),
-                        VanillaItems.DIAMOND.component,
-                        Component.text("Diamond?"),
-                        Component.newline(),
-                        (DefaultFont.START_BUTTON.component
-                         .clickEvent(ClickEvent.runCommand("/hallow yes " + name))
-                         .hoverEvent(HoverEvent.showText(Component.text("Play this Game", NamedTextColor.GREEN)))),
-                        Component.space(),
-                        (DefaultFont.CANCEL_BUTTON.component
-                         .clickEvent(ClickEvent.runCommand("/hallow no " + name))
-                         .hoverEvent(HoverEvent.showText(Component.text("Goodbye!", NamedTextColor.RED)))),
-                    });
+                Component page = join(noSeparators(),
+                                      displayName,
+                                      newline(),
+                                      description,
+                                      (doesRequireInstrument
+                                       ? join(noSeparators(),
+                                              newline(),
+                                              Mytems.ANGELIC_HARP.component,
+                                              text("Musical Instrument Required", RED))
+                                       : empty()),
+                                      newline(),
+                                      (!session.isUniqueLocked(this)
+                                       ? text(Unicode.CHECKBOX.character + " Not yet finished", DARK_GRAY)
+                                       : text(Unicode.CHECKED_CHECKBOX.character + " Finished", BLUE)),
+                                      newline(),
+                                      newline(),
+                                      text("Play game for 1"),
+                                      VanillaItems.DIAMOND.component,
+                                      text("Diamond?"),
+                                      newline(),
+                                      (DefaultFont.START_BUTTON.component
+                                       .clickEvent(ClickEvent.runCommand("/hallow yes " + name))
+                                       .hoverEvent(HoverEvent.showText(text("Play this Game", GREEN)))),
+                                      space(),
+                                      (DefaultFont.CANCEL_BUTTON.component
+                                       .clickEvent(ClickEvent.runCommand("/hallow no " + name))
+                                       .hoverEvent(HoverEvent.showText(text("Goodbye!", RED)))));
                 meta.setAuthor("Cavetale");
                 meta.title(displayName);
                 meta.pages(List.of(page));
@@ -550,7 +560,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     }
 
     protected final void subtitle(Player player, Component component) {
-        player.showTitle(Title.title(Component.empty(), component));
+        player.showTitle(Title.title(empty(), component));
     }
 
     protected final void confetti(Player player, Location location) {

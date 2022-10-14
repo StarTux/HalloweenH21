@@ -10,7 +10,10 @@ public enum AttractionType {
     OPEN_CHEST(OpenChestAttraction.class),
     FIND_BLOCKS(FindBlocksAttraction.class),
     RACE(RaceAttraction.class),
-    MUSIC_HERO(MusicHeroAttraction.class);
+    MUSIC_HERO(MusicHeroAttraction.class),
+    POSTER(PosterAttraction.class),
+    SNOWBALL_FIGHT(SnowballFightAttraction.class),
+    ;
 
     public final Class<? extends Attraction> type;
 

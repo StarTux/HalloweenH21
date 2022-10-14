@@ -11,8 +11,9 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Instrument;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 /**
  * Static information for Attractions.
@@ -100,7 +101,7 @@ public enum Booth {
 
     // Shoot Target
     SHOOTING_PYRAMID(AttractionType.SHOOT_TARGET,
-                     Component.text("Pyramid Shooting Gallery", NamedTextColor.DARK_RED),
+                     Component.text("Pyramid Shooting Gallery", DARK_RED),
                      Component.text("Targets will appear on each level of this pyramid."
                                     + " Use the Televator to hit them all with an arrow."
                                     + " Don't forget about the ghasts!"),
@@ -175,7 +176,7 @@ public enum Booth {
                        null, null,
                        null, null),
     FOIVI_SPIDER_GARDEN(AttractionType.FIND_SPIDERS,
-                        Component.text("Spider Garden", NamedTextColor.DARK_RED),
+                        Component.text("Spider Garden", DARK_RED),
                         Component.text("Help, my home and garden are infested with spiders!"
                                        + " They come out one by one and make noise."
                                        + " Please find them all."),
@@ -189,7 +190,7 @@ public enum Booth {
                             Mytems.HALLOWEEN_TOKEN_2,
                             null),
     BRIGHTER_GIANT_SPIDER(AttractionType.FIND_SPIDERS,
-                          Component.text("Giant Spider", NamedTextColor.DARK_RED),
+                          Component.text("Giant Spider", DARK_RED),
                           Component.text("I knew moving into a giant spider was a bad idea."
                                          + " Turns out this place is spider infested."
                                          + " Can you find them all?"),
@@ -267,7 +268,7 @@ public enum Booth {
                                    + " We meet back here, haha!"),
               null, null),
     MELANTHIA_GRAVEYARD_RACE(AttractionType.RACE,
-                             Component.text("Graveyard Race", NamedTextColor.DARK_RED),
+                             Component.text("Graveyard Race", DARK_RED),
                              Component.text("Let's race once around the graveyard,"
                                             + " counter clockwise,"
                                             + " then back here!"),
@@ -309,5 +310,9 @@ public enum Booth {
             if (n.equals(booth.name)) return booth;
         }
         return null;
+    }
+
+    public Component format(String txt) {
+        return text(txt, GOLD);
     }
 }
