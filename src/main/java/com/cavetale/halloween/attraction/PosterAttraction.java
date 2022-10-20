@@ -2,8 +2,6 @@ package com.cavetale.halloween.attraction;
 
 import com.cavetale.area.struct.Area;
 import com.cavetale.core.struct.Vec3i;
-import com.cavetale.halloween.Booth;
-import com.cavetale.halloween.HalloweenPlugin;
 import com.cavetale.poster.PosterPlugin;
 import com.cavetale.poster.save.Poster;
 import java.time.Duration;
@@ -32,9 +30,9 @@ public final class PosterAttraction extends Attraction<PosterAttraction.SaveTag>
     private Duration playTime = Duration.ofMinutes(5);
     private long shownTime = -1;
 
-    protected PosterAttraction(final HalloweenPlugin plugin, final String name, final List<Area> areaList, final Booth booth) {
-        super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
-        for (Area area : areaList) {
+    protected PosterAttraction(final AttractionConfiguration config) {
+        super(config, SaveTag.class, SaveTag::new);
+        for (Area area : allAreas) {
             if ("block".equals(area.name)) {
                 posterBlock = area.min;
             } else if ("face".equals(area.name)) {
@@ -118,7 +116,7 @@ public final class PosterAttraction extends Attraction<PosterAttraction.SaveTag>
         int x = index % poster.getWidth();
         int y = index / poster.getWidth();
         Vec3i vec = getPosterBlock(x, y);
-        Location location = vec.toLocation(plugin.getWorld()).add(0, 0.5, 0);
+        Location location = vec.toLocation(world).add(0, 0.5, 0);
         PosterPlugin posterPlugin = (PosterPlugin) Bukkit.getPluginManager().getPlugin("Poster");
         GlowItemFrame entity = location.getWorld().spawn(location, GlowItemFrame.class, e -> {
                 e.setPersistent(false);
@@ -233,7 +231,7 @@ public final class PosterAttraction extends Attraction<PosterAttraction.SaveTag>
         }
         Vec3i vec = getPosterBlock(emptyX, emptyY);
         Entity entity = Bukkit.getEntity(frame.uuid);
-        Location location = vec.toLocation(plugin.getWorld());
+        Location location = vec.toLocation(world);
         location.setDirection(entity.getLocation().getDirection());
         entity.teleport(location);
         // swap

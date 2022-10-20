@@ -4,8 +4,6 @@ import com.cavetale.area.struct.Area;
 import com.cavetale.core.font.VanillaItems;
 import com.cavetale.core.struct.Cuboid;
 import com.cavetale.core.struct.Vec3i;
-import com.cavetale.halloween.Booth;
-import com.cavetale.halloween.HalloweenPlugin;
 import com.cavetale.halloween.Session;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -46,13 +44,13 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
      */
     private final Map<UUID, Vec3i> targetGhastMap = new HashMap<>();
 
-    protected ShootTargetAttraction(final HalloweenPlugin plugin, final String name, final List<Area> areaList, final Booth booth) {
-        super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
+    protected ShootTargetAttraction(final AttractionConfiguration config) {
+        super(config, SaveTag.class, SaveTag::new);
         List<Cuboid> list = new ArrayList<>();
         List<Cuboid> ghastList = new ArrayList<>();
         Set<Vec3i> set = new HashSet<>();
         Set<Vec3i> ghastSet = new HashSet<>();
-        for (Area area : areaList) {
+        for (Area area : allAreas) {
             if ("target".equals(area.name)) {
                 list.add(area.toCuboid());
                 set.addAll(area.enumerate());
@@ -179,7 +177,7 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
             if (i >= possibleBlocks.size()) break;
             Vec3i targetBlock = possibleBlocks.get(i);
             saveTag.targetBlocks.add(targetBlock);
-            targetBlock.toBlock(plugin.getWorld()).setType(Material.TARGET);
+            targetBlock.toBlock(world).setType(Material.TARGET);
         }
         if (saveTag.currentRound >= 2 && !ghastBlocks.isEmpty()) {
             int ghastCount = Math.max(1, (saveTag.currentRound - 1) / 2);
@@ -199,7 +197,7 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
 
     protected void clearTargets() {
         for (Vec3i targetBlock : saveTag.targetBlocks) {
-            targetBlock.toBlock(plugin.getWorld()).setType(Material.AIR);
+            targetBlock.toBlock(world).setType(Material.AIR);
         }
         saveTag.targetBlocks.clear();
         clearGhastEntities();
@@ -208,7 +206,7 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
 
     protected void spawnGhastEntities() {
         for (Vec3i ghastBlock : saveTag.targetGhasts) {
-            Location location = ghastBlock.toLocation(plugin.getWorld());
+            Location location = ghastBlock.toLocation(world);
             location.setYaw(random.nextFloat() * 360.0f);
             Ghast ghast = location.getWorld().spawn(location, Ghast.class, g -> {
                     g.setPersistent(false);

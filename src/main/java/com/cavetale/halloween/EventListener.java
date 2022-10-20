@@ -3,6 +3,7 @@ package com.cavetale.halloween;
 import com.cavetale.core.event.player.PluginPlayerEvent;
 import com.cavetale.core.struct.Vec3i;
 import com.cavetale.halloween.attraction.Attraction;
+import com.cavetale.halloween.attraction.Festival;
 import com.cavetale.halloween.attraction.MusicHeroAttraction;
 import com.cavetale.halloween.attraction.ShootTargetAttraction;
 import com.cavetale.magicmap.event.MagicMapCursorEvent;
@@ -40,22 +41,23 @@ public final class EventListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     protected void onPlayerQuit(PlayerQuitEvent event) {
-        for (Attraction attraction : plugin.attractionsMap.values()) {
+        Player player = event.getPlayer();
+        for (Attraction attraction : plugin.getAttractions(player.getWorld())) {
             attraction.onPlayerQuit(event);
         }
-        plugin.clearSession(event.getPlayer().getUniqueId());
+        plugin.clearSession(player.getUniqueId());
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     protected void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
-        plugin.clearSession(event.getPlayer().getUniqueId());
+        Player player = event.getPlayer();
+        plugin.clearSession(player.getUniqueId());
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     protected void onPluginPlayer(PluginPlayerEvent event) {
         Player player = event.getPlayer();
-        if (!plugin.getWorld().equals(player.getWorld())) return;
-        for (Attraction attraction : plugin.attractionsMap.values()) {
+        for (Attraction attraction : plugin.getAttractions(player.getWorld())) {
             if (!attraction.isInArea(player.getLocation())) continue;
             attraction.onPluginPlayer(event);
         }
@@ -64,8 +66,7 @@ public final class EventListener implements Listener {
     @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
     protected void onProjectileHit(ProjectileHitEvent event) {
         Projectile entity = event.getEntity();
-        if (!plugin.getWorld().equals(entity.getWorld())) return;
-        for (Attraction attraction : plugin.attractionsMap.values()) {
+        for (Attraction attraction : plugin.getAttractions(entity.getWorld())) {
             if (!attraction.isInArea(entity.getLocation())) continue;
             if (attraction instanceof ShootTargetAttraction) {
                 ((ShootTargetAttraction) attraction).onProjectileHit(event);
@@ -77,7 +78,7 @@ public final class EventListener implements Listener {
     protected void onEntityDamage(EntityDamageEvent event) {
         Entity entity = event.getEntity();
         Location location = entity.getLocation();
-        for (Attraction attraction : plugin.attractionsMap.values()) {
+        for (Attraction attraction : plugin.getAttractions(entity.getWorld())) {
             if (!attraction.isInArea(location)) continue;
             attraction.onEntityDamage(event);
         }
@@ -87,7 +88,7 @@ public final class EventListener implements Listener {
     protected void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         Entity entity = event.getEntity();
         Location location = entity.getLocation();
-        for (Attraction attraction : plugin.attractionsMap.values()) {
+        for (Attraction attraction : plugin.getAttractions(entity.getWorld())) {
             if (!attraction.isInArea(location)) continue;
             attraction.onEntityDamageByEntity(event);
         }
@@ -97,7 +98,7 @@ public final class EventListener implements Listener {
     protected void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
         Entity entity = event.getRightClicked();
         Location location = entity.getLocation();
-        for (Attraction attraction : plugin.attractionsMap.values()) {
+        for (Attraction attraction : plugin.getAttractions(entity.getWorld())) {
             if (!attraction.isInArea(location)) continue;
             attraction.onPlayerInteractEntity(event);
         }
@@ -107,7 +108,7 @@ public final class EventListener implements Listener {
     protected void onPlayerInteract(PlayerInteractEvent event) {
         if (!event.hasBlock()) return;
         Location location = event.getClickedBlock().getLocation();
-        for (Attraction attraction : plugin.attractionsMap.values()) {
+        for (Attraction attraction : plugin.getAttractions(location.getWorld())) {
             if (!attraction.isInArea(location)) continue;
             attraction.onPlayerInteract(event);
         }
@@ -135,11 +136,10 @@ public final class EventListener implements Listener {
 
     @EventHandler
     protected void onMagicMapCursor(MagicMapCursorEvent event) {
-        if (!event.getPlayer().getWorld().getName().equals((String) HalloweenPlugin.WORLD)) {
-            return;
-        }
+        Festival festival = plugin.getFestival(event.getPlayer().getWorld());
+        if (festival == null) return;
         Session session = plugin.sessionOf(event.getPlayer());
-        for (Attraction attraction : plugin.attractionsMap.values()) {
+        for (Attraction attraction : festival.getAttractions()) {
             Vec3i vec = attraction.getNpcVector();
             if (vec == null) continue;
             if (vec.x < event.getMinX() || vec.x > event.getMaxX()) continue;

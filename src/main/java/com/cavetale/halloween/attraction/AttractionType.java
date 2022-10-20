@@ -4,18 +4,20 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum AttractionType {
-    REPEAT_MELODY(RepeatMelodyAttraction.class),
-    SHOOT_TARGET(ShootTargetAttraction.class),
-    FIND_SPIDERS(FindSpidersAttraction.class),
-    OPEN_CHEST(OpenChestAttraction.class),
-    FIND_BLOCKS(FindBlocksAttraction.class),
-    RACE(RaceAttraction.class),
-    MUSIC_HERO(MusicHeroAttraction.class),
-    POSTER(PosterAttraction.class),
-    SNOWBALL_FIGHT(SnowballFightAttraction.class),
+    REPEAT_MELODY(RepeatMelodyAttraction.class, RepeatMelodyAttraction::new),
+    SHOOT_TARGET(ShootTargetAttraction.class, ShootTargetAttraction::new),
+    FIND_SPIDERS(FindSpidersAttraction.class, FindSpidersAttraction::new),
+    OPEN_CHEST(OpenChestAttraction.class, OpenChestAttraction::new),
+    FIND_BLOCKS(FindBlocksAttraction.class, FindBlocksAttraction::new),
+    RACE(RaceAttraction.class, RaceAttraction::new),
+    MUSIC_HERO(MusicHeroAttraction.class, MusicHeroAttraction::new),
+    POSTER(PosterAttraction.class, PosterAttraction::new),
+    SNOWBALL_FIGHT(SnowballFightAttraction.class, SnowballFightAttraction::new),
+    MEMORY(MemoryAttraction.class, MemoryAttraction::new),
     ;
 
     public final Class<? extends Attraction> type;
+    private final AttractionConstructor ctor;
 
     public static AttractionType forName(String name) {
         for (AttractionType it : AttractionType.values()) {
@@ -29,5 +31,14 @@ public enum AttractionType {
             if (it.type.isInstance(attraction)) return it;
         }
         return null;
+    }
+
+    @FunctionalInterface
+    public interface AttractionConstructor {
+        Attraction make(AttractionConfiguration config);
+    }
+
+    public Attraction make(AttractionConfiguration config) {
+        return ctor.make(config);
     }
 }

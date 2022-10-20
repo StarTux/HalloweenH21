@@ -1,11 +1,8 @@
 package com.cavetale.halloween.attraction;
 
-import com.cavetale.area.struct.Area;
 import com.cavetale.core.event.player.PluginPlayerEvent.Detail;
 import com.cavetale.core.event.player.PluginPlayerEvent;
 import com.cavetale.core.util.Json;
-import com.cavetale.halloween.Booth;
-import com.cavetale.halloween.HalloweenPlugin;
 import com.cavetale.mytems.item.music.Beat;
 import com.cavetale.mytems.item.music.Melody;
 import com.cavetale.mytems.item.music.MelodyBuilder;
@@ -32,8 +29,8 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
     @Setter protected Instrument instrument = Instrument.PIANO;
     @Setter protected int octave = 1;
 
-    protected RepeatMelodyAttraction(final HalloweenPlugin plugin, final String name, final List<Area> areaList, final Booth booth) {
-        super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
+    protected RepeatMelodyAttraction(final AttractionConfiguration config) {
+        super(config, SaveTag.class, SaveTag::new);
         this.doesRequireInstrument = true;
         this.displayName = Component.text("Play the Melody", NamedTextColor.DARK_RED);
         this.description = Component.text("I'll give you a melody and you're gonna repeat it. It gets harder every round.");
@@ -87,7 +84,7 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
 
     protected void playNote(Player player, Location location) {
         Beat beat = melody.getBeats().get(saveTag.noteIndex);
-        for (Player online : plugin.getPlayersIn(mainArea)) {
+        for (Player online : getPlayersIn(mainArea)) {
             beat.play(melody, online, location);
         }
         List<Component> comps = new ArrayList<>();

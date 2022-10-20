@@ -3,8 +3,6 @@ package com.cavetale.halloween.attraction;
 import com.cavetale.area.struct.Area;
 import com.cavetale.core.font.VanillaItems;
 import com.cavetale.core.struct.Vec3i;
-import com.cavetale.halloween.Booth;
-import com.cavetale.halloween.HalloweenPlugin;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,10 +35,10 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
     protected CaveSpider currentSpider;
     protected int secondsLeft;
 
-    protected FindSpidersAttraction(final HalloweenPlugin plugin, final String name, final List<Area> areaList, final Booth booth) {
-        super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
+    protected FindSpidersAttraction(final AttractionConfiguration config) {
+        super(config, SaveTag.class, SaveTag::new);
         Set<Vec3i> spiderSet = new HashSet<>();
-        for (Area area : areaList) {
+        for (Area area : allAreas) {
             if ("spider".equals(area.name)) {
                 spiderSet.addAll(area.enumerate());
             }
@@ -151,7 +149,7 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
 
     protected void makeSpiderBlocks() {
         List<Vec3i> spiderBlocks = new ArrayList<>(possibleSpiderBlocks);
-        World w = plugin.getWorld();
+        World w = world;
         spiderBlocks.removeIf(it -> {
                 Block block = it.toBlock(w);
                 if (block.isEmpty()) return false;
@@ -167,8 +165,7 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
 
     protected void spawnSpider() {
         Vec3i vector = saveTag.spiderBlocks.get(saveTag.spiderBlockIndex);
-        World w = plugin.getWorld();
-        currentSpider = plugin.getWorld().spawn(vector.toLocation(w), CaveSpider.class, s -> {
+        currentSpider = world.spawn(vector.toLocation(world), CaveSpider.class, s -> {
                 s.setPersistent(false);
                 s.setRemoveWhenFarAway(false);
                 s.setGravity(false);

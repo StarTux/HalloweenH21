@@ -2,8 +2,6 @@ package com.cavetale.halloween.attraction;
 
 import com.cavetale.area.struct.Area;
 import com.cavetale.core.struct.Vec3i;
-import com.cavetale.halloween.Booth;
-import com.cavetale.halloween.HalloweenPlugin;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,7 +17,6 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.Tag;
-import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -39,11 +36,11 @@ public final class SnowballFightAttraction extends Attraction<SnowballFightAttra
     protected final List<Vec3i> snowmanBlocks = new ArrayList<>();
     @Setter private int totalRounds = 5;
 
-    protected SnowballFightAttraction(final HalloweenPlugin plugin, final String name, final List<Area> areaList, final Booth booth) {
-        super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
+    protected SnowballFightAttraction(final AttractionConfiguration config) {
+        super(config, SaveTag.class, SaveTag::new);
         Set<Vec3i> snowmanBlockSet = new HashSet<>();
         Set<Vec3i> noSnowmanBlockSet = new HashSet<>();
-        for (Area area : areaList) {
+        for (Area area : allAreas) {
             if ("snowman".equals(area.name)) {
                 snowmanBlockSet.addAll(area.enumerate());
             } else if ("nosnowman".equals(area.name)) {
@@ -69,9 +66,8 @@ public final class SnowballFightAttraction extends Attraction<SnowballFightAttra
     }
 
     protected void spawnSnowmen() {
-        World w = plugin.getWorld();
         snowmanBlocks.removeIf(v -> {
-                Block block = v.toBlock(w);
+                Block block = v.toBlock(world);
                 if (block.isEmpty()) return false;
                 Material mat = block.getType();
                 if (Tag.WOOL_CARPETS.isTagged(mat)) return false;
@@ -97,7 +93,7 @@ public final class SnowballFightAttraction extends Attraction<SnowballFightAttra
         saveTag.snowmanCount = (saveTag.round - 1) * 2 + 10;
         for (int i = 0; i < saveTag.snowmanCount; i += 1) {
             Vec3i vec = snowmanBlocks.get(i);
-            Location location = vec.toLocation(w);
+            Location location = vec.toLocation(world);
             location.setYaw(random.nextFloat() * 360.0f);
             Snowman snowman = location.getWorld().spawn(location, Snowman.class, s -> {
                     s.setPersistent(false);

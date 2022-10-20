@@ -3,8 +3,6 @@ package com.cavetale.halloween.attraction;
 import com.cavetale.area.struct.Area;
 import com.cavetale.core.font.Unicode;
 import com.cavetale.core.struct.Vec3i;
-import com.cavetale.halloween.Booth;
-import com.cavetale.halloween.HalloweenPlugin;
 import com.cavetale.halloween.Music;
 import com.cavetale.mytems.Mytems;
 import com.cavetale.mytems.event.music.PlayerBeatEvent;
@@ -41,9 +39,9 @@ public final class MusicHeroAttraction extends Attraction<MusicHeroAttraction.Sa
     protected Vec3i lecternBlock = null;
     protected ItemStack melodyBook;
 
-    protected MusicHeroAttraction(final HalloweenPlugin plugin, final String name, final List<Area> areaList, final Booth booth) {
-        super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
-        for (Area area : areaList) {
+    protected MusicHeroAttraction(final AttractionConfiguration config) {
+        super(config, SaveTag.class, SaveTag::new);
+        for (Area area : allAreas) {
             if ("lectern".equals(area.name)) {
                 lecternBlock = area.min;
             }
@@ -64,8 +62,8 @@ public final class MusicHeroAttraction extends Attraction<MusicHeroAttraction.Sa
         saveTag.currentPlayer = player.getUniqueId();
         startingGun(player);
         changeState(State.WARMUP);
-        if (lecternBlock != null && lecternBlock.toBlock(plugin.getWorld()).isEmpty()) {
-            lecternBlock.toBlock(plugin.getWorld()).setType(Material.LECTERN);
+        if (lecternBlock != null && lecternBlock.toBlock(world).isEmpty()) {
+            lecternBlock.toBlock(world).setType(Material.LECTERN);
         }
     }
 

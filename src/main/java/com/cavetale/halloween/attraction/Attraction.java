@@ -20,6 +20,7 @@ import com.cavetale.resident.ZoneType;
 import com.cavetale.resident.save.Loc;
 import java.io.File;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -40,6 +41,7 @@ import org.bukkit.Note;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -48,6 +50,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+import static com.cavetale.halloween.HalloweenPlugin.plugin;
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.join;
 import static net.kyori.adventure.text.Component.newline;
@@ -64,6 +67,7 @@ import static net.kyori.adventure.text.format.TextDecoration.*;
 @Getter
 public abstract class Attraction<T extends Attraction.SaveTag> {
     protected final HalloweenPlugin plugin;
+    protected final World world;
     protected final String name;
     protected final List<Area> allAreas;
     protected final File saveFile;
@@ -116,68 +120,52 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     protected boolean prizePoolHasDuds = false;
     protected final Booth booth;
 
-    public static Attraction of(HalloweenPlugin plugin, @NonNull final String name, @NonNull final List<Area> areaList,
-                                final Booth booth) {
+    public static Attraction of(final World world,
+                                @NonNull final String name,
+                                @NonNull final List<Area> areaList,
+                                @NonNull final Booth booth) {
         if (areaList.isEmpty()) throw new IllegalArgumentException(name + ": area list is empty");
         if (areaList.get(0).name == null) throw new IllegalArgumentException(name + ": first area has no name!");
         String typeName = areaList.get(0).name;
-        AttractionType attractionType = booth != null && booth.type != null
-            ? booth.type
+        AttractionType attractionType = booth.getType() != null
+            ? booth.getType()
             : AttractionType.forName(typeName);
         if (attractionType == null) return null;
-        Attraction result = makeAttraction(plugin, attractionType, name, areaList, booth);
-        if (booth != null) {
-            if (booth.displayName != null) result.displayName = booth.displayName;
-            if (booth.description != null) result.description = booth.description;
-            if (booth.reward != null) result.firstCompletionReward = booth.reward.createItemStack();
-            if (booth.consumer != null) booth.consumer.accept(result);
-        }
+        Attraction result =  attractionType.make(new AttractionConfiguration(world, name, areaList, booth));
+        if (booth.getDisplayName() != null) result.displayName = booth.getDisplayName();
+        if (booth.getDescription() != null) result.description = booth.getDescription();
+        if (booth.getReward() != null) result.firstCompletionReward = booth.getReward().createItemStack();
+        booth.apply(result);
         return result;
     }
 
-    private static Attraction makeAttraction(HalloweenPlugin plugin, AttractionType type, String name, List<Area> areaList, Booth booth) {
-        switch (type) {
-        case REPEAT_MELODY: return new RepeatMelodyAttraction(plugin, name, areaList, booth);
-        case SHOOT_TARGET: return new ShootTargetAttraction(plugin, name, areaList, booth);
-        case FIND_SPIDERS: return new FindSpidersAttraction(plugin, name, areaList, booth);
-        case OPEN_CHEST: return new OpenChestAttraction(plugin, name, areaList, booth);
-        case FIND_BLOCKS: return new FindBlocksAttraction(plugin, name, areaList, booth);
-        case RACE: return new RaceAttraction(plugin, name, areaList, booth);
-        case MUSIC_HERO: return new MusicHeroAttraction(plugin, name, areaList, booth);
-        case POSTER: return new PosterAttraction(plugin, name, areaList, booth);
-        case SNOWBALL_FIGHT: return new SnowballFightAttraction(plugin, name, areaList, booth);
-        default:
-            throw new IllegalArgumentException(type + ": Not implemented!");
-        }
-    }
-
-    protected Attraction(final HalloweenPlugin plugin, final String name, final List<Area> areaList, final Booth booth,
-                         final Class<T> saveTagClass, final Supplier<T> saveTagSupplier) {
-        this.plugin = plugin;
-        this.name = name;
-        this.allAreas = areaList;
+    protected Attraction(final AttractionConfiguration config, final Class<T> saveTagClass, final Supplier<T> saveTagSupplier) {
+        this.plugin = plugin();
+        this.world = config.world;
+        this.name = config.name;
+        this.allAreas = config.areaList;
         this.saveFile = new File(plugin.getAttractionsFolder(), name + ".json");
-        this.mainArea = areaList.get(0).toCuboid();
+        this.mainArea = allAreas.get(0).toCuboid();
         this.saveTagClass = saveTagClass;
         this.saveTagSupplier = saveTagSupplier;
-        for (Area area : areaList) {
+        for (Area area : allAreas) {
             if ("npc".equals(area.name)) {
                 npcVector = area.min;
             }
         }
         if (npcVector != null) {
-            Location location = npcVector.toLocation(plugin.getWorld());
+            Location location = npcVector.toLocation(world);
             mainVillager = PluginSpawn.register(plugin, ZoneType.HALLOWEEN, Loc.of(location));
             mainVillager.setOnPlayerClick(this::clickMainVillager);
             mainVillager.setOnMobSpawning(mob -> {
                     mob.setCollidable(false);
                 });
         }
-        this.booth = booth;
+        this.booth = config.booth;
     }
 
     public final boolean isInArea(Location location) {
-        return mainArea.contains(location);
+        return world.equals(location.getWorld()) && mainArea.contains(location);
     }
 
     public final void load() {
@@ -570,5 +558,15 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     protected final void highlight(Player player, Location location) {
         Particle.DustOptions dustOptions = new Particle.DustOptions(Color.WHITE, 4.0f);
         player.spawnParticle(Particle.REDSTONE, location, 4, 1.0, 1.0, 1.0, 1.0, dustOptions);
+    }
+
+    public final List<Player> getPlayersIn(Cuboid area) {
+        List<Player> result = new ArrayList<>();
+        for (Player player : world.getPlayers()) {
+            if (area.contains(player.getLocation())) {
+                result.add(player);
+            }
+        }
+        return result;
     }
 }

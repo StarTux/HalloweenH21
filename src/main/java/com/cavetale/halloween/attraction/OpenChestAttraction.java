@@ -3,12 +3,9 @@ package com.cavetale.halloween.attraction;
 import com.cavetale.area.struct.Area;
 import com.cavetale.core.font.Unicode;
 import com.cavetale.core.struct.Vec3i;
-import com.cavetale.halloween.Booth;
-import com.cavetale.halloween.HalloweenPlugin;
 import com.cavetale.halloween.Session;
 import java.time.Duration;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
@@ -26,9 +23,9 @@ public final class OpenChestAttraction extends Attraction<OpenChestAttraction.Sa
     protected Set<Vec3i> chestBlockSet = new HashSet<>();
     protected int secondsLeft;
 
-    protected OpenChestAttraction(final HalloweenPlugin plugin, final String name, final List<Area> areaList, final Booth booth) {
-        super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
-        for (Area cuboid : areaList) {
+    protected OpenChestAttraction(final AttractionConfiguration config) {
+        super(config, SaveTag.class, SaveTag::new);
+        for (Area cuboid : allAreas) {
             if ("chest".equals(cuboid.name)) {
                 chestBlockSet.addAll(cuboid.enumerate());
             }
@@ -116,13 +113,13 @@ public final class OpenChestAttraction extends Attraction<OpenChestAttraction.Sa
         for (Vec3i vec : chestBlockSet) {
             Chest blockData = (Chest) Material.CHEST.createBlockData();
             blockData.setFacing(horizontalBlockFace(npcVector.subtract(vec)));
-            vec.toBlock(plugin.getWorld()).setBlockData(blockData);
+            vec.toBlock(world).setBlockData(blockData);
         }
     }
 
     private void clearChests() {
         for (Vec3i vec : chestBlockSet) {
-            vec.toBlock(plugin.getWorld()).setType(Material.AIR);
+            vec.toBlock(world).setType(Material.AIR);
         }
     }
 

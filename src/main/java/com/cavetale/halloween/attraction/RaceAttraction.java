@@ -3,8 +3,6 @@ package com.cavetale.halloween.attraction;
 import com.cavetale.area.struct.Area;
 import com.cavetale.core.struct.Cuboid;
 import com.cavetale.core.struct.Vec3i;
-import com.cavetale.halloween.Booth;
-import com.cavetale.halloween.HalloweenPlugin;
 import com.cavetale.mytems.Mytems;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -28,9 +26,9 @@ public final class RaceAttraction extends Attraction<RaceAttraction.SaveTag> {
     protected List<Cuboid> playerCheckpointList = new ArrayList<>();
     protected Cuboid startArea = Cuboid.ZERO;
 
-    protected RaceAttraction(final HalloweenPlugin plugin, final String name, final List<Area> areaList, final Booth booth) {
-        super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
-        for (Area area : areaList) {
+    protected RaceAttraction(final AttractionConfiguration config) {
+        super(config, SaveTag.class, SaveTag::new);
+        for (Area area : allAreas) {
             if ("ai".equals(area.name)) {
                 aiCheckpointList.add(area.toCuboid());
             } else if ("player".equals(area.name)) {
@@ -142,7 +140,7 @@ public final class RaceAttraction extends Attraction<RaceAttraction.SaveTag> {
                                                        saveTag.playerCheckpointIndex + 1, playerCheckpointList.size()));
             List<Vec3i> vectorList = playerCheckpoint.enumerate();
             Vec3i vector = vectorList.get(random.nextInt(vectorList.size()));
-            confetti(player, vector.toLocation(plugin.getWorld()).add(0, 0.6, 0));
+            confetti(player, vector.toLocation(world).add(0, 0.6, 0));
             pathTo(saveTag.aiCheckpointIndex);
         }
         return null;
@@ -154,7 +152,7 @@ public final class RaceAttraction extends Attraction<RaceAttraction.SaveTag> {
         Vec3i vec = new Vec3i((checkpoint.ax + checkpoint.bx) / 2,
                               checkpoint.ay,
                               (checkpoint.az + checkpoint.bz) / 2);
-        Block block = vec.toBlock(plugin.getWorld());
+        Block block = vec.toBlock(world);
         while (block.isSolid()) {
             block = block.getRelative(0, 1, 0);
         }

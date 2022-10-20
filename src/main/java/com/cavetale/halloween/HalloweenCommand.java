@@ -3,11 +3,11 @@ package com.cavetale.halloween;
 import com.cavetale.core.command.AbstractCommand;
 import com.cavetale.core.command.CommandArgCompleter;
 import com.cavetale.core.command.CommandWarn;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 public final class HalloweenCommand extends AbstractCommand<HalloweenPlugin> {
     protected HalloweenCommand(final HalloweenPlugin plugin) {
@@ -43,11 +43,10 @@ public final class HalloweenCommand extends AbstractCommand<HalloweenPlugin> {
 
     protected boolean reload(CommandSender sender, String[] args) {
         if (args.length != 0) return false;
-        plugin.clearAttractions();
         plugin.clearSessions();
-        plugin.loadAttractions();
-        sender.sendMessage(Component.text("Players and attractions reloaded",
-                                          NamedTextColor.YELLOW));
+        plugin.clearFestivals();
+        plugin.loadFestivals();
+        sender.sendMessage(text("Players and attractions reloaded", YELLOW));
         return true;
     }
 
@@ -73,7 +72,7 @@ public final class HalloweenCommand extends AbstractCommand<HalloweenPlugin> {
             target = (Player) sender;
         }
         music.melody.play(plugin, target);
-        sender.sendMessage(Component.text("Playing " + music + " to " + target.getName(), NamedTextColor.YELLOW));
+        sender.sendMessage(text("Playing " + music + " to " + target.getName(), YELLOW));
         return true;
     }
 }

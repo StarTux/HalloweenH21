@@ -4,11 +4,8 @@ import com.cavetale.area.struct.Area;
 import com.cavetale.core.font.Unicode;
 import com.cavetale.core.font.VanillaItems;
 import com.cavetale.core.struct.Vec3i;
-import com.cavetale.halloween.Booth;
-import com.cavetale.halloween.HalloweenPlugin;
 import java.time.Duration;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
@@ -20,9 +17,9 @@ public final class DummyAttraction extends Attraction<DummyAttraction.SaveTag> {
     protected int secondsLeft;
     protected final Set<Vec3i> blocks = new HashSet<>();;
 
-    protected DummyAttraction(final HalloweenPlugin plugin, final String name, final List<Area> areaList, final Booth booth) {
-        super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
-        for (Area area : areaList) {
+    protected DummyAttraction(final AttractionConfiguration config) {
+        super(config, SaveTag.class, SaveTag::new);
+        for (Area area : allAreas) {
             if ("name".equals(area.name)) {
                 blocks.addAll(area.enumerate());
             }

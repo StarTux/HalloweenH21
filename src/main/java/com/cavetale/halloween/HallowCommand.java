@@ -21,7 +21,7 @@ public final class HallowCommand extends AbstractCommand<HalloweenPlugin> {
 
     protected boolean yes(Player player, String[] args) {
         if (args.length != 1) return true;
-        Attraction attraction = plugin.attractionsMap.get(args[0]);
+        Attraction attraction = plugin.getAttraction(player.getWorld(), args[0]);
         if (attraction == null) return true;
         attraction.onClickYes(player);
         return true;

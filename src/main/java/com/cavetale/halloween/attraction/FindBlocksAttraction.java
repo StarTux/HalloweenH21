@@ -4,8 +4,6 @@ import com.cavetale.area.struct.Area;
 import com.cavetale.core.font.Unicode;
 import com.cavetale.core.font.VanillaItems;
 import com.cavetale.core.struct.Vec3i;
-import com.cavetale.halloween.Booth;
-import com.cavetale.halloween.HalloweenPlugin;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,9 +41,9 @@ public final class FindBlocksAttraction extends Attraction<FindBlocksAttraction.
     Set<Vec3i> originBlockSet = new HashSet<>();
     protected int secondsLeft;
 
-    protected FindBlocksAttraction(final HalloweenPlugin plugin, final String name, final List<Area> areaList, final Booth booth) {
-        super(plugin, name, areaList, booth, SaveTag.class, SaveTag::new);
-        for (Area area : areaList) {
+    protected FindBlocksAttraction(final AttractionConfiguration config) {
+        super(config, SaveTag.class, SaveTag::new);
+        for (Area area : allAreas) {
             if ("blocks".equals(area.name)) {
                 originBlockSet.addAll(area.enumerate());
             }
@@ -139,7 +137,7 @@ public final class FindBlocksAttraction extends Attraction<FindBlocksAttraction.
         saveTag.blockDataList = new ArrayList<>();
         List<Vec3i> possibleBlocks = new ArrayList<>(originBlockSet);
         Collections.shuffle(possibleBlocks, random);
-        World w = plugin.getWorld();
+        World w = world;
         for (Vec3i vec : possibleBlocks) {
             if (saveTag.blockList.size() >= MAX_BLOCKS) break;
             Block block = vec.toBlock(w);
@@ -266,7 +264,7 @@ public final class FindBlocksAttraction extends Attraction<FindBlocksAttraction.
         Vec3i vec = saveTag.blockList.remove(blockIndex);
         String string = saveTag.blockDataList.remove(blockIndex);
         BlockData blockData = Bukkit.createBlockData(string);
-        Block block = vec.toBlock(plugin.getWorld());
+        Block block = vec.toBlock(world);
         block.setBlockData(blockData, false);
         return block;
     }
