@@ -31,7 +31,6 @@ public final class MemoryAttraction extends Attraction<MemoryAttraction.SaveTag>
         this.displayName = text("Memory Game", DARK_RED);
         this.description = text("Choose one of my chests and keep"
                                           + " what you find inside!");
-        this.prizePoolHasDuds = true;
     }
 
     @Override

@@ -10,7 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import static net.kyori.adventure.text.Component.text;
 
-public final class DefaultBooth implements Booth {
+public final class Booth2022 implements Booth {
     @Override
     public AttractionType getType() {
         return null;
@@ -46,11 +46,23 @@ public final class DefaultBooth implements Booth {
 
     @Override
     public ItemStack getFirstCompletionReward() {
-        return new ItemStack(Material.DIAMOND);
+        return Mytems.HALLOWEEN_TOKEN_2.createItemStack();
     }
+
+    private static final List<List<ItemStack>> PRIZE_POOL =
+        List.of(List.of(Mytems.CANDY_CORN.createItemStack(),
+                        Mytems.CHOCOLATE_BAR.createItemStack(),
+                        Mytems.LOLLIPOP.createItemStack(),
+                        Mytems.ORANGE_CANDY.createItemStack()),
+                List.of(Mytems.RUBY.createItemStack(1),
+                        Mytems.RUBY.createItemStack(2),
+                        Mytems.RUBY.createItemStack(3)),
+                List.of(new ItemStack(Material.EMERALD),
+                        new ItemStack(Material.COD),
+                        new ItemStack(Material.POISONOUS_POTATO)));
 
     @Override
     public List<List<ItemStack>> getPrizePool() {
-        return List.of(List.of(new ItemStack(Material.DIAMOND)));
+        return PRIZE_POOL;
     }
 }

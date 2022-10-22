@@ -67,6 +67,7 @@ import static net.kyori.adventure.text.format.TextDecoration.*;
 @Getter
 public abstract class Attraction<T extends Attraction.SaveTag> {
     protected final HalloweenPlugin plugin;
+    protected final Festival festival;
     protected final World world;
     protected final String name;
     protected final List<Area> allAreas;
@@ -78,49 +79,13 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     protected T saveTag;
     protected Supplier<T> saveTagSupplier;
     protected Vec3i npcVector;
-    protected Mytems firstCompletionMytems = null;
     protected boolean doesRequireInstrument;
     protected Duration completionCooldown = Duration.ofMinutes(10);
     protected Component displayName = empty();
     protected Component description = empty();
-    protected ItemStack firstCompletionReward = Mytems.HALLOWEEN_TOKEN.createItemStack();
-    protected static final ItemStack[] PREMIUM_PRIZE_POOL = {
-        Mytems.CANDY_CORN.createItemStack(),
-            Mytems.CHOCOLATE_BAR.createItemStack(),
-            Mytems.LOLLIPOP.createItemStack(),
-            Mytems.ORANGE_CANDY.createItemStack(),
-            new ItemStack(Material.DIAMOND, 2),
-            new ItemStack(Material.DIAMOND, 4),
-            new ItemStack(Material.DIAMOND, 8),
-            new ItemStack(Material.DIAMOND, 16),
-            new ItemStack(Material.DIAMOND, 32),
-            new ItemStack(Material.DIAMOND, 64),
-    };
-    protected static final ItemStack[][] DUD_PRIZE_POOL = {
-        {
-            Mytems.CANDY_CORN.createItemStack(),
-            Mytems.CHOCOLATE_BAR.createItemStack(),
-            Mytems.LOLLIPOP.createItemStack(),
-            Mytems.ORANGE_CANDY.createItemStack(),
-        },
-        {
-            new ItemStack(Material.DIAMOND, 2),
-            new ItemStack(Material.DIAMOND, 4),
-            new ItemStack(Material.DIAMOND, 8),
-            new ItemStack(Material.DIAMOND, 16),
-            new ItemStack(Material.DIAMOND, 32),
-            new ItemStack(Material.DIAMOND, 64),
-        },
-        {
-            new ItemStack(Material.EMERALD),
-            new ItemStack(Material.COD),
-            new ItemStack(Material.POISONOUS_POTATO),
-        }
-    };
-    protected boolean prizePoolHasDuds = false;
     protected final Booth booth;
 
-    public static Attraction of(final World world,
+    public static Attraction of(final Festival festival,
                                 @NonNull final String name,
                                 @NonNull final List<Area> areaList,
                                 @NonNull final Booth booth) {
@@ -131,20 +96,21 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
             ? booth.getType()
             : AttractionType.forName(typeName);
         if (attractionType == null) return null;
-        Attraction result =  attractionType.make(new AttractionConfiguration(world, name, areaList, booth));
+        Attraction result =  attractionType.make(new AttractionConfiguration(festival, name, areaList, booth));
         if (booth.getDisplayName() != null) result.displayName = booth.getDisplayName();
         if (booth.getDescription() != null) result.description = booth.getDescription();
-        if (booth.getReward() != null) result.firstCompletionReward = booth.getReward().createItemStack();
+        //if (booth.getReward() != null) result.firstCompletionReward = booth.getReward().createItemStack();
         booth.apply(result);
         return result;
     }
 
     protected Attraction(final AttractionConfiguration config, final Class<T> saveTagClass, final Supplier<T> saveTagSupplier) {
         this.plugin = plugin();
-        this.world = config.world;
+        this.festival = config.festival;
+        this.world = festival.getWorld();
         this.name = config.name;
         this.allAreas = config.areaList;
-        this.saveFile = new File(plugin.getAttractionsFolder(), name + ".json");
+        this.saveFile = new File(festival.getSaveFolder(), name + ".json");
         this.mainArea = allAreas.get(0).toCuboid();
         this.saveTagClass = saveTagClass;
         this.saveTagSupplier = saveTagSupplier;
@@ -312,11 +278,10 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     }
 
     protected final ItemStack getRegularCompletionReward(Player player) {
-        ItemStack[] list = prizePoolHasDuds
-            ? DUD_PRIZE_POOL[random.nextInt(DUD_PRIZE_POOL.length)]
-            : PREMIUM_PRIZE_POOL;
-        ItemStack itemStack = list[random.nextInt(list.length)];
-        return itemStack.clone();
+        List<List<ItemStack>> list = booth.getPrizePool();
+        List<ItemStack> list2 = list.get(random.nextInt(list.size()));
+        ItemStack item = list2.get(random.nextInt(list2.size()));
+        return item.clone();
     }
 
     /**
@@ -327,7 +292,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         session.clearPrizeWaiting(this);
         session.lockUnique(this);
         session.save();
-        giveInGui(player, firstCompletionReward.clone());
+        giveInGui(player, booth.getFirstCompletionReward().clone());
     }
 
     /**
@@ -568,5 +533,9 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
             }
         }
         return result;
+    }
+
+    public final String getUniqueKey() {
+        return festival.getWorldName() + "." + name;
     }
 }

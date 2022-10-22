@@ -8,6 +8,7 @@ import com.cavetale.halloween.Session;
 import com.cavetale.resident.PluginSpawn;
 import com.cavetale.resident.ZoneType;
 import com.cavetale.resident.save.Loc;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -37,6 +38,7 @@ public final class Festival {
     // data
     protected final Map<String, Attraction> attractionsMap = new HashMap<>();
     protected PluginSpawn totalCompletionVillager;
+    protected File saveFolder;
 
     public void clear() {
         for (Attraction attraction : attractionsMap.values()) {
@@ -77,6 +79,8 @@ public final class Festival {
             logWarn("World not found: " + worldName);
             return;
         }
+        saveFolder = new File(plugin().getAttractionsFolder(), worldName);
+        saveFolder.mkdirs();
         AreasFile areasFile = AreasFile.load(world, AREAS_FILE);
         if (areasFile == null) throw new IllegalStateException("Areas file not found: " + AREAS_FILE);
         for (Map.Entry<String, List<Area>> entry : areasFile.areas.entrySet()) {
@@ -93,7 +97,7 @@ public final class Festival {
                 logWarn(name + ": No Booth found!");
             }
             List<Area> areaList = entry.getValue();
-            Attraction attraction = Attraction.of(world, name, areaList, booth != null ? booth : new DefaultBooth());
+            Attraction attraction = Attraction.of(this, name, areaList, booth != null ? booth : new DefaultBooth());
             if (attraction == null) {
                 logWarn(name + ": No Attraction!");
             }
@@ -142,20 +146,20 @@ public final class Festival {
 
     public void clickTotalCompletionVillager(Player player) {
         Session session = plugin().sessionOf(player);
-        if (session.isUniqueNameLocked(TOTAL_COMPLETION)) {
+        if (session.isTotallyCompleted()) {
             player.sendMessage(text("You completed everything. Congratulations!", GOLD));
             return;
         }
         final int total = attractionsMap.size();
         int locked = 0;
-        for (String attractionName : attractionsMap.keySet()) {
-            if (session.isUniqueNameLocked(attractionName)) {
+        for (Attraction attraction : attractionsMap.values()) {
+            if (session.isUniqueLocked(attraction)) {
                 locked += 1;
             }
         }
         if (locked >= total) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kite member HalloweenComplete " + player.getName());
-            session.lockUniqueName(TOTAL_COMPLETION);
+            session.lockTotallyCompleted();
             session.save();
             Attraction.perfect(player, true);
         } else {

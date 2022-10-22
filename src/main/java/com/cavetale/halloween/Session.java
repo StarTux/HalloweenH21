@@ -34,54 +34,55 @@ public final class Session {
     }
 
     public Duration getCooldown(Attraction attraction) {
-        Long cd = tag.cooldowns.get(attraction.getName());
+        Long cd = tag.cooldowns.get(attraction.getUniqueKey());
         if (cd == null) return null;
         long now = System.currentTimeMillis();
         if (now > cd) {
-            tag.cooldowns.remove(attraction.getName());
+            tag.cooldowns.remove(attraction.getUniqueKey());
             return null;
         }
         return Duration.ofMillis(cd - now);
     }
 
     public void setCooldown(Attraction attraction, Duration duration) {
-        tag.cooldowns.put(attraction.getName(), duration.toMillis() + System.currentTimeMillis());
+        tag.cooldowns.put(attraction.getUniqueKey(), duration.toMillis() + System.currentTimeMillis());
     }
 
     public boolean isUniqueLocked(Attraction attraction) {
-        return tag.uniquesGot.contains(attraction.getName());
-    }
-
-    public boolean isUniqueNameLocked(String named) {
-        return tag.uniquesGot.contains(named);
+        return tag.uniquesGot.contains(attraction.getUniqueKey());
     }
 
     public void lockUnique(Attraction attraction) {
-        tag.uniquesGot.add(attraction.getName());
+        tag.uniquesGot.add(attraction.getUniqueKey());
     }
 
-    public void lockUniqueName(String named) {
-        tag.uniquesGot.add(named);
+    public boolean isTotallyCompleted() {
+        return tag.totallyCompleted;
+    }
+
+    public void lockTotallyCompleted() {
+        tag.totallyCompleted = true;
     }
 
     public int getPrizeWaiting(Attraction attraction) {
-        Integer result = tag.prizesWaiting.get(attraction.getName());
+        Integer result = tag.prizesWaiting.get(attraction.getUniqueKey());
         return result != null ? result : 0;
     }
 
     public void setFirstCompletionPrizeWaiting(Attraction attraction) {
-        tag.prizesWaiting.put(attraction.getName(), 2);
+        tag.prizesWaiting.put(attraction.getUniqueKey(), 2);
     }
 
     public void setRegularCompletionPrizeWaiting(Attraction attraction) {
-        tag.prizesWaiting.put(attraction.getName(), 1);
+        tag.prizesWaiting.put(attraction.getUniqueKey(), 1);
     }
 
     public void clearPrizeWaiting(Attraction attraction) {
-        tag.prizesWaiting.remove(attraction.getName());
+        tag.prizesWaiting.remove(attraction.getUniqueKey());
     }
 
     static final class Tag {
+        protected boolean totallyCompleted;
         protected final Map<String, Long> cooldowns = new HashMap<>();
         protected final Set<String> uniquesGot = new HashSet<>();
         protected final Map<String, Integer> prizesWaiting = new HashMap<>(); // 1 = regular, 2 = unique

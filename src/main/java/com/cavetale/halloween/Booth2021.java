@@ -8,12 +8,15 @@ import com.cavetale.halloween.attraction.MusicHeroAttraction;
 import com.cavetale.halloween.attraction.RepeatMelodyAttraction;
 import com.cavetale.mytems.Mytems;
 import java.time.Duration;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Instrument;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.NamedTextColor.*;
 
@@ -332,5 +335,30 @@ public enum Booth2021 implements Booth {
     @Override
     public Festival getFestival() {
         return FESTIVAL;
+    }
+
+    @Override
+    public ItemStack getFirstCompletionReward() {
+        return Mytems.HALLOWEEN_TOKEN.createItemStack();
+    }
+
+    private static final List<List<ItemStack>> PRIZE_POOL =
+    List.of(List.of(Mytems.CANDY_CORN.createItemStack(),
+                    Mytems.CHOCOLATE_BAR.createItemStack(),
+                    Mytems.LOLLIPOP.createItemStack(),
+                    Mytems.ORANGE_CANDY.createItemStack()),
+            List.of(new ItemStack(Material.DIAMOND, 2),
+                    new ItemStack(Material.DIAMOND, 4),
+                    new ItemStack(Material.DIAMOND, 8),
+                    new ItemStack(Material.DIAMOND, 16),
+                    new ItemStack(Material.DIAMOND, 32),
+                    new ItemStack(Material.DIAMOND, 64)),
+            List.of(new ItemStack(Material.EMERALD),
+                    new ItemStack(Material.COD),
+                    new ItemStack(Material.POISONOUS_POTATO)));
+
+    @Override
+    public List<List<ItemStack>> getPrizePool() {
+        return PRIZE_POOL;
     }
 }
