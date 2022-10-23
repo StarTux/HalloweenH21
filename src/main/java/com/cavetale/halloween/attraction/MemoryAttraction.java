@@ -44,7 +44,7 @@ public final class MemoryAttraction extends Attraction<MemoryAttraction.SaveTag>
         placeBlocks();
         saveTag.gameStarted = System.currentTimeMillis();
         startingGun(player);
-        changeState(State.PICK_1);
+        changeState(State.GAME);
     }
 
     @Override
@@ -60,7 +60,7 @@ public final class MemoryAttraction extends Attraction<MemoryAttraction.SaveTag>
 
     @Override
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (saveTag.state != State.PICK_1 && saveTag.state != State.PICK_2) return;
+        if (saveTag.state != State.GAME && saveTag.state != State.GAME) return;
         switch (event.getAction()) {
         case RIGHT_CLICK_BLOCK:
         case LEFT_CLICK_BLOCK:
@@ -137,16 +137,12 @@ public final class MemoryAttraction extends Attraction<MemoryAttraction.SaveTag>
 
     enum State {
         IDLE,
-        PICK_1 {
+        GAME {
             @Override protected State tick(MemoryAttraction instance) {
                 return instance.tickGame(false);
             }
         },
-        PICK_2 {
-            @Override protected State tick(MemoryAttraction instance) {
-                return instance.tickGame(true);
-            }
-        };
+        ;
 
         protected void enter(MemoryAttraction instance) { }
 

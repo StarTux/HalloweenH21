@@ -12,6 +12,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -105,6 +106,12 @@ public final class HalloweenPlugin extends JavaPlugin {
         Festival festival = festivalMap.get(world.getName());
         if (festival == null) return null;
         return festival.getAttraction(attractionName);
+    }
+
+    public Attraction getAttraction(Location location) {
+        Festival festival = festivalMap.get(location.getWorld().getName());
+        if (festival == null) return null;
+        return festival.getAttraction(location);
     }
 
     public List<Attraction> getAttractions(World world) {

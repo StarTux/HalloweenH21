@@ -1,7 +1,8 @@
 package com.cavetale.halloween.attraction;
 
 import com.cavetale.area.struct.Area;
-import com.cavetale.core.font.Unicode;
+import com.cavetale.core.event.hud.PlayerHudEvent;
+import com.cavetale.core.event.hud.PlayerHudPriority;
 import com.cavetale.core.font.VanillaItems;
 import com.cavetale.core.struct.Vec3i;
 import java.time.Duration;
@@ -10,8 +11,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Axis;
 import org.bukkit.Bukkit;
@@ -284,16 +285,7 @@ public final class FindBlocksAttraction extends Attraction<FindBlocksAttraction.
             timeout(player);
             return State.IDLE;
         }
-        int seconds = (int) ((SEARCH_TIME.toMillis() - searchTime - 1) / 1000L + 1L);
-        if (seconds != secondsLeft) {
-            secondsLeft = seconds;
-            player.sendActionBar(Component.join(JoinConfiguration.noSeparators(), new Component[] {
-                        Component.text(Unicode.WATCH.string + seconds, NamedTextColor.GOLD),
-                        Component.space(),
-                        VanillaItems.JACK_O_LANTERN.component,
-                        Component.text(saveTag.blocksFound + "/" + saveTag.totalBlocks, NamedTextColor.DARK_RED),
-                    }));
-        }
+        secondsLeft = (int) ((SEARCH_TIME.toMillis() - searchTime - 1) / 1000L + 1L);
         return null;
     }
 
@@ -336,5 +328,13 @@ public final class FindBlocksAttraction extends Attraction<FindBlocksAttraction.
         protected int blocksFound;
         protected int totalBlocks;
         protected long searchStarted;
+    }
+
+    @Override
+    public void onPlayerHud(PlayerHudEvent event) {
+        event.bossbar(PlayerHudPriority.HIGHEST,
+                      makeProgressComponent(secondsLeft, VanillaItems.JACK_O_LANTERN, saveTag.blocksFound, saveTag.totalBlocks),
+                      BossBar.Color.RED, BossBar.Overlay.PROGRESS,
+                      (float) secondsLeft / (float) SEARCH_TIME.toSeconds());
     }
 }

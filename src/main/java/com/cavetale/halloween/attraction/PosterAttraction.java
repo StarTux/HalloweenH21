@@ -116,7 +116,7 @@ public final class PosterAttraction extends Attraction<PosterAttraction.SaveTag>
         int x = index % poster.getWidth();
         int y = index / poster.getWidth();
         Vec3i vec = getPosterBlock(x, y);
-        Location location = vec.toLocation(world).add(0, 0.5, 0);
+        Location location = vec.toCenterLocation(world);
         PosterPlugin posterPlugin = (PosterPlugin) Bukkit.getPluginManager().getPlugin("Poster");
         GlowItemFrame entity = location.getWorld().spawn(location, GlowItemFrame.class, e -> {
                 e.setPersistent(false);
@@ -231,7 +231,7 @@ public final class PosterAttraction extends Attraction<PosterAttraction.SaveTag>
         }
         Vec3i vec = getPosterBlock(emptyX, emptyY);
         Entity entity = Bukkit.getEntity(frame.uuid);
-        Location location = vec.toLocation(world);
+        Location location = vec.toCenterFloorLocation(world);
         location.setDirection(entity.getLocation().getDirection());
         entity.teleport(location);
         // swap

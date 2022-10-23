@@ -139,7 +139,7 @@ public final class OpenChestAttraction extends Attraction<OpenChestAttraction.Sa
                         Component.text(" Pick a chest!", NamedTextColor.WHITE),
                     }));
             for (Vec3i vec : chestBlockSet) {
-                highlight(player, vec.toLocation(player.getWorld()).add(0, 0.5, 0));
+                highlight(player, vec.toCenterLocation(player.getWorld()));
             }
         }
         return null;

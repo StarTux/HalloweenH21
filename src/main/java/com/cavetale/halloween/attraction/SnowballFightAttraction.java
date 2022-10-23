@@ -1,6 +1,9 @@
 package com.cavetale.halloween.attraction;
 
 import com.cavetale.area.struct.Area;
+import com.cavetale.core.event.hud.PlayerHudEvent;
+import com.cavetale.core.event.hud.PlayerHudPriority;
+import com.cavetale.core.font.VanillaItems;
 import com.cavetale.core.struct.Vec3i;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -10,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import lombok.Setter;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -24,6 +28,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
 import org.bukkit.entity.Snowman;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import static net.kyori.adventure.text.Component.empty;
@@ -32,9 +37,9 @@ import static net.kyori.adventure.text.Component.text;
 public final class SnowballFightAttraction extends Attraction<SnowballFightAttraction.SaveTag> {
     protected final Duration playTime = Duration.ofSeconds(60);
     protected final Duration warmupTime = Duration.ofSeconds(5);
-    protected int lastShownTime = -1;
     protected final List<Vec3i> snowmanBlocks = new ArrayList<>();
     @Setter private int totalRounds = 5;
+    protected int secondsLeft;
 
     protected SnowballFightAttraction(final AttractionConfiguration config) {
         super(config, SaveTag.class, SaveTag::new);
@@ -49,6 +54,9 @@ public final class SnowballFightAttraction extends Attraction<SnowballFightAttra
         }
         snowmanBlocks.addAll(snowmanBlockSet);
         snowmanBlocks.removeAll(noSnowmanBlockSet);
+        this.displayName = booth.format("Snowball Fight");
+        this.description = text("These golems think they are undefeatable."
+                                + " Please teach them a lesson for me!");
     }
 
     @Override
@@ -93,7 +101,7 @@ public final class SnowballFightAttraction extends Attraction<SnowballFightAttra
         saveTag.snowmanCount = (saveTag.round - 1) * 2 + 10;
         for (int i = 0; i < saveTag.snowmanCount; i += 1) {
             Vec3i vec = snowmanBlocks.get(i);
-            Location location = vec.toLocation(world);
+            Location location = vec.toCenterFloorLocation(world);
             location.setYaw(random.nextFloat() * 360.0f);
             Snowman snowman = location.getWorld().spawn(location, Snowman.class, s -> {
                     s.setPersistent(false);
@@ -143,11 +151,7 @@ public final class SnowballFightAttraction extends Attraction<SnowballFightAttra
                                                            Duration.ZERO)));
             return State.PLAY;
         }
-        int secondsLeft = (int) ((timeLeft - 1) / 1000L) + 1;
-        if (secondsLeft != lastShownTime) {
-            lastShownTime = secondsLeft;
-            player.sendActionBar(makeProgressComponent(secondsLeft));
-        }
+        secondsLeft = (int) ((timeLeft - 1) / 1000L) + 1;
         return null;
     }
 
@@ -158,12 +162,7 @@ public final class SnowballFightAttraction extends Attraction<SnowballFightAttra
             timeout(player);
             return State.IDLE;
         }
-        int secondsLeft = (int) ((timeLeft - 1) / 1000L) + 1;
-        if (secondsLeft != lastShownTime) {
-            lastShownTime = secondsLeft;
-            player.sendActionBar(makeProgressComponent(secondsLeft, text("Snowmen "),
-                                                       saveTag.snowmenHit, saveTag.snowmanCount));
-        }
+        secondsLeft = (int) ((timeLeft - 1) / 1000L) + 1;
         // Snowball every X ticks
         if (saveTag.shootCooldown > 0) {
             saveTag.shootCooldown -= 1;
@@ -292,5 +291,20 @@ public final class SnowballFightAttraction extends Attraction<SnowballFightAttra
         protected int snowmanCount;
         protected int round;
         protected int shootCooldown;
+    }
+
+    @Override
+    public void onPlayerHud(PlayerHudEvent event) {
+        event.bossbar(PlayerHudPriority.HIGHEST,
+                      makeProgressComponent(secondsLeft, VanillaItems.CARVED_PUMPKIN, saveTag.snowmenHit, saveTag.snowmanCount),
+                      BossBar.Color.RED, BossBar.Overlay.PROGRESS,
+                      (float) secondsLeft / (float) playTime.toSeconds());
+    }
+
+    @Override
+    public void onEntityDamage(EntityDamageEvent event) {
+        if (event.getCause() == EntityDamageEvent.DamageCause.MELTING) {
+            event.setCancelled(true);
+        }
     }
 }

@@ -15,26 +15,29 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.JoinConfiguration;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
 import org.bukkit.Instrument;
 import org.bukkit.Location;
 import org.bukkit.Note.Tone;
 import org.bukkit.Note;
 import org.bukkit.entity.Player;
+import static net.kyori.adventure.text.Component.empty;
+import static net.kyori.adventure.text.Component.join;
+import static net.kyori.adventure.text.Component.space;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.JoinConfiguration.separator;
+import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttraction.SaveTag> {
     protected Melody melody = null;
     @Setter protected Instrument instrument = Instrument.PIANO;
-    @Setter protected int octave = 1;
+    @Setter protected int octave = 0;
 
     protected RepeatMelodyAttraction(final AttractionConfiguration config) {
         super(config, SaveTag.class, SaveTag::new);
         this.doesRequireInstrument = true;
-        this.displayName = Component.text("Play the Melody", NamedTextColor.DARK_RED);
-        this.description = Component.text("I'll give you a melody and you're gonna repeat it. It gets harder every round.");
-
+        this.displayName = booth.format("Play the Melody");
+        this.description = text("I'll give you a melody and you're gonna repeat it. It gets harder every round.");
     }
 
     public void set(Instrument theInstr, int theOctave) {
@@ -68,6 +71,9 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
         makeMelody();
         saveTag.maxNoteIndex = 2;
         startingGun(player);
+        octave = random.nextInt(2);
+        Instrument[] instruments = Instrument.values();
+        instrument = instruments[random.nextInt(instruments.length)];
         changeState(State.PLAY);
     }
 
@@ -82,6 +88,10 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
         saveTag.state.enter(this);
     }
 
+    private String toString(Beat beat) {
+        return beat.getTone() + (beat.getSemitone() != null ? beat.getSemitone().toString() : "");
+    }
+
     protected void playNote(Player player, Location location) {
         Beat beat = melody.getBeats().get(saveTag.noteIndex);
         for (Player online : getPlayersIn(mainArea)) {
@@ -89,10 +99,10 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
         }
         List<Component> comps = new ArrayList<>();
         for (int i = 0; i <= saveTag.noteIndex; i += 1) {
-            comps.add(Component.text(melody.getBeats().get(i).toString()));
+            comps.add(text(toString(melody.getBeats().get(i))));
         }
-        Component line = Component.join(JoinConfiguration.separator(Component.space()), comps).color(NamedTextColor.AQUA);
-        player.showTitle(Title.title(Component.empty(), line,
+        Component line = join(separator(space()), comps).color(AQUA);
+        player.showTitle(Title.title(empty(), line,
                                      Title.Times.times(Duration.ZERO, Duration.ofSeconds(1), Duration.ofSeconds(1))));
         saveTag.noteIndex += 1;
     }
@@ -139,7 +149,7 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
         saveTag.playerTimeout = System.currentTimeMillis() + 10000L;
         Player player = getCurrentPlayer();
         if (player == null) return;
-        player.sendActionBar(Component.text("Your turn!", NamedTextColor.GREEN));
+        player.sendActionBar(text("Your turn!", GREEN));
     }
 
     protected State tickReplay() {

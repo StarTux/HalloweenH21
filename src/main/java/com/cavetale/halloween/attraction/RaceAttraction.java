@@ -1,12 +1,15 @@
 package com.cavetale.halloween.attraction;
 
 import com.cavetale.area.struct.Area;
+import com.cavetale.core.event.hud.PlayerHudEvent;
+import com.cavetale.core.event.hud.PlayerHudPriority;
 import com.cavetale.core.struct.Cuboid;
 import com.cavetale.core.struct.Vec3i;
 import com.cavetale.mytems.Mytems;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -136,11 +139,9 @@ public final class RaceAttraction extends Attraction<RaceAttraction.SaveTag> {
         }
         if (seconds != secondsRaced) {
             secondsRaced = seconds;
-            player.sendActionBar(makeProgressComponent(seconds, Mytems.GOLDEN_CUP.component,
-                                                       saveTag.playerCheckpointIndex + 1, playerCheckpointList.size()));
             List<Vec3i> vectorList = playerCheckpoint.enumerate();
             Vec3i vector = vectorList.get(random.nextInt(vectorList.size()));
-            confetti(player, vector.toLocation(world).add(0, 0.6, 0));
+            confetti(player, vector.toCenterLocation(world).add(0, 0.1, 0));
             pathTo(saveTag.aiCheckpointIndex);
         }
         return null;
@@ -220,5 +221,14 @@ public final class RaceAttraction extends Attraction<RaceAttraction.SaveTag> {
         protected int aiCheckpointIndex;
         protected int playerCheckpointIndex;
         protected boolean playerFinished;
+    }
+
+
+    @Override
+    public void onPlayerHud(PlayerHudEvent event) {
+        event.bossbar(PlayerHudPriority.HIGHEST,
+                      makeProgressComponent(secondsRaced, Mytems.GOLDEN_CUP.component, saveTag.playerCheckpointIndex + 1, playerCheckpointList.size()),
+                      BossBar.Color.RED, BossBar.Overlay.PROGRESS,
+                      (float) secondsRaced / (float) MAX_RACE_TIME.toSeconds());
     }
 }

@@ -1,10 +1,11 @@
 package com.cavetale.halloween.attraction;
 
 import com.cavetale.area.struct.Area;
+import com.cavetale.core.event.hud.PlayerHudEvent;
 import com.cavetale.core.event.player.PluginPlayerEvent;
 import com.cavetale.core.font.DefaultFont;
 import com.cavetale.core.font.Unicode;
-import com.cavetale.core.font.VanillaItems;
+import com.cavetale.core.item.ItemKinds;
 import com.cavetale.core.struct.Cuboid;
 import com.cavetale.core.struct.Vec3i;
 import com.cavetale.core.util.Json;
@@ -29,6 +30,7 @@ import java.util.function.Supplier;
 import lombok.Getter;
 import lombok.NonNull;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.title.Title;
@@ -120,7 +122,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
             }
         }
         if (npcVector != null) {
-            Location location = npcVector.toLocation(world);
+            Location location = npcVector.toCenterFloorLocation(world);
             mainVillager = PluginSpawn.register(plugin, ZoneType.HALLOWEEN, Loc.of(location));
             mainVillager.setOnPlayerClick(this::clickMainVillager);
             mainVillager.setOnMobSpawning(mob -> {
@@ -220,7 +222,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         }
     }
 
-    protected final Component makeProgressComponent(int seconds, Component prefix, int has, int max) {
+    protected final Component makeProgressComponent(int seconds, ComponentLike prefix, int has, int max) {
         return join(noSeparators(),
                     text(Unicode.WATCH.string + seconds, GOLD),
                     space(),
@@ -250,6 +252,10 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
             return null;
         }
         return player;
+    }
+
+    public final boolean isCurrentPlayer(Player player) {
+        return isPlaying() && player.getUniqueId().equals(saveTag.currentPlayer);
     }
 
     protected abstract void onTick();
@@ -422,7 +428,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     }
 
     protected final boolean takeEntryFee(Player player) {
-        ItemStack entryFee = new ItemStack(Material.DIAMOND);
+        ItemStack entryFee = booth.getEntryFee();
         for (ItemStack itemStack : player.getInventory()) {
             if (entryFee.isSimilar(itemStack)) {
                 itemStack.subtract(1);
@@ -430,9 +436,9 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
             }
         }
         Component message = join(noSeparators(),
-                                 text("You don't have a "),
-                                 VanillaItems.DIAMOND.component,
-                                 text("diamond!"))
+                                 text("You don't have "),
+                                 ItemKinds.chatDescription(booth.getEntryFee()),
+                                 text("!"))
             .color(RED);
         player.sendMessage(message);
         player.sendActionBar(message);
@@ -480,9 +486,9 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
                                        : text(Unicode.CHECKED_CHECKBOX.character + " Finished", BLUE)),
                                       newline(),
                                       newline(),
-                                      text("Play game for 1"),
-                                      VanillaItems.DIAMOND.component,
-                                      text("Diamond?"),
+                                      text("Play game for "),
+                                      ItemKinds.chatDescription(booth.getEntryFee()),
+                                      text("?"),
                                       newline(),
                                       (DefaultFont.START_BUTTON.component
                                        .clickEvent(ClickEvent.runCommand("/hallow yes " + name))
@@ -538,4 +544,9 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     public final String getUniqueKey() {
         return festival.getWorldName() + "." + name;
     }
+
+    /**
+     * Print to the hud.
+     */
+    public void onPlayerHud(PlayerHudEvent event) { }
 }

@@ -1,5 +1,6 @@
 package com.cavetale.halloween;
 
+import com.cavetale.core.event.hud.PlayerHudEvent;
 import com.cavetale.core.event.player.PluginPlayerEvent;
 import com.cavetale.core.struct.Vec3i;
 import com.cavetale.halloween.attraction.Attraction;
@@ -78,8 +79,8 @@ public final class EventListener implements Listener {
     protected void onEntityDamage(EntityDamageEvent event) {
         Entity entity = event.getEntity();
         Location location = entity.getLocation();
-        for (Attraction attraction : plugin.getAttractions(entity.getWorld())) {
-            if (!attraction.isInArea(location)) continue;
+        Attraction attraction = plugin.getAttraction(location);
+        if (attraction != null && attraction.isInArea(location)) {
             attraction.onEntityDamage(event);
         }
     }
@@ -159,6 +160,14 @@ public final class EventListener implements Listener {
                                                vec.z - event.getMinZ(),
                                                8);
             event.getCursors().addCursor(mapCursor);
+        }
+    }
+
+    @EventHandler
+    protected void onPlayerHud(PlayerHudEvent event) {
+        Attraction attraction = plugin.getAttraction(event.getPlayer().getLocation());
+        if (attraction != null && attraction.isCurrentPlayer(event.getPlayer())) {
+            attraction.onPlayerHud(event);
         }
     }
 }

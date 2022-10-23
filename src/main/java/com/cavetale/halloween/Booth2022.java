@@ -55,10 +55,12 @@ public final class Booth2022 implements Booth {
                         Mytems.LOLLIPOP.createItemStack(),
                         Mytems.ORANGE_CANDY.createItemStack()),
                 List.of(Mytems.RUBY.createItemStack(1),
-                        Mytems.RUBY.createItemStack(2),
-                        Mytems.RUBY.createItemStack(3)),
+                        Mytems.RUBY.createItemStack(3),
+                        Mytems.RUBY.createItemStack(5),
+                        Mytems.RUBY.createItemStack(7)),
                 List.of(new ItemStack(Material.EMERALD),
                         new ItemStack(Material.COD),
+                        new ItemStack(Material.DIAMOND),
                         new ItemStack(Material.POISONOUS_POTATO)));
 
     @Override

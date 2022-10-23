@@ -30,4 +30,8 @@ public interface Booth {
     ItemStack getFirstCompletionReward();
 
     List<List<ItemStack>> getPrizePool();
+
+    default ItemStack getEntryFee() {
+        return Mytems.RUBY.createItemStack();
+    }
 }

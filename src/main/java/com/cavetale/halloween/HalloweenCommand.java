@@ -3,6 +3,14 @@ package com.cavetale.halloween;
 import com.cavetale.core.command.AbstractCommand;
 import com.cavetale.core.command.CommandArgCompleter;
 import com.cavetale.core.command.CommandWarn;
+import com.cavetale.halloween.attraction.Attraction;
+import com.cavetale.halloween.attraction.AttractionType;
+import com.cavetale.halloween.attraction.Festival;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -27,6 +35,10 @@ public final class HalloweenCommand extends AbstractCommand<HalloweenPlugin> {
             .completers(CommandArgCompleter.enumLowerList(Music.class),
                         CommandArgCompleter.NULL)
             .senderCaller(this::music);
+        rootNode.addChild("count").arguments("<world>")
+            .description("Count attractions")
+            .completers(CommandArgCompleter.supplyList(() -> List.copyOf(plugin.festivalMap.keySet())))
+            .senderCaller(this::count);
     }
 
     private int requireInt(String arg) {
@@ -73,6 +85,25 @@ public final class HalloweenCommand extends AbstractCommand<HalloweenPlugin> {
         }
         music.melody.play(plugin, target);
         sender.sendMessage(text("Playing " + music + " to " + target.getName(), YELLOW));
+        return true;
+    }
+
+    protected boolean count(CommandSender sender, String[] args) {
+        if (args.length != 1) return false;
+        Festival festival = plugin.festivalMap.get(args[0]);
+        if (festival == null) throw new CommandWarn("World not found: " + args[0]);
+        Map<AttractionType, Integer> counts = new EnumMap<>(AttractionType.class);
+        for (AttractionType type : AttractionType.values()) counts.put(type, 0);
+        for (Attraction attraction : festival.getAttractionsMap().values()) {
+            AttractionType type = AttractionType.of(attraction);
+            counts.put(type, counts.get(type) + 1);
+        }
+        List<AttractionType> rankings = new ArrayList<>(List.of(AttractionType.values()));
+        Collections.sort(rankings, (a, b) -> Integer.compare(counts.get(a), counts.get(b)));
+        for (AttractionType type : rankings) {
+            sender.sendMessage(counts.get(type) + " " + type);
+        }
+        sender.sendMessage(festival.getAttractionsMap().size() + " Total");
         return true;
     }
 }

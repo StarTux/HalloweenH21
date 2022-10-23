@@ -1,6 +1,8 @@
 package com.cavetale.halloween.attraction;
 
 import com.cavetale.area.struct.Area;
+import com.cavetale.core.event.hud.PlayerHudEvent;
+import com.cavetale.core.event.hud.PlayerHudPriority;
 import com.cavetale.core.font.VanillaItems;
 import com.cavetale.core.struct.Cuboid;
 import com.cavetale.core.struct.Vec3i;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -171,6 +174,7 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
 
     protected void makeTargets() {
         List<Vec3i> possibleBlocks = new ArrayList<>(targetBlocks);
+        possibleBlocks.removeIf(v -> !v.toBlock(world).isEmpty());
         Collections.shuffle(possibleBlocks, random);
         saveTag.targetBlocks.clear();
         for (int i = 0; i < Math.max(3, saveTag.currentRound); i += 1) {
@@ -206,7 +210,7 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
 
     protected void spawnGhastEntities() {
         for (Vec3i ghastBlock : saveTag.targetGhasts) {
-            Location location = ghastBlock.toLocation(world);
+            Location location = ghastBlock.toCenterFloorLocation(world);
             location.setYaw(random.nextFloat() * 360.0f);
             Ghast ghast = location.getWorld().spawn(location, Ghast.class, g -> {
                     g.setPersistent(false);
@@ -260,10 +264,8 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
             long seconds = (SHOOT_TIME.toMillis() - (now - saveTag.shootingStarted) - 1L) / 1000L + 1L;
             if (secondsLeft != seconds) {
                 secondsLeft = seconds;
-                player.sendActionBar(makeProgressComponent((int) seconds, VanillaItems.TARGET.component,
-                                                           saveTag.roundScore, saveTag.roundTargetCount));
                 for (Vec3i vec : saveTag.targetBlocks) {
-                    highlight(player, vec.toLocation(player.getWorld()).add(0, 0.5, 0));
+                    highlight(player, vec.toCenterLocation(player.getWorld()));
                 }
             }
             for (UUID uuid : targetGhastMap.keySet()) {
@@ -363,5 +365,14 @@ public final class ShootTargetAttraction extends Attraction<ShootTargetAttractio
         protected int currentRound;
         protected int roundScore;
         protected int roundTargetCount;
+    }
+
+
+    @Override
+    public void onPlayerHud(PlayerHudEvent event) {
+        event.bossbar(PlayerHudPriority.HIGHEST,
+                      makeProgressComponent((int) secondsLeft, VanillaItems.TARGET.component, saveTag.roundScore, saveTag.roundTargetCount),
+                      BossBar.Color.RED, BossBar.Overlay.PROGRESS,
+                      (float) secondsLeft / (float) SHOOT_TIME.toSeconds());
     }
 }

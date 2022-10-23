@@ -1,8 +1,10 @@
 package com.cavetale.halloween.attraction;
 
 import com.cavetale.area.struct.Area;
-import com.cavetale.core.font.VanillaItems;
+import com.cavetale.core.event.hud.PlayerHudEvent;
+import com.cavetale.core.event.hud.PlayerHudPriority;
 import com.cavetale.core.struct.Vec3i;
+import com.cavetale.mytems.Mytems;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.Setter;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -141,8 +144,6 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
             changeState(State.IDLE);
         } else {
             progress(player);
-            player.sendActionBar(makeProgressComponent(secondsLeft, VanillaItems.SPIDER_EYE.component,
-                                                       saveTag.spiderBlockIndex + 1, saveTag.spiderBlocks.size()));
             changeState(State.SEARCH);
         }
     }
@@ -165,7 +166,7 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
 
     protected void spawnSpider() {
         Vec3i vector = saveTag.spiderBlocks.get(saveTag.spiderBlockIndex);
-        currentSpider = world.spawn(vector.toLocation(world), CaveSpider.class, s -> {
+        currentSpider = world.spawn(vector.toCenterFloorLocation(world), CaveSpider.class, s -> {
                 s.setPersistent(false);
                 s.setRemoveWhenFarAway(false);
                 s.setGravity(false);
@@ -194,8 +195,6 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
         int seconds = (int) ((timeout - now - 1) / 1000L) + 1;
         if (seconds != secondsLeft) {
             secondsLeft = seconds;
-            player.sendActionBar(makeProgressComponent(seconds, VanillaItems.SPIDER_EYE.component,
-                                                       saveTag.spiderBlockIndex + 1, saveTag.spiderBlocks.size()));
             currentSpider.getWorld().playSound(currentSpider.getLocation(), Sound.ENTITY_SPIDER_HURT, SoundCategory.HOSTILE, 1.0f, 0.5f);
         }
         Location location = currentSpider.getLocation();
@@ -242,5 +241,13 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
         protected List<Vec3i> spiderBlocks;
         protected int spiderBlockIndex;
         protected long searchStarted;
+    }
+
+    @Override
+    public void onPlayerHud(PlayerHudEvent event) {
+        event.bossbar(PlayerHudPriority.HIGHEST,
+                      makeProgressComponent(secondsLeft, Mytems.SPIDER_FACE.component, saveTag.spiderBlockIndex + 1, saveTag.spiderBlocks.size()),
+                      BossBar.Color.RED, BossBar.Overlay.PROGRESS,
+                      (float) secondsLeft / (float) searchTime.toSeconds());
     }
 }

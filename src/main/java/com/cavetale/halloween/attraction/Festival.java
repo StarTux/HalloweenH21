@@ -177,4 +177,11 @@ public final class Festival {
     public List<Attraction> getAttractions() {
         return List.copyOf(attractionsMap.values());
     }
+
+    public Attraction getAttraction(Location location) {
+        for (Attraction attraction : attractionsMap.values()) {
+            if (attraction.isInArea(location)) return attraction;
+        }
+        return null;
+    }
 }
