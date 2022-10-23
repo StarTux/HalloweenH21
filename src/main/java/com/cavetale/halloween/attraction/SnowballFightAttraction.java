@@ -211,6 +211,7 @@ public final class SnowballFightAttraction extends Attraction<SnowballFightAttra
             fail(target);
             stop();
         } else if (event.getEntity() instanceof Snowman target) {
+            event.setCancelled(true);
             if (!(snowball.getShooter() instanceof Player shooter)) return;
             if (!shooter.equals(getCurrentPlayer())) return;
             if (!saveTag.snowmen.remove(target.getUniqueId())) return;

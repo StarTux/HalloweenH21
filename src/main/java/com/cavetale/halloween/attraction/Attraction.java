@@ -2,8 +2,10 @@ package com.cavetale.halloween.attraction;
 
 import com.cavetale.area.struct.Area;
 import com.cavetale.core.event.hud.PlayerHudEvent;
+import com.cavetale.core.event.item.PlayerReceiveItemsEvent;
 import com.cavetale.core.event.player.PluginPlayerEvent;
 import com.cavetale.core.font.DefaultFont;
+import com.cavetale.core.font.GuiOverlay;
 import com.cavetale.core.font.Unicode;
 import com.cavetale.core.item.ItemKinds;
 import com.cavetale.core.struct.Cuboid;
@@ -298,7 +300,11 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         session.clearPrizeWaiting(this);
         session.lockUnique(this);
         session.save();
-        giveInGui(player, booth.getFirstCompletionReward().clone());
+        giveInGui(player, booth.getFirstCompletionReward().clone(),
+                  booth.getEntryFee().clone(),
+                  new ItemStack(Material.DIAMOND),
+                  new ItemStack(Material.EMERALD),
+                  new ItemStack(Material.EMERALD));
     }
 
     /**
@@ -357,18 +363,25 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         }
     }
 
-    protected final void giveInGui(Player player, ItemStack prize) {
+    protected final void giveInGui(Player player, ItemStack prize, ItemStack... extras) {
+        final int size = 27;
+        Component title = GuiOverlay.BLANK.builder(size, DARK_RED).title(displayName).build();
         Gui gui = new Gui(plugin);
+        gui.size(size);
         gui.setItem(13, prize);
+        int[] indexes = {
+            22, 4, 12, 14,
+        };
+        for (int i = 0; i < extras.length; i += 1) {
+            if (i >= indexes.length) {
+                throw new IllegalStateException("Index exceeded: " + i + "/" + indexes.length);
+            }
+            gui.setItem(indexes[i], extras[i]);
+        }
         gui.setEditable(true);
-        gui.title(displayName);
+        gui.title(title);
         gui.onClose(evt -> {
-                for (ItemStack item : gui.getInventory()) {
-                    if (item == null || item.getType() == Material.AIR) continue;
-                    for (ItemStack drop : player.getInventory().addItem(item).values()) {
-                        player.getWorld().dropItem(player.getEyeLocation(), drop);
-                    }
-                }
+                PlayerReceiveItemsEvent.receiveInventory(player, gui.getInventory());
                 player.playSound(player.getLocation(), Sound.BLOCK_CHEST_CLOSE, SoundCategory.BLOCKS, 1.0f, 1.0f);
             });
         gui.open(player);
@@ -498,7 +511,7 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
                                        .clickEvent(ClickEvent.runCommand("/hallow no " + name))
                                        .hoverEvent(HoverEvent.showText(text("Goodbye!", RED)))));
                 meta.setAuthor("Cavetale");
-                meta.title(displayName);
+                meta.title(text("Halloween"));
                 meta.pages(List.of(page));
             });
         player.openBook(book);

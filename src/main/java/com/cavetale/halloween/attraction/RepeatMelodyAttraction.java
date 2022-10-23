@@ -2,7 +2,6 @@ package com.cavetale.halloween.attraction;
 
 import com.cavetale.core.event.player.PluginPlayerEvent.Detail;
 import com.cavetale.core.event.player.PluginPlayerEvent;
-import com.cavetale.core.util.Json;
 import com.cavetale.mytems.item.music.Beat;
 import com.cavetale.mytems.item.music.Melody;
 import com.cavetale.mytems.item.music.MelodyBuilder;
@@ -11,6 +10,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -29,7 +29,7 @@ import static net.kyori.adventure.text.JoinConfiguration.separator;
 import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttraction.SaveTag> {
-    protected Melody melody = null;
+    protected Melody melody;
     @Setter protected Instrument instrument = Instrument.PIANO;
     @Setter protected int octave = 0;
 
@@ -38,6 +38,11 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
         this.doesRequireInstrument = true;
         this.displayName = booth.format("Play the Melody");
         this.description = text("I'll give you a melody and you're gonna repeat it. It gets harder every round.");
+        Random random2 = new Random(npcVector.hashCode());
+        octave = random2.nextInt(2);
+        Instrument[] instruments = Instrument.values();
+        instrument = instruments[random2.nextInt(instruments.length)];
+        makeMelody(random2);
     }
 
     public void set(Instrument theInstr, int theOctave) {
@@ -55,9 +60,6 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
 
     @Override
     protected void onLoad() {
-        if (saveTag.melody != null) {
-            melody = Json.deserialize(saveTag.melody, Melody.class);
-        }
     }
 
     @Override
@@ -68,12 +70,8 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
     @Override
     protected void start(Player player) {
         saveTag.currentPlayer = player.getUniqueId();
-        makeMelody();
         saveTag.maxNoteIndex = 2;
         startingGun(player);
-        octave = random.nextInt(2);
-        Instrument[] instruments = Instrument.values();
-        instrument = instruments[random.nextInt(instruments.length)];
         changeState(State.PLAY);
     }
 
@@ -107,22 +105,22 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
         saveTag.noteIndex += 1;
     }
 
-    protected void makeMelody() {
+    protected void makeMelody(Random random2) {
         MelodyBuilder melodyBuilder = Melody.builder(instrument, 100L);
         Tone[] tones = Tone.values();
         List<Tone> semis = new ArrayList<>(List.of(tones));
         final Semitone semitone;
-        if (random.nextBoolean()) {
+        if (random2.nextBoolean()) {
             semis.removeIf(tone -> !tone.isSharpable());
             semitone = Semitone.SHARP;
         } else {
             semis.removeIf(tone -> tone.ordinal() > 0 && !tones[tone.ordinal() - 1].isSharpable());
             semitone = Semitone.FLAT;
         }
-        Collections.shuffle(semis, random);
-        semis = new ArrayList<>(semis.subList(0, random.nextInt(4)));
+        Collections.shuffle(semis, random2);
+        semis = new ArrayList<>(semis.subList(0, random2.nextInt(4)));
         for (int i = 0; i < 8; i += 1) {
-            Tone tone = tones[random.nextInt(tones.length)];
+            Tone tone = tones[random2.nextInt(tones.length)];
             if (semis.contains(tone)) {
                 melodyBuilder.beat(6, tone, semitone, octave);
             } else {
@@ -130,7 +128,6 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
             }
         }
         melody = melodyBuilder.build();
-        saveTag.melody = Json.serialize(melody);
     }
 
     protected State tickPlay() {
@@ -204,8 +201,6 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
         IDLE {
             @Override void enter(RepeatMelodyAttraction instance) {
                 instance.saveTag.currentPlayer = null;
-                instance.saveTag.melody = null;
-                instance.melody = null;
             }
 
             @Override void exit(RepeatMelodyAttraction instance) {
@@ -246,6 +241,5 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
         protected int maxNoteIndex;
         protected long lastNotePlayed;
         protected long playerTimeout;
-        protected String melody;
     }
 }

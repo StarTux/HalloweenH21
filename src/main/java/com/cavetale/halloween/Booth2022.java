@@ -6,9 +6,11 @@ import com.cavetale.halloween.attraction.Festival;
 import com.cavetale.mytems.Mytems;
 import java.util.List;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 public final class Booth2022 implements Booth {
     @Override
@@ -36,7 +38,11 @@ public final class Booth2022 implements Booth {
 
     @Override
     public Component format(String txt) {
-        return text(txt);
+        TextComponent.Builder builder = text();
+        for (int i = 0; i < txt.length(); i += 1) {
+            builder.append(text(txt.charAt(i), i % 2 == 0 ? GOLD : RED));
+        }
+        return builder.build();
     }
 
     @Override
