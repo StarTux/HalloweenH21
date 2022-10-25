@@ -1,5 +1,6 @@
 package com.cavetale.halloween;
 
+import com.cavetale.core.playercache.PlayerCache;
 import com.cavetale.halloween.attraction.Attraction;
 import com.cavetale.halloween.attraction.Festival;
 import com.cavetale.halloween.util.Gui;
@@ -87,6 +88,14 @@ public final class HalloweenPlugin extends JavaPlugin {
     public Session sessionOf(Player player) {
         return sessionsMap.computeIfAbsent(player.getUniqueId(), u -> {
                 Session newSession = new Session(this, player);
+                newSession.load();
+                return newSession;
+            });
+    }
+
+    public Session sessionOf(PlayerCache player) {
+        return sessionsMap.computeIfAbsent(player.uuid, u -> {
+                Session newSession = new Session(this, player.uuid, player.name);
                 newSession.load();
                 return newSession;
             });

@@ -19,9 +19,13 @@ public final class Session {
     protected Tag tag;
 
     protected Session(final HalloweenPlugin plugin, final Player player) {
+        this(plugin, player.getUniqueId(), player.getName());
+    }
+
+    protected Session(final HalloweenPlugin plugin, final UUID uuid, final String name) {
         this.plugin = plugin;
-        this.uuid = player.getUniqueId();
-        this.name = player.getName();
+        this.uuid = uuid;
+        this.name = name;
         this.saveFile = new File(plugin.getPlayersFolder(), uuid + ".json");
     }
 
@@ -79,6 +83,13 @@ public final class Session {
 
     public void clearPrizeWaiting(Attraction attraction) {
         tag.prizesWaiting.remove(attraction.getUniqueKey());
+    }
+
+    public void reset() {
+        tag.totallyCompleted = false;
+        tag.cooldowns.clear();
+        tag.uniquesGot.clear();
+        tag.prizesWaiting.clear();
     }
 
     static final class Tag {

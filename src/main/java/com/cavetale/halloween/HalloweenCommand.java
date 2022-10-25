@@ -2,7 +2,9 @@ package com.cavetale.halloween;
 
 import com.cavetale.core.command.AbstractCommand;
 import com.cavetale.core.command.CommandArgCompleter;
+import com.cavetale.core.command.CommandNode;
 import com.cavetale.core.command.CommandWarn;
+import com.cavetale.core.playercache.PlayerCache;
 import com.cavetale.halloween.attraction.Attraction;
 import com.cavetale.halloween.attraction.AttractionType;
 import com.cavetale.halloween.attraction.Festival;
@@ -39,6 +41,12 @@ public final class HalloweenCommand extends AbstractCommand<HalloweenPlugin> {
             .description("Count attractions")
             .completers(CommandArgCompleter.supplyList(() -> List.copyOf(plugin.festivalMap.keySet())))
             .senderCaller(this::count);
+        CommandNode sessionNode = rootNode.addChild("session")
+            .description("Session subcommands");
+        sessionNode.addChild("reset").arguments("<player>")
+            .description("Reset player session")
+            .completers(CommandArgCompleter.PLAYER_CACHE)
+            .senderCaller(this::sessionReset);
     }
 
     private int requireInt(String arg) {
@@ -104,6 +112,16 @@ public final class HalloweenCommand extends AbstractCommand<HalloweenPlugin> {
             sender.sendMessage(counts.get(type) + " " + type);
         }
         sender.sendMessage(festival.getAttractionsMap().size() + " Total");
+        return true;
+    }
+
+    private boolean sessionReset(CommandSender sender, String[] args) {
+        if (args.length != 1) return false;
+        PlayerCache player = PlayerCache.require(args[0]);
+        Session session = plugin.sessionOf(player);
+        session.reset();
+        session.save();
+        plugin.clearSession(player.uuid);
         return true;
     }
 }

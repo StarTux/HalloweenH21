@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 /**
  * A "booth" is the static, plugin provided part of the Attraction
- * Configuration.
+ * Configuration for one individual attraction.
  */
 public interface Booth {
     AttractionType getType();
