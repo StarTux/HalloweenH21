@@ -19,11 +19,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import static net.kyori.adventure.text.Component.text;
 
 public final class MemoryAttraction extends Attraction<MemoryAttraction.SaveTag> {
-    protected static final Duration PLAY_TIME = Duration.ofSeconds(90);
     protected static final int REVEAL_TICKS = 30;
+    protected Duration playTime;
     protected List<Vec3i> memoryBlocks = new ArrayList<>();
     protected int secondsLeft;
-    protected int maxTries;
 
     protected MemoryAttraction(final AttractionConfiguration config) {
         super(config, SaveTag.class, SaveTag::new);
@@ -34,7 +33,7 @@ public final class MemoryAttraction extends Attraction<MemoryAttraction.SaveTag>
         }
         this.displayName = booth.format("Memory Game");
         this.description = text("Find matching pairs of blocks. Reveal 2 blocks at a time.");
-        this.maxTries = memoryBlocks.size();
+        this.playTime = Duration.ofSeconds(memoryBlocks.size() * 5);
     }
 
     @Override
@@ -180,7 +179,7 @@ public final class MemoryAttraction extends Attraction<MemoryAttraction.SaveTag>
         final Player player = getCurrentPlayer();
         if (player == null) return State.IDLE;
         final long now = System.currentTimeMillis();
-        final long timeout = saveTag.gameStarted + PLAY_TIME.toMillis();
+        final long timeout = saveTag.gameStarted + playTime.toMillis();
         if (!saveTag.complete) {
             if (now > timeout) {
                 timeout(player);
@@ -191,10 +190,6 @@ public final class MemoryAttraction extends Attraction<MemoryAttraction.SaveTag>
         if (saveTag.state == State.REVEAL) {
             saveTag.revealTicks += 1;
             if (saveTag.revealTicks >= REVEAL_TICKS) {
-                if (saveTag.tries >= maxTries) {
-                    fail(player);
-                    return State.IDLE;
-                }
                 return saveTag.complete
                     ? State.IDLE
                     : State.PICK_1;
@@ -266,8 +261,8 @@ public final class MemoryAttraction extends Attraction<MemoryAttraction.SaveTag>
     @Override
     public void onPlayerHud(PlayerHudEvent event) {
         event.bossbar(PlayerHudPriority.HIGHEST,
-                      makeProgressComponent(secondsLeft, Mytems.QUESTION_MARK, saveTag.tries, maxTries),
+                      makeProgressComponent(secondsLeft),
                       BossBar.Color.RED, BossBar.Overlay.PROGRESS,
-                      (float) secondsLeft / (float) PLAY_TIME.toSeconds());
+                      (float) secondsLeft / (float) playTime.toSeconds());
     }
 }
