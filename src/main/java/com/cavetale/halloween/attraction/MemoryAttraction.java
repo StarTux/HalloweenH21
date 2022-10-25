@@ -141,7 +141,7 @@ public final class MemoryAttraction extends Attraction<MemoryAttraction.SaveTag>
         saveTag.hiddenBlocks.clear();
         saveTag.foundBlocks.clear();
         for (int i = 0; i < memoryBlocks.size() / 2; i += 1) {
-            Material mat = hidden.get(i);
+            Material mat = hidden.get(i % hidden.size());
             saveTag.hiddenBlocks.add(mat);
             saveTag.hiddenBlocks.add(mat);
             saveTag.foundBlocks.add(false);
