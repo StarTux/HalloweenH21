@@ -40,8 +40,12 @@ public final class RepeatMelodyAttraction extends Attraction<RepeatMelodyAttract
         this.description = text("I'll give you a melody and you're gonna repeat it. It gets harder every round.");
         Random random2 = new Random(npcVector.hashCode());
         octave = random2.nextInt(2);
-        Instrument[] instruments = Instrument.values();
-        instrument = instruments[random2.nextInt(instruments.length)];
+        List<Instrument> instruments = new ArrayList<>();
+        for (Instrument it : Instrument.values()) instruments.add(it);
+        instruments.remove(Instrument.BASS_DRUM);
+        instruments.remove(Instrument.SNARE_DRUM);
+        instruments.remove(Instrument.STICKS);
+        instrument = instruments.get(random2.nextInt(instruments.size()));
         makeMelody(random2);
     }
 
