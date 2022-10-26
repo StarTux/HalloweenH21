@@ -539,6 +539,10 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         player.spawnParticle(Particle.SPELL_MOB, location, 16, 0.25, 0.25, 0.25, 1.0);
     }
 
+    protected final void confetti(Location location) {
+        location.getWorld().spawnParticle(Particle.SPELL_MOB, location, 16, 0.25, 0.25, 0.25, 1.0);
+    }
+
     protected final void highlight(Player player, Location location) {
         Particle.DustOptions dustOptions = new Particle.DustOptions(Color.WHITE, 4.0f);
         player.spawnParticle(Particle.REDSTONE, location, 4, 1.0, 1.0, 1.0, 1.0, dustOptions);
