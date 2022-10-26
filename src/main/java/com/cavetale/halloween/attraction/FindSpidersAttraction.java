@@ -23,6 +23,7 @@ import org.bukkit.SoundCategory;
 import org.bukkit.Tag;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.CaveSpider;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -148,11 +149,23 @@ public final class FindSpidersAttraction extends Attraction<FindSpidersAttractio
         }
     }
 
+    private static final List<BlockFace> ADJACENT = List.of(BlockFace.UP, BlockFace.DOWN,
+                                                            BlockFace.NORTH, BlockFace.SOUTH,
+                                                            BlockFace.EAST, BlockFace.WEST);
+
     protected void makeSpiderBlocks() {
         List<Vec3i> spiderBlocks = new ArrayList<>(possibleSpiderBlocks);
         World w = world;
         spiderBlocks.removeIf(it -> {
                 Block block = it.toBlock(w);
+                boolean adjacent = false;
+                for (BlockFace face : ADJACENT) {
+                    if (!block.getRelative(face).getCollisionShape().getBoundingBoxes().isEmpty()) {
+                        adjacent = true;
+                        break;
+                    }
+                }
+                if (!adjacent) return true;
                 if (block.isEmpty()) return false;
                 Material mat = block.getType();
                 if (Tag.WOOL_CARPETS.isTagged(mat)) return false;
