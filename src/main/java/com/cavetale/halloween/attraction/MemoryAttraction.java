@@ -9,10 +9,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import net.kyori.adventure.bossbar.BossBar;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerInteractEvent;
 import static net.kyori.adventure.text.Component.text;
@@ -133,10 +135,6 @@ public final class MemoryAttraction extends Attraction<MemoryAttraction.SaveTag>
         List<Material> hidden = new ArrayList<>();
         hidden.addAll(hiddenMaterials);
         Collections.shuffle(hidden);
-        int count = 0;
-        for (Vec3i vec : memoryBlocks) {
-            vec.toBlock(world).setType(Material.SMOOTH_STONE);
-        }
         saveTag.hiddenBlocks.clear();
         saveTag.foundBlocks.clear();
         for (int i = 0; i < memoryBlocks.size() / 2; i += 1) {
@@ -147,6 +145,11 @@ public final class MemoryAttraction extends Attraction<MemoryAttraction.SaveTag>
             saveTag.foundBlocks.add(false);
         }
         Collections.shuffle(saveTag.hiddenBlocks);
+        saveTag.originalBlockData.clear();
+        for (Vec3i vector : memoryBlocks) {
+            Block block = vector.toBlock(world);
+            saveTag.originalBlockData.add(block.getBlockData().getAsString());
+        }
     }
 
     private void hideBlocks() {
@@ -162,13 +165,15 @@ public final class MemoryAttraction extends Attraction<MemoryAttraction.SaveTag>
     }
 
     private void clearBlocks() {
-        for (int i = 0; i < memoryBlocks.size(); i += 1) {
+        for (int i = 0; i < saveTag.originalBlockData.size(); i += 1) {
             Vec3i vector = memoryBlocks.get(i);
             Block block = vector.toBlock(world);
-            block.setType(Material.AIR);
+            BlockData original = Bukkit.createBlockData(saveTag.originalBlockData.get(i));
+            block.setBlockData(original, false);
         }
         saveTag.hiddenBlocks.clear();
         saveTag.foundBlocks.clear();
+        saveTag.originalBlockData.clear();
         saveTag.revealedIndex = -1;
         saveTag.revealTicks = 0;
         saveTag.complete = false;
@@ -251,6 +256,7 @@ public final class MemoryAttraction extends Attraction<MemoryAttraction.SaveTag>
         protected long gameStarted;
         protected List<Material> hiddenBlocks = new ArrayList<>();
         protected List<Boolean> foundBlocks = new ArrayList<>();
+        protected List<String> originalBlockData = new ArrayList<>();
         protected int revealedIndex = -1;
         protected int revealTicks;
         protected boolean complete;
