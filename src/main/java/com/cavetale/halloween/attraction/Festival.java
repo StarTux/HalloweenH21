@@ -86,7 +86,7 @@ public final class Festival {
         for (Map.Entry<String, List<Area>> entry : areasFile.areas.entrySet()) {
             String name = entry.getKey();
             if (name.equals(TOTAL_COMPLETION)) {
-                Location location = entry.getValue().get(0).min.toLocation(world);
+                Location location = entry.getValue().get(0).min.toCenterFloorLocation(world);
                 this.totalCompletionVillager = PluginSpawn.register(plugin(), ZoneType.HALLOWEEN, Loc.of(location));
                 this.totalCompletionVillager.setOnPlayerClick(this::clickTotalCompletionVillager);
                 this.totalCompletionVillager.setOnMobSpawning(mob -> mob.setCollidable(false));
