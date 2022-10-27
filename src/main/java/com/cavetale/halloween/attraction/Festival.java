@@ -158,7 +158,7 @@ public final class Festival {
             }
         }
         if (locked >= total) {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kite member HalloweenComplete " + player.getName());
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kite member HalloweenComplete2022 " + player.getName());
             session.lockTotallyCompleted();
             session.save();
             Attraction.perfect(player, true);
