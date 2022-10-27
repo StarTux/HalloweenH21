@@ -292,6 +292,12 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         return item.clone();
     }
 
+    private static final List<ItemStack> CANDY = List
+        .of(Mytems.CANDY_CORN.createItemStack(),
+            Mytems.CHOCOLATE_BAR.createItemStack(),
+            Mytems.LOLLIPOP.createItemStack(),
+            Mytems.ORANGE_CANDY.createItemStack());
+
     /**
      * Give unique prize in a chest and update the session.
      */
@@ -303,8 +309,8 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
         giveInGui(player, booth.getFirstCompletionReward().clone(),
                   booth.getEntryFee().clone(),
                   new ItemStack(Material.DIAMOND),
-                  new ItemStack(Material.EMERALD),
-                  new ItemStack(Material.EMERALD));
+                  CANDY.get(random.nextInt(CANDY.size())).clone(),
+                  CANDY.get(random.nextInt(CANDY.size())).clone());
     }
 
     /**
