@@ -12,7 +12,10 @@ import org.bukkit.inventory.ItemStack;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.NamedTextColor.*;
 
-public final class Booth2022 implements Booth {
+public final class TwinGourds implements Booth {
+    public static final TwinGourds INSTANCE = new TwinGourds();
+    public static final Festival FESTIVAL = new Festival("twin_gourds", s -> INSTANCE);
+
     @Override
     public AttractionType getType() {
         return null;

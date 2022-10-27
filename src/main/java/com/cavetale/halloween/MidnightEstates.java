@@ -24,7 +24,7 @@ import static net.kyori.adventure.text.format.NamedTextColor.*;
  * Static information for Attractions.
  */
 @Getter
-public enum Booth2021 implements Booth {
+public enum MidnightEstates implements Booth {
     // Music Hero 8
     MOUNTAIN_HERO(AttractionType.MUSIC_HERO,
                   null, Component.text("Thanks for visiting me up here."
@@ -289,8 +289,7 @@ public enum Booth2021 implements Booth {
                                                 + " Nobody's faster than me!"),
                            null, null);
 
-    public static final Festival FESTIVAL = new Festival("halloween", Booth2021::forName);
-
+    public static final Festival FESTIVAL = new Festival("midnight_estates", MidnightEstates::forName);
     private final String name; // Corresponds with area.name
     private final AttractionType type;
     private final Component displayName;
@@ -298,7 +297,7 @@ public enum Booth2021 implements Booth {
     private final Mytems reward;
     private final Consumer<Attraction> consumer;
 
-    Booth2021(final AttractionType type,
+    MidnightEstates(final AttractionType type,
           final Component displayName,
           final Component description,
           final Mytems reward,
@@ -313,8 +312,8 @@ public enum Booth2021 implements Booth {
         this.consumer = consumer;
     }
 
-    public static Booth2021 forName(String n) {
-        for (Booth2021 booth : Booth2021.values()) {
+    public static MidnightEstates forName(String n) {
+        for (MidnightEstates booth : MidnightEstates.values()) {
             if (n.equals(booth.name)) return booth;
         }
         return null;

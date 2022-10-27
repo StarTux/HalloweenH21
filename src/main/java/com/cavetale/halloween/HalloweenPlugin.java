@@ -50,9 +50,8 @@ public final class HalloweenPlugin extends JavaPlugin {
     }
 
     public void loadFestivals() {
-        loadFestival(Booth2021.FESTIVAL);
-        loadFestival(new Festival("twin_gourds", s -> new Booth2022()));
-
+        loadFestival(MidnightEstates.FESTIVAL);
+        loadFestival(TwinGourds.FESTIVAL);
     }
 
     private void loadFestival(Festival festival) {
