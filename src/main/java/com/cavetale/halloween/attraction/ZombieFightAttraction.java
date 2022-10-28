@@ -75,6 +75,7 @@ public final class ZombieFightAttraction extends Attraction<ZombieFightAttractio
     protected void spawnZombies() {
         zombieBlocks.removeIf(v -> {
                 Block block = v.toBlock(world);
+                if (!block.getRelative(0, 1, 0).isEmpty()) return true;
                 if (block.isEmpty()) return false;
                 Material mat = block.getType();
                 if (Tag.WOOL_CARPETS.isTagged(mat)) return false;
