@@ -12,7 +12,7 @@ public enum AttractionType {
     RACE(RaceAttraction.class, RaceAttraction::new),
     MUSIC_HERO(MusicHeroAttraction.class, MusicHeroAttraction::new),
     POSTER(PosterAttraction.class, PosterAttraction::new),
-    SNOWBALL_FIGHT(SnowballFightAttraction.class, SnowballFightAttraction::new),
+    SNOWBALL_FIGHT(ZombieFightAttraction.class, ZombieFightAttraction::new),
     MEMORY(MemoryAttraction.class, MemoryAttraction::new),
     FIND_GHOSTS(FindGhostsAttraction.class, FindGhostsAttraction::new),
     CARVE_PUMPKIN(CarvePumpkinAttraction.class, CarvePumpkinAttraction::new),

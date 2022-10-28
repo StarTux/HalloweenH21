@@ -13,6 +13,7 @@ import com.cavetale.mytems.event.music.PlayerBeatEvent;
 import com.cavetale.mytems.event.music.PlayerCloseMusicalInstrumentEvent;
 import com.cavetale.mytems.event.music.PlayerMelodyCompleteEvent;
 import com.cavetale.mytems.event.music.PlayerOpenMusicalInstrumentEvent;
+import com.destroystokyo.paper.event.entity.ThrownEggHatchEvent;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -160,6 +161,14 @@ public final class EventListener implements Listener {
                                                vec.z - event.getMinZ(),
                                                8);
             event.getCursors().addCursor(mapCursor);
+        }
+    }
+
+    @EventHandler
+    protected void onThrownEggHatch(ThrownEggHatchEvent event) {
+        Festival festival = plugin.getFestival(event.getEgg().getWorld());
+        if (festival != null) {
+            event.setHatching(false);
         }
     }
 
