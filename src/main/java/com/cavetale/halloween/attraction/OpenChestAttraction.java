@@ -90,6 +90,7 @@ public final class OpenChestAttraction extends Attraction<OpenChestAttraction.Sa
         giveReward(player, bingo);
         Session session = plugin.sessionOf(player);
         if (bingo) {
+            perfect(player);
             session.setCooldown(this, completionCooldown);
         } else {
             session.setCooldown(this, (session.isUniqueLocked(this)
