@@ -47,6 +47,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -273,6 +274,8 @@ public abstract class Attraction<T extends Attraction.SaveTag> {
     public void onEntityDamage(EntityDamageEvent event) { }
 
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) { }
+
+    public void onEntityCombust(EntityCombustEvent event) { }
 
     public void onPlayerInteract(PlayerInteractEvent event) { }
 

@@ -23,6 +23,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -94,6 +95,13 @@ public final class EventListener implements Listener {
             if (!attraction.isInArea(location)) continue;
             attraction.onEntityDamageByEntity(event);
         }
+    }
+
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)
+    protected void onEntityCombust(EntityCombustEvent event) {
+        Attraction attraction = plugin.getAttraction(event.getEntity().getLocation());
+        if (attraction == null) return;
+        attraction.onEntityCombust(event);
     }
 
     @EventHandler(ignoreCancelled = false, priority = EventPriority.LOWEST)

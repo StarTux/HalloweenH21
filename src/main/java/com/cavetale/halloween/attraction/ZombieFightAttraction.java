@@ -27,6 +27,7 @@ import org.bukkit.entity.Egg;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
+import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
@@ -305,7 +306,14 @@ public final class ZombieFightAttraction extends Attraction<ZombieFightAttractio
 
     @Override
     public void onEntityDamage(EntityDamageEvent event) {
-        if (event.getCause() == EntityDamageEvent.DamageCause.MELTING) {
+        if (event.getEntity() instanceof Zombie zombie) {
+            event.setCancelled(true);
+        }
+    }
+
+    @Override
+    public void onEntityCombust(EntityCombustEvent event) {
+        if (event.getEntity() instanceof Zombie zombie) {
             event.setCancelled(true);
         }
     }
