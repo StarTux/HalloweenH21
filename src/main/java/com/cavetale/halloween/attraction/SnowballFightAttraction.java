@@ -82,7 +82,7 @@ public final class SnowballFightAttraction extends Attraction<SnowballFightAttra
                 if (Tag.CROPS.isTagged(mat)) return false;
                 switch (mat) {
                 case COBWEB:
-                case GRASS:
+                case SHORT_GRASS:
                 case PUMPKIN_STEM:
                 case MELON_STEM:
                 case CARROTS:
